@@ -9,9 +9,10 @@
     "jquery-csv": "^1.0.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.8.0",
+    "react-router-dom": "^6.8.1",
     "react-scripts": "5.0.1",
     "recharts": "^2.3.2",
+    "styled-components": "^5.3.6",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
