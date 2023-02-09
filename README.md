@@ -36,6 +36,22 @@ npm install
 npm run start
 ```
 
+# Server Links
+
+After starting up the development server, there are a handful of useful things you can view in your browser if you go the following links
+
+- http://127.0.0.1:8000/docs# - provides documentation on all the available routes the server provides. It also gives you the option to execute the corresponding requests these routes accept
+
+- http://127.0.0.1:8000/redoc - provides all responses the server has given and the specific errors they may have had
+
+- http://127.0.0.1:8000/ - this is the root route, which is currently a basic get request saying "Hello World". You can make sure you get a page saying "Hello World" with this link to ensure the server is running
+
+# Frontend Links
+
+There is not much for links here, just the one that connects you to the client, which should open by default
+
+- http://localhost:3000/
+
 # Recommended Dev Tools
 
 While these tools are not required, these are good tools to use in your development environment. Assuming you are a student of the University of Minnesota, all of these should be free through the school
