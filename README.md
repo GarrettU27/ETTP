@@ -2,6 +2,10 @@
 
 This is the repository for the ECG Training Tool Project, or ETTP for short. It is a web application meant to train people in identifying various arrhythmias in ECGs. The backend is implemented using [FastAPI](https://fastapi.tiangolo.com/) with [pymongo]([pymongo · PyPI](https://pypi.org/project/pymongo/)) used to connect to an instance of [MongoDB](https://www.mongodb.com/). The frontend is implemented using [React](https://reactjs.org/).
 
+
+
+[PyMongo Tutorial: MongoDB And Python | MongoDB](https://www.mongodb.com/languages/python/pymongo-tutorial) served as a good basis for the project, and helped with setting up many of the features
+
 # Setting Up the Project
 
 1. Install [MongoDB Community Server](https://www.mongodb.com/try/download/community). Use the complete setup type. Keep the options default, but make sure you install MongoDB Compass 
@@ -13,7 +17,7 @@ This is the repository for the ECG Training Tool Project, or ETTP for short. It 
 4. In the server folder, run 
 
 ```bash
-pip install "fastapi[all]" "pymongo[srv]"
+pip install "fastapi[all]" "pymongo[srv]" python-dotenv
 ```
 
 5. Then, run the following command to start the server

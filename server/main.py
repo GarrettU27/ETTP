@@ -2,10 +2,31 @@ from enum import Enum
 from fastapi import FastAPI
 from typing import Union
 from pydantic import BaseModel
+from dotenv import dotenv_values
+from pymongo import MongoClient
 
 from pymongo_get_database import get_database
 
+config = dotenv_values(".env")
+
 app = FastAPI()
+
+# Initialize to none. They will be given values at startup.
+# This is mainly to get autocompletion on other functions
+app.mongodb_client = None
+app.database = None
+
+
+@app.on_event("startup")
+def startup_db_client():
+    app.mongodb_client = MongoClient(config["DB_URI"])
+    app.database = app.mongodb_client[config["DB_NAME"]]
+    print("Connected to the MongoDB database!")
+
+
+@app.on_event("shutdown")
+def shutdown_db_client():
+    app.mongodb_client.close()
 
 
 @app.get("/")
@@ -53,5 +74,4 @@ async def create_item(item: Item):
 
 @app.get("/db")
 def get_database_name():
-    dbname = get_database()
-    return dbname.name
+    return app.database.name
