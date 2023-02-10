@@ -1,5 +1,6 @@
 import {MainButton} from "../components/Button";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 const Center = styled.div`
   display: flex;
@@ -11,10 +12,12 @@ const Center = styled.div`
 `
 
 function Root() {
+  const navigate = useNavigate();
+
   return(
     <Center>
-      <MainButton>Training</MainButton>
-      <MainButton>Test</MainButton>
+      <MainButton onClick={() => navigate("/training")}>Training</MainButton>
+      <MainButton onClick={() => navigate("/testing")}>Test</MainButton>
     </Center>
   )
 }
