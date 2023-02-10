@@ -14,31 +14,43 @@ This is the repository for the ECG Training Tool Project, or ETTP for short. It 
 
 3. Install [Python 3.11.2](https://www.python.org/downloads/) (current latest installation of Python)
 
-4. In the server folder, run 
+4. For installing the Python libraries, I heavily recommend creating a virtual environment first. First, you will create a virtual environment in the server folder with the following command
+   
+   ```bash
+   python -m venv venv
+   ```
+   
+   After that, you run the script you generated to activate your virtual environment. On Windows, that would look like the following
+   
+   ```bash
+   .\venv\Scripts\activate
+   ```
 
-```bash
-pip install "fastapi[all]" "pymongo[srv]" python-dotenv
-```
+5. Then, in the server folder, run the following command
+   
+   ```bash
+   pip install "fastapi[all]" "pymongo[srv]" python-dotenv numpy matplotlib
+   ```
 
-5. Then, run the following command to start the server
+6. Then, run the following command to start the server
+   
+   ```bash
+   uvicorn main:app --reload
+   ```
 
-```bash
-uvicorn main:app --reload
-```
+7. Install [Node 18.14.0](https://nodejs.org/en/) (current LTS version of NodeJS)
 
-6. Install [Node 18.14.0](https://nodejs.org/en/) (current LTS version of NodeJS)
+8. In the client folder, first run
+   
+   ```bash
+   npm install
+   ```
 
-7. In the client folder, first run
-
-```bash
-npm install
-```
-
-8. Then, use the following command to start the client
-
-```bash
-npm run start
-```
+9. Then, use the following command to start the client
+   
+   ```bash
+   npm run start
+   ```
 
 # Server Links
 
