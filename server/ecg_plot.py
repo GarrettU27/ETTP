@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 # code pulled from https://github.com/dy1901/ecg_plot
+import base64
+import urllib
 
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
 import os
 from math import ceil
+import io
 
 
 def _ax_plot(ax, x, y, secs=10, lwidth=0.5, amplitude_ecg=1.8, time_ticks=0.2):
@@ -269,6 +272,18 @@ def save_as_svg(file_name, path=DEFAULT_PATH):
     plt.ioff()
     plt.savefig(path + file_name + '.svg')
     plt.close()
+
+
+def return_svg_bytes():
+    fig = plt.gcf()
+    plt.ioff()
+
+    buf = io.BytesIO()
+    fig.savefig(buf, format="svg")
+    buf.seek(0)
+
+    return buf.read()
+
 
 
 def save_as_jpg(file_name, path=DEFAULT_PATH):

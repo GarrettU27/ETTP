@@ -5,8 +5,6 @@ from pydantic import BaseModel
 from dotenv import dotenv_values
 from pymongo import MongoClient
 
-from pymongo_get_database import get_database
-
 config = dotenv_values(".env")
 
 app = FastAPI()
