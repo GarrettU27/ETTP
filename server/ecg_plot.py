@@ -285,6 +285,17 @@ def return_svg_bytes():
     return buf.read()
 
 
+def return_png_bytes():
+    fig = plt.gcf()
+    plt.ioff()
+
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=300)
+    buf.seek(0)
+
+    return buf.read()
+
+
 
 def save_as_jpg(file_name, path=DEFAULT_PATH):
     """Plot multi lead ECG chart.

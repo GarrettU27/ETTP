@@ -2,8 +2,6 @@
 
 This is the repository for the ECG Training Tool Project, or ETTP for short. It is a web application meant to train people in identifying various arrhythmias in ECGs. The backend is implemented using [FastAPI](https://fastapi.tiangolo.com/) with [pymongo]([pymongo · PyPI](https://pypi.org/project/pymongo/)) used to connect to an instance of [MongoDB](https://www.mongodb.com/). The frontend is implemented using [React](https://reactjs.org/).
 
-
-
 [PyMongo Tutorial: MongoDB And Python | MongoDB](https://www.mongodb.com/languages/python/pymongo-tutorial) served as a good basis for the project, and helped with setting up many of the features
 
 # Setting Up the Project
@@ -25,6 +23,8 @@ This is the repository for the ECG Training Tool Project, or ETTP for short. It 
    ```bash
    .\venv\Scripts\activate
    ```
+   
+   Note that you might need to enable the ability to run scripts on your system
 
 5. Then, in the server folder, run the following command
    

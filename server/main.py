@@ -1,9 +1,12 @@
 from enum import Enum
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from typing import Union
 from pydantic import BaseModel
 from dotenv import dotenv_values
 from pymongo import MongoClient
+from ecg_plot import plot, show, return_svg_bytes, return_png_bytes
+from scipy.io import loadmat
+import numpy as np
 
 config = dotenv_values(".env")
 
@@ -30,6 +33,42 @@ def shutdown_db_client():
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+
+def convert_to_millivolts(microvolts: int):
+    # the data is in microvolts, convert to millivolts
+    return microvolts/1000
+
+
+@app.get("/ecg-svg")
+def get_ecg_svg():
+    mat = loadmat("./JS00001.mat")
+    data = mat["val"]
+    ecg = []
+
+    for ecg_lead in data:
+        ecg.append([convert_to_millivolts(bits) for bits in ecg_lead])
+
+    ecg = np.array(ecg)
+
+    plot(ecg)
+    return Response(content=return_svg_bytes(), media_type="application/xml")
+
+
+@app.get("/ecg-png")
+def get_ecg_png():
+    mat = loadmat("./JS00001.mat")
+    data = mat["val"]
+    ecg = []
+
+    for ecg_lead in data:
+        ecg.append([convert_to_millivolts(bits) for bits in ecg_lead])
+
+    ecg = np.array(ecg)
+
+    plot(ecg)
+
+    return Response(content=return_png_bytes(), media_type="image/png")
 
 
 @app.get("/items/{item_id}")
