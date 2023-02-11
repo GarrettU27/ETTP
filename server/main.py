@@ -36,6 +36,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# https://fastapi.tiangolo.com/advanced/middleware/#gzipmiddleware
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
