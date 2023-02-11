@@ -14,7 +14,10 @@ const router = createBrowserRouter([
   },
   {
     path: "/training",
-    element: <Training />
+    element: <Training />,
+    loader: async () => {
+      return await fetch("http://127.0.0.1:8000/ecg-png")
+    }
   },
   {
     path: "/testing",

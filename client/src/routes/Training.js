@@ -1,6 +1,10 @@
+import {useLoaderData} from "react-router-dom";
+
 function Training() {
+  const image = useLoaderData()
+
   return(
-    <p>Training</p>
+    <img src={image}  alt={"ECG Plot"}/>
   )
 }
 

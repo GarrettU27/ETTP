@@ -1,5 +1,7 @@
+import base64
 from enum import Enum
 from fastapi import FastAPI, Response
+from fastapi.middleware.cors import CORSMiddleware
 from typing import Union
 from pydantic import BaseModel
 from dotenv import dotenv_values
@@ -16,6 +18,22 @@ app = FastAPI()
 # This is mainly to get autocompletion on other functions
 app.mongodb_client = None
 app.database = None
+
+
+# this deals with some security errors we'd have attempting to pull data from the backend in a dev environment
+# for deployment, this permissive security policy would have to be dealt with
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")
@@ -68,7 +86,12 @@ def get_ecg_png():
 
     plot(ecg)
 
-    return Response(content=return_png_bytes(), media_type="image/png")
+    png_bytes = return_png_bytes()
+    encoded_bytes = base64.b64encode(png_bytes)
+    encoded_bytes_string = encoded_bytes.decode('ascii')
+    base64_string = f"data:image/png;base64,{encoded_bytes_string}"
+
+    return Response(content=base64_string, media_type="image/png")
 
 
 @app.get("/items/{item_id}")
