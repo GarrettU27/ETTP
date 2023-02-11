@@ -4,7 +4,7 @@ function Training() {
   const image = useLoaderData()
 
   return(
-    <img src={image}  alt={"ECG Plot"}/>
+    <img width={"100%"} src={image}  alt={"ECG Plot"}/>
   )
 }
 
