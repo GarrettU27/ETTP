@@ -9,6 +9,7 @@ from matplotlib.ticker import AutoMinorLocator
 import os
 from math import ceil
 import io
+from PIL import Image
 
 
 def _ax_plot(ax, x, y, secs=10, lwidth=0.5, amplitude_ecg=1.8, time_ticks=0.2):
@@ -290,10 +291,20 @@ def return_png_bytes():
     plt.ioff()
 
     buf = io.BytesIO()
-    fig.savefig(buf, format="png", dpi=300)
+    fig.savefig(buf, format="png", dpi=150)
     buf.seek(0)
 
-    return buf.read()
+    # compress image
+    # https://stackoverflow.com/questions/10784652/png-options-to-produce-smaller-file-size-when-using-savefig
+    # https://stackoverflow.com/questions/35004067/compress-png-image-in-python-using-pil
+    image = Image.open(buf)
+    compressed_image = image.convert('RGB').convert('P', palette=Image.ADAPTIVE)
+
+    buf2 = io.BytesIO()
+    compressed_image.save(buf2, format='PNG')
+    buf2.seek(0)
+
+    return buf2.read()
 
 
 

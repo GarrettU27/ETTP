@@ -2,6 +2,7 @@ import base64
 from enum import Enum
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from typing import Union
 from pydantic import BaseModel
 from dotenv import dotenv_values
@@ -34,6 +35,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
 @app.on_event("startup")
