@@ -29,7 +29,7 @@ This is the repository for the ECG Training Tool Project, or ETTP for short. It 
 5. Then, in the server folder, run the following command
    
    ```bash
-   pip install "fastapi[all]" "pymongo[srv]" python-dotenv numpy matplotlib scipy neurokit2 
+   pip install numpy matplotlib scipy neurokit2 
    ```
 
 6. Then, run the following command to start the server
