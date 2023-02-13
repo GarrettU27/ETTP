@@ -95,7 +95,7 @@ def get_ecg_png():
     encoded_bytes_string = encoded_bytes.decode('ascii')
     base64_string = f"data:image/png;base64,{encoded_bytes_string}"
 
-    return Response(content=base64_string, media_type="image/png")
+    return base64_string
 
 
 @app.get("/items/{item_id}")
