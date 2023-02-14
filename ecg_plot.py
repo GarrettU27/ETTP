@@ -133,7 +133,7 @@ def plot(
     rows = int(ceil(leads / columns))
     # display_factor = 2.5
     display_factor = 1
-    line_width = 0.5
+    line_width = 1
     fig, ax = plt.subplots(figsize=(secs * columns * display_factor, rows * row_height / 5 * display_factor))
     display_factor = display_factor ** 0.5
     fig.subplots_adjust(
@@ -157,15 +157,21 @@ def plot(
         color_minor = (0.75, 0.75, 0.75)
         color_line = (0, 0, 0)
     else:
+        # color_major = (1, 0, 0)
+        # color_minor = (1, 0.7, 0.7)
+        # color_line = (0, 0, 0.7)
         color_major = (1, 0, 0)
         color_minor = (1, 0.7, 0.7)
-        color_line = (0, 0, 0.7)
+        color_line = (0, 0, 0)
 
     if (show_grid):
         ax.set_xticks(np.arange(x_min, x_max, 0.2))
         ax.set_yticks(np.arange(y_min, y_max, 0.5))
 
         ax.minorticks_on()
+
+        ax.set_yticklabels([])
+        ax.set_xticklabels([])
 
         ax.xaxis.set_minor_locator(AutoMinorLocator(5))
 

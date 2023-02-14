@@ -1,5 +1,5 @@
 import base64
-from ecg_plot import plot, show, return_svg_bytes, return_png_bytes
+from ecg_plot import plot, plot_12, plot_1, show, return_svg_bytes, return_png_bytes
 from scipy.io import loadmat
 import numpy as np
 
@@ -35,9 +35,4 @@ def get_ecg_png():
 
     plot(ecg)
 
-    png_bytes = return_png_bytes()
-    encoded_bytes = base64.b64encode(png_bytes)
-    encoded_bytes_string = encoded_bytes.decode('ascii')
-    base64_string = f"data:image/png;base64,{encoded_bytes_string}"
-
-    return base64_string
+    return return_png_bytes()
