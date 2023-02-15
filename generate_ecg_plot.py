@@ -10,21 +10,21 @@ def convert_to_millivolts(microvolts: int):
 
 
 def get_ecg_svg():
-    mat = loadmat("./JS00001.mat")
+    mat = loadmat("JS00001.mat")
     data = mat["val"]
     ecg = []
 
     for ecg_lead in data:
-        ecg.append([convert_to_millivolts(bits) for bits in ecg_lead])
+        ecg.append([convert_to_millivolts(bits) for bits in ecg_lead][0:1300])
 
     ecg = np.array(ecg)
 
-    plot(ecg)
+    plot(ecg, columns=3)
     return return_svg_bytes()
 
 
 def get_ecg_png():
-    mat = loadmat("./JS00001.mat")
+    mat = loadmat("JS00001.mat")
     data = mat["val"]
     ecg = []
 
