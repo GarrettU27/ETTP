@@ -10,25 +10,25 @@ con = get_sqlite_connection()
 cur = con.cursor()
 
 # drop the table if it exists
-cur.execute("DROP TABLE IF EXISTS ecg")
+cur.execute("DROP TABLE IF EXISTS patient")
 cur.execute("DROP TABLE IF EXISTS diagnosis")
 cur.execute("DROP TABLE IF EXISTS arrhythmia")
 
 
 cur.execute("""
-CREATE TABLE ecg (
+CREATE TABLE patient (
     id INTEGER PRIMARY KEY, 
     age, 
     sex, 
-    graph ARRAY
+    ecg ARRAY
 )""")
 
 cur.execute("""
 CREATE TABLE diagnosis (
     id INTEGER PRIMARY KEY, 
-    ecg_id INT,
+    patient_id INT,
     arrhythmia_id INT,
-    FOREIGN KEY(ecg_id) REFERENCES ecg(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(patient_id) REFERENCES patient(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY(arrhythmia_id) REFERENCES arrhythmia(id) ON DELETE CASCADE ON UPDATE CASCADE 
 )""")
 
@@ -57,9 +57,9 @@ def process_mat_file(mat_fname):
 
 
 def add_to_db(hea_data, mat_data):
-    cur.execute("INSERT INTO ecg VALUES(NULL, ?, ?, ?)",
+    cur.execute("INSERT INTO patient VALUES(NULL, ?, ?, ?)",
                 (hea_data['Age'], hea_data['Sex'], mat_data))
-    ecg_row_id = cur.lastrowid
+    patient_row_id = cur.lastrowid
 
     arrhythmia_codes = hea_data['Dx'].split(',')
 
@@ -69,7 +69,7 @@ def add_to_db(hea_data, mat_data):
 
         if arrhythmia_row is not None:
             arrhythmia_row_id = arrhythmia_row[0]
-            cur.execute("INSERT INTO diagnosis VALUES(NULL, ?, ?)", (ecg_row_id, arrhythmia_row_id))
+            cur.execute("INSERT INTO diagnosis VALUES(NULL, ?, ?)", (patient_row_id, arrhythmia_row_id))
 
 
 

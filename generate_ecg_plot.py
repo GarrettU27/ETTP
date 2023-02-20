@@ -19,7 +19,7 @@ def get_ecg_svg():
 
     ecg = np.array(ecg)
 
-    plot(ecg, columns=3)
+    plot(ecg, columns=4)
     return return_svg_bytes()
 
 
