@@ -3,10 +3,10 @@
 
 from PyQt6.QtWidgets import QApplication
 import sys
-from window import Window
+from mainwindow import MainWindow
 
 
 app = QApplication(sys.argv)
-window = Window()
+window = MainWindow()
 window.show()
 sys.exit(app.exec())
