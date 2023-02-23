@@ -11,7 +11,7 @@ class BurgerMenu(QListWidget):
 
         self.animation = QtCore.QPropertyAnimation(self, b"maximumWidth")
         self.animation.setDuration(125)
-        self.animation.setEasingCurve(QtCore.QEasingCurve.Type.InOutQuart)
+        self.animation.setEasingCurve(QtCore.QEasingCurve.Type.OutCubic)
 
         self.openWidth = width
         self.setMaximumWidth(self.openWidth)
