@@ -25,7 +25,7 @@ This is the repository for the ECG Training Tool Project, or ETTP for short. It 
 3. Then, run the following command
    
    ```bash
-   pip install numpy matplotlib scipy neurokit2 PyQt6
+   pip install numpy matplotlib scipy neurokit2 PyQt6 qtawesome
    ```
 
 4. To run the application, run the following command

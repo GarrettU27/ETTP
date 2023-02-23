@@ -1,14 +1,16 @@
 import PyQt6
+import qtawesome
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QVBoxLayout, QWidget, QMainWindow, QStackedWidget, QHBoxLayout, \
-    QListWidget, QPushButton
+    QListWidget, QPushButton, QTreeWidget, QTreeWidgetItem
 
 from burger_menu import BurgerMenu
 from pages.home import Home
 from pages.testing import Testing
 from pages.training import Training
 from pages.welcome import Welcome
+
 
 
 class MainWindow(QMainWindow):
@@ -44,10 +46,38 @@ class MainWindow(QMainWindow):
         self.stackedWidget.addWidget(testing)
 
         self.page_list = BurgerMenu(250)
-        self.page_list.addItem("Home")
-        self.page_list.addItem("Welcome")
-        self.page_list.addItem("Training")
-        self.page_list.addItem("Testing")
+        home = QTreeWidgetItem(["Home"])
+        home.setIcon(0, qtawesome.icon("fa5s.home"))
+
+        about_us = QTreeWidgetItem(["About Us"])
+        about_us.setIcon(0, qtawesome.icon("fa5s.address-card"))
+
+        train = QTreeWidgetItem(["Train"])
+        train.setIcon(0, qtawesome.icon("fa5s.globe"))
+
+        train.addChild(QTreeWidgetItem(["Start New"]))
+        train.addChild(QTreeWidgetItem(["Reading an ECG Strip"]))
+        train.addChild(QTreeWidgetItem(["Lead Placements"]))
+
+        test = QTreeWidgetItem(["Test"])
+        test.setIcon(0, qtawesome.icon("fa5s.pen-nib"))
+
+        test.addChild(QTreeWidgetItem(["Start New"]))
+        test.addChild(QTreeWidgetItem(["Last Score"]))
+        test.addChild(QTreeWidgetItem(["Resume"]))
+
+        tools = QTreeWidgetItem(["Tools"])
+        tools.setIcon(0, qtawesome.icon("fa5s.wrench"))
+
+        manage = QTreeWidgetItem(["Manage"])
+        manage.setIcon(0, qtawesome.icon("fa5s.cog"))
+
+        self.page_list.addTopLevelItem(home)
+        self.page_list.addTopLevelItem(about_us)
+        self.page_list.addTopLevelItem(train)
+        self.page_list.addTopLevelItem(test)
+        self.page_list.addTopLevelItem(tools)
+        self.page_list.addTopLevelItem(manage)
         self.page_list.itemClicked.connect(self.switch_page)
 
         self.burger_button = QPushButton("BURGER")
@@ -63,10 +93,10 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(default_window)
 
     def switch_page(self, item):
-        match item.text():
+        match item.text(0):
             case "Home":
                 self.stackedWidget.setCurrentIndex(0)
-            case "Welcome":
+            case "About Us":
                 self.stackedWidget.setCurrentIndex(1)
             case "Training":
                 self.stackedWidget.setCurrentIndex(2)

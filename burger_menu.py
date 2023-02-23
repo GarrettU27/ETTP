@@ -1,13 +1,17 @@
 # https://www.pythonguis.com/tutorials/pyqt6-animated-widgets/
 # https://stackoverflow.com/questions/72054664/pyqt6-animation-doesnt-work-for-decreasing-width
 
-from PyQt6.QtWidgets import QListWidget
+from PyQt6.QtWidgets import QListWidget, QTreeWidget
 from PyQt6 import QtCore
 
 
-class BurgerMenu(QListWidget):
+class BurgerMenu(QTreeWidget):
     def __init__(self, width):
         super().__init__()
+
+        self.setColumnCount(1)
+        self.setHeaderHidden(True)
+        self.setStyleSheet("* { font-size: 20px }")
 
         self.animation = QtCore.QPropertyAnimation(self, b"maximumWidth")
         self.animation.setDuration(125)
