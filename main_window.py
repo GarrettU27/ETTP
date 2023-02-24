@@ -45,7 +45,7 @@ class MainWindow(QMainWindow):
         testing = Testing()
         self.stackedWidget.addWidget(testing)
 
-        self.page_list = BurgerMenu(250)
+        self.page_list = BurgerMenu()
         home = QTreeWidgetItem(["Home"])
         home.setIcon(0, qtawesome.icon("fa5s.home"))
 
@@ -80,13 +80,16 @@ class MainWindow(QMainWindow):
         self.page_list.addTopLevelItem(manage)
         self.page_list.itemClicked.connect(self.switch_page)
 
-        self.burger_button = QPushButton("BURGER")
+        burger_icon = qtawesome.icon("fa5s.bars")
+        self.burger_button = QPushButton(burger_icon, "")
+        self.burger_button.setStyleSheet("* { font-size: 20px; }")
         self.burger_button.clicked.connect(self.page_list.toggle)
 
         default_window = QWidget()
         layout = QHBoxLayout()
         layout.addWidget(self.page_list)
         layout.addWidget(self.burger_button)
+        layout.setAlignment(self.burger_button, PyQt6.QtCore.Qt.AlignmentFlag.AlignTop)
         layout.addWidget(self.stackedWidget)
         default_window.setLayout(layout)
 
