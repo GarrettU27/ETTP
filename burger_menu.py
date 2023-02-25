@@ -20,6 +20,7 @@ class BurgerMenu(QTreeWidget):
         self.animation.finished.connect(self.ensure_proper_size)
 
         self.setMinimumWidth(self.openWidth)
+        self.setMaximumWidth(self.openWidth)
 
         self.isOpen = True
 
