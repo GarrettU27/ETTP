@@ -1,11 +1,11 @@
 import PyQt6
 import qtawesome
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QVBoxLayout, QWidget, QMainWindow, QStackedWidget, QHBoxLayout, \
-    QListWidget, QPushButton, QTreeWidget, QTreeWidgetItem
+    QPushButton, QTreeWidgetItem
 
-from burger_menu import BurgerMenu
+from components.burger_menu import BurgerMenu
 from pages.about_us import AboutUs
 from pages.home import Home
 from pages.testing import Testing
@@ -27,6 +27,8 @@ class MainWindow(QMainWindow):
 
         # set screen size based off current screen size
         screenSize = self.screen().availableGeometry().size() * (3 / 4)
+
+        self.setStyleSheet("* { background: #ffffff; }")
 
         self.resize(screenSize.width(), screenSize.height())
         self.setWindowTitle("ETTP")
@@ -87,7 +89,12 @@ class MainWindow(QMainWindow):
 
         burger_icon = qtawesome.icon("fa5s.bars")
         self.burger_button = QPushButton(burger_icon, "")
-        self.burger_button.setStyleSheet("* { font-size: 20px; }")
+        self.burger_button.setIconSize(QSize(30, 30))
+        self.burger_button.setStyleSheet("""
+            QPushButton { 
+                border: none; 
+            }      
+        """)
         self.burger_button.clicked.connect(self.page_list.toggle)
 
         default_window = QWidget()

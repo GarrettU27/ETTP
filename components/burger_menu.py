@@ -11,7 +11,15 @@ class BurgerMenu(QTreeWidget):
 
         self.setColumnCount(1)
         self.setHeaderHidden(True)
-        self.setStyleSheet("* { font-size: 20px; border: none; }")
+        self.setStyleSheet("""* { 
+            font-size: 20px; 
+            border: none; 
+            font-family: 'Encode Sans'; 
+            border-width: 0 2px 0 0;
+            border-color: #ddd;
+            border-style: solid; 
+        }
+        """)
         self.openWidth = self.sizeHint().width()
 
         self.animation = QtCore.QPropertyAnimation(self, b"maximumWidth")
