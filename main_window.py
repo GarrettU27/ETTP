@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import QVBoxLayout, QWidget, QMainWindow, QStackedWidget, Q
     QListWidget, QPushButton, QTreeWidget, QTreeWidgetItem
 
 from burger_menu import BurgerMenu
+from pages.about_us import AboutUs
 from pages.home import Home
 from pages.testing import Testing
 from pages.training import Training
@@ -35,6 +36,9 @@ class MainWindow(QMainWindow):
 
         welcome = Welcome()
         self.stackedWidget.addWidget(welcome)
+
+        about_us = AboutUs()
+        self.stackedWidget.addWidget(about_us)
 
         home = Home()
         self.stackedWidget.addWidget(home)
