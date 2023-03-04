@@ -18,7 +18,6 @@ class AboutUs(QWidget):
         self.layout = QGridLayout(self)
         self.layout.setSpacing(16)
         self.layout.addWidget(self.heading, 0, 0, 1, 2)
-        # self.layout.addItem(QSpacerItem(0, 0), 0, 2, 1, 2)
 
         self.layout.addWidget(AboutUsPicture("../images/marie.jpg"), 1, 0)
         self.layout.addWidget(ParagraphLabel("Marie Hessefort"), 1, 1)

@@ -35,6 +35,7 @@ class MainWindow(QMainWindow):
         self.stackedWidget = QStackedWidget()
 
         welcome = Welcome()
+        welcome.about_us_button.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
         self.stackedWidget.addWidget(welcome)
 
         about_us = AboutUs()
