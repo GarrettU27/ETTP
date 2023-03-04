@@ -33,11 +33,11 @@ class MainWindow(QMainWindow):
 
         self.stackedWidget = QStackedWidget()
 
-        home = Home()
-        self.stackedWidget.addWidget(home)
-
         welcome = Welcome()
         self.stackedWidget.addWidget(welcome)
+
+        home = Home()
+        self.stackedWidget.addWidget(home)
 
         training = Training()
         self.stackedWidget.addWidget(training)
