@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import QVBoxLayout, QWidget, QMainWindow, QStackedWidget, Q
 from components.burger_menu import BurgerMenu
 from pages.about_us import AboutUs
 from pages.home import Home
+from pages.lead_placement import LeadPlacement
 from pages.testing import Testing
 from pages.training import Training
 from pages.welcome import Welcome
@@ -51,6 +52,10 @@ class MainWindow(QMainWindow):
 
         testing = Testing()
         self.stackedWidget.addWidget(testing)
+
+        lead_placement = LeadPlacement()
+        self.stackedWidget.addWidget(lead_placement)
+
 
         self.page_list = BurgerMenu()
         home = QTreeWidgetItem(["Home"])
@@ -117,6 +122,8 @@ class MainWindow(QMainWindow):
                 self.stackedWidget.setCurrentIndex(2)
             case "Testing":
                 self.stackedWidget.setCurrentIndex(3)
+            case "Lead Placements":
+                self.stackedWidget.setCurrentIndex(5)
             case _:
                 self.stackedWidget.setCurrentIndex(0)
 
