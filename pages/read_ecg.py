@@ -1,6 +1,7 @@
 import os
 
 import PyQt6
+from PyQt6 import QtGui
 from PyQt6.QtCore import QSize, QRect
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QTextEdit, QWidget, QLabel, QSizePolicy
@@ -48,12 +49,13 @@ class ReadECG(QWidget):
             it represents 0.5 mV.</p>
         """)
 
+        self.image = QLabel()
+        self.pixmap = QPixmap(os.path.join(os.path.dirname(__file__), "../images/read_ecg.png"))
+        self.image.setPixmap(self.pixmap)
 
-        image = QLabel()
-        pixmap = QPixmap(os.path.join(os.path.dirname(__file__), "../images/read_ecg.png"))
-        image.setPixmap(pixmap)
+        self.image.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Maximum, PyQt6.QtWidgets.QSizePolicy.Policy.Maximum)
 
-        layout2.addWidget(image)
+        layout2.addWidget(self.image)
         layout2.addWidget(self.read_ecg_explanation)
 
         layout2.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignTop)
@@ -61,7 +63,7 @@ class ReadECG(QWidget):
 
         self.read_ecg_explanation.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred, PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
 
-        layout2.setStretch(0, 0)
+        layout2.setStretch(0, 1)
         layout2.setStretch(1, 1)
 
         self.layout.addLayout(layout2)
