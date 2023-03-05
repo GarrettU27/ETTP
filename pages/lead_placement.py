@@ -12,8 +12,6 @@ class LeadPlacement(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.hello = ["Hallo Welt", "Hei maailma", "Hola Mundo", "Привет мир"]
-
         self.layout = QVBoxLayout(self)
         self.layout.addWidget(HeadingLabel("Where are the 12 Leads Placed on the Body"))
 

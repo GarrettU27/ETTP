@@ -9,6 +9,7 @@ from components.burger_menu import BurgerMenu
 from pages.about_us import AboutUs
 from pages.home import Home
 from pages.lead_placement import LeadPlacement
+from pages.read_ecg import ReadECG
 from pages.testing import Testing
 from pages.training import Training
 from pages.welcome import Welcome
@@ -55,6 +56,9 @@ class MainWindow(QMainWindow):
 
         lead_placement = LeadPlacement()
         self.stackedWidget.addWidget(lead_placement)
+
+        read_ecg = ReadECG()
+        self.stackedWidget.addWidget(read_ecg)
 
 
         self.page_list = BurgerMenu()
@@ -124,6 +128,8 @@ class MainWindow(QMainWindow):
                 self.stackedWidget.setCurrentIndex(3)
             case "Lead Placements":
                 self.stackedWidget.setCurrentIndex(5)
+            case "Reading an ECG Strip":
+                self.stackedWidget.setCurrentIndex(6)
             case _:
                 self.stackedWidget.setCurrentIndex(0)
 
