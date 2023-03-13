@@ -82,18 +82,18 @@ class MainWindow(QMainWindow):
         test.addChild(QTreeWidgetItem(["Last Score"]))
         test.addChild(QTreeWidgetItem(["Resume"]))
 
-        tools = QTreeWidgetItem(["Tools"])
-        tools.setIcon(0, qtawesome.icon("fa5s.wrench"))
-
-        manage = QTreeWidgetItem(["Manage"])
-        manage.setIcon(0, qtawesome.icon("fa5s.cog"))
+        # tools = QTreeWidgetItem(["Tools"])
+        # tools.setIcon(0, qtawesome.icon("fa5s.wrench"))
+        #
+        # manage = QTreeWidgetItem(["Manage"])
+        # manage.setIcon(0, qtawesome.icon("fa5s.cog"))
 
         self.page_list.addTopLevelItem(home)
         self.page_list.addTopLevelItem(about_us)
         self.page_list.addTopLevelItem(train)
         self.page_list.addTopLevelItem(test)
-        self.page_list.addTopLevelItem(tools)
-        self.page_list.addTopLevelItem(manage)
+        # self.page_list.addTopLevelItem(tools)
+        # self.page_list.addTopLevelItem(manage)
         self.page_list.itemClicked.connect(self.switch_page)
 
         burger_icon = qtawesome.icon("fa5s.bars")
