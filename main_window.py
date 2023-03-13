@@ -101,7 +101,7 @@ class MainWindow(QMainWindow):
                 self.stackedWidget.setCurrentIndex(0)
             case "About Us":
                 self.stackedWidget.setCurrentIndex(1)
-            case "Training":
+            case "Train":
                 self.stackedWidget.setCurrentIndex(2)
             case "Testing":
                 self.stackedWidget.setCurrentIndex(3)
