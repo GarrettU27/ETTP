@@ -54,6 +54,7 @@ class ReadECG(QWidget):
         self.image = AspectRatioImage()
         self.pixmap = QPixmap(os.path.join(os.path.dirname(__file__), "../images/read_ecg.png"))
         self.image.setPixmap(self.pixmap)
+        self.image.setMaximumHeight(800)
 
         layout2.addWidget(self.image)
         layout2.setAlignment(self.image, PyQt6.QtCore.Qt.AlignmentFlag.AlignTop)
