@@ -3,7 +3,7 @@ import qtawesome
 from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QVBoxLayout, QWidget, QMainWindow, QStackedWidget, QHBoxLayout, \
-    QPushButton, QTreeWidgetItem
+    QPushButton, QTreeWidgetItem, QScrollArea
 
 from components.burger_menu import BurgerMenu
 from pages.about_us import AboutUs
@@ -36,7 +36,15 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("ETTP")
         self.setWindowIcon(QIcon("icon.jpg"))
 
-        self.stackedWidget = QStackedWidget()
+        # https://stackoverflow.com/questions/12781407/how-do-i-resize-the-contents-of-a-qscrollarea-as-more-widgets-are-placed-inside
+        self.scroll = QScrollArea()
+        self.scroll.setWidgetResizable(True)
+
+        self.stackedWidget = QStackedWidget(self.scroll)
+
+        self.scroll.setWidget(self.stackedWidget)
+
+        self.scroll.setStyleSheet("* { border: none; }")
 
         welcome = Welcome()
         welcome.about_us_button.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
@@ -59,7 +67,6 @@ class MainWindow(QMainWindow):
 
         read_ecg = ReadECG()
         self.stackedWidget.addWidget(read_ecg)
-
 
         self.page_list = BurgerMenu()
         home = QTreeWidgetItem(["Home"])
@@ -111,7 +118,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.page_list)
         layout.addWidget(self.burger_button)
         layout.setAlignment(self.burger_button, PyQt6.QtCore.Qt.AlignmentFlag.AlignTop)
-        layout.addWidget(self.stackedWidget)
+        layout.addWidget(self.scroll)
         default_window.setLayout(layout)
 
         self.setCentralWidget(default_window)

@@ -5,7 +5,9 @@ from PyQt6.QtCore import QSize, QRect
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QTextEdit, QWidget, QLabel
 
+from components.aspect_ratio_image import AspectRatioImage
 from components.heading_label import HeadingLabel
+from components.resizing_text_edit import ResizingTextEdit
 
 
 class LeadPlacement(QWidget):
@@ -16,7 +18,7 @@ class LeadPlacement(QWidget):
         self.layout.addWidget(HeadingLabel("Where are the 12 Leads Placed on the Body"))
 
         layout2 = QHBoxLayout()
-        self.lead_placement_explanation = QTextEdit()
+        self.lead_placement_explanation = ResizingTextEdit()
         self.lead_placement_explanation.setReadOnly(True)
 
         self.lead_placement_explanation.setStyleSheet("""
@@ -89,14 +91,11 @@ class LeadPlacement(QWidget):
         </ul>
         """)
 
-        self.lead_placement_explanation.setMaximumWidth(self.size().width())
         self.layout.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignLeft)
 
-        image = QLabel()
+        image = AspectRatioImage()
         pixmap = QPixmap(os.path.join(os.path.dirname(__file__), "../images/lead_placement.png"))
         image.setPixmap(pixmap)
-
-        image.setMaximumWidth(self.size().width())
 
         layout2.addWidget(self.lead_placement_explanation)
         layout2.addWidget(image)

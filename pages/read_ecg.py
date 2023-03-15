@@ -6,7 +6,9 @@ from PyQt6.QtCore import QSize, QRect
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QTextEdit, QWidget, QLabel, QSizePolicy
 
+from components.aspect_ratio_image import AspectRatioImage
 from components.heading_label import HeadingLabel
+from components.resizing_text_edit import ResizingTextEdit
 
 
 class ReadECG(QWidget):
@@ -17,7 +19,7 @@ class ReadECG(QWidget):
         self.layout.addWidget(HeadingLabel("How do I read a 12-lead ECG?"))
 
         layout2 = QHBoxLayout()
-        self.read_ecg_explanation = QTextEdit()
+        self.read_ecg_explanation = ResizingTextEdit()
         self.read_ecg_explanation.setReadOnly(True)
 
         self.read_ecg_explanation.setStyleSheet("""
@@ -49,13 +51,12 @@ class ReadECG(QWidget):
             it represents 0.5 mV.</p>
         """)
 
-        self.image = QLabel()
+        self.image = AspectRatioImage()
         self.pixmap = QPixmap(os.path.join(os.path.dirname(__file__), "../images/read_ecg.png"))
         self.image.setPixmap(self.pixmap)
 
-        self.image.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Maximum, PyQt6.QtWidgets.QSizePolicy.Policy.Maximum)
-
         layout2.addWidget(self.image)
+        layout2.setAlignment(self.image, PyQt6.QtCore.Qt.AlignmentFlag.AlignTop)
         layout2.addWidget(self.read_ecg_explanation)
 
         layout2.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignTop)
