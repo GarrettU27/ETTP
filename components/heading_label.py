@@ -8,7 +8,7 @@ class HeadingLabel(QLabel):
         super().__init__(text)
 
         self.setWordWrap(True)
-        self.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Maximum, PyQt6.QtWidgets.QSizePolicy.Policy.Maximum)
+        self.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred, PyQt6.QtWidgets.QSizePolicy.Policy.Minimum)
 
         font = self.font()
         font.setPixelSize(64)
