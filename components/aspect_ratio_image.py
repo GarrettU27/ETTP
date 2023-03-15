@@ -20,7 +20,7 @@ class AspectRatioImage(QLabel):
         if self.pix is None:
             return self.height()
         else:
-            return int((self.pix.height() * width) / self.pix.width())
+            return int((self.pix.height() * width) / max(1, self.pix.width()))
 
     def sizeHint(self) -> QtCore.QSize:
         w = self.width()

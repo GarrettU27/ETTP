@@ -40,6 +40,20 @@ This is the repository for the ECG Training Tool Project, or ETTP for short. It 
    python seed.py
    ```
 
+6. To compile the application into an executable, first install the `pyinstaller` library like so
+   
+   ```bash
+   pip install -U pyinstaller
+   ```
+
+7. Then, simply compile using the `spec` file in the root directory. In other words, run the following command
+   
+   ```bash
+   pyinstaller main.spec
+   ```
+
+8. To run the application, find the app's executable, which will  `dist/main/main.exe`
+
 # Recommended Dev Tools
 
 While these tools are not required, these are good tools to use in your development environment. Assuming you are a student of the University of Minnesota, all of these should be free through the school
