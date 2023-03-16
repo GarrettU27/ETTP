@@ -63,8 +63,6 @@ class ReadECG(QWidget):
         layout2.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignTop)
         layout2.setSpacing(50)
 
-        self.read_ecg_explanation.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred, PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
-
         layout2.setStretch(0, 1)
         layout2.setStretch(1, 1)
 
