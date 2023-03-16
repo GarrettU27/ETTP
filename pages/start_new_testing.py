@@ -1,15 +1,18 @@
-from PyQt6.QtWidgets import QWidget, QPushButton, QLabel, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QPushButton, QLabel, QVBoxLayout, QGridLayout
+
+from arrhythmia import supported_arrhythmias
+from components.heading_label import HeadingLabel
+from components.main_button import MainButton
 
 
 class StartNewTesting(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.hello = ["Hallo Welt", "Hei maailma", "Hola Mundo", "Привет мир"]
+        self.heading = HeadingLabel("What Do You Want to be Tested On?")
 
-        self.button = QPushButton("Go to home")
-        self.text = QLabel("Hello World")
+        self.layout = QGridLayout(self)
+        self.layout.addWidget(self.heading, 0, 0)
 
-        self.layout = QVBoxLayout(self)
-        self.layout.addWidget(self.text)
-        self.layout.addWidget(self.button)
+        for index, arrhythmia in enumerate(supported_arrhythmias):
+            self.layout.addWidget(MainButton(arrhythmia.name), index + 1, 0)
