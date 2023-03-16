@@ -12,6 +12,8 @@ from pages.about_us import AboutUs
 from pages.home import Home
 from pages.lead_placement import LeadPlacement
 from pages.read_ecg import ReadECG
+from pages.start_new_testing import StartNewTesting
+from pages.start_new_training import StartNewTraining
 from pages.testing import Testing
 from pages.training import Training
 from pages.welcome import Welcome
@@ -83,20 +85,23 @@ class MainWindow(QMainWindow):
         about_us = AboutUs()
         self.stackedWidget.addWidget(about_us)
 
-        home = Home()
-        self.stackedWidget.addWidget(home)
-
         training = Training()
         self.stackedWidget.addWidget(training)
 
         testing = Testing()
         self.stackedWidget.addWidget(testing)
 
+        start_new_training = StartNewTraining()
+        self.stackedWidget.addWidget(start_new_training)
+
         read_ecg = ReadECG()
         self.stackedWidget.addWidget(read_ecg)
 
         lead_placement = LeadPlacement()
         self.stackedWidget.addWidget(lead_placement)
+
+        start_new_testing = StartNewTesting()
+        self.stackedWidget.addWidget(start_new_testing)
 
     def create_page_list(self):
         self.page_list = BurgerMenu()
