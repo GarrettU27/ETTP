@@ -19,7 +19,7 @@ def get_train_ecgs(idArray, numEcg):
     # Decide number of ECGs for each arrhythmia
     # Calculate the number of ECGs each arrhythmia can have while keeping below the requested number of ECGs
     numEqualEcgs = math.floor(numEcg / numArrhy)
-    arrhyCount = [numEqualEcgs] * numArrhy #Make sure each arrhythmia has at least one ecg
+    arrhyCount = [numEqualEcgs] * numArrhy #Each arrhythmia gets base number of ECGs
     for i in range(numEcg - numEqualEcgs * numArrhy):
         tempInd = random.randrange(0, numArrhy)
         while arrhyCount[tempInd] > numEqualEcgs:
@@ -37,15 +37,38 @@ def get_train_ecgs(idArray, numEcg):
     cur = con.cursor()
     for i in range(numArrhy): #For each type of arrhythmia given
         for j in range(arrhyCount[i]): #For each ecg that will be fetched for a particular arrhythmia
-            res = cur.execute(
-                "SELECT ecg.graph "
+            tempECGID = cur.execute(
+                "SELECT ecg.id "
                 "FROM ecg, diagnosis "
                 "WHERE ecg.id = diagnosis.ecg_id "
                     "AND diagnosis.arrhythmia_id = " + str(idArray[i]) + " "
                 "ORDER BY RANDOM() "
                 "LIMIT 1"
-            )
-            returnedEcgs[i][j] = res.fetchone()
+            ).fetchone()[0]
+            diags = cur.execute(
+                "SELECT diagnosis.arrhythmia_id "
+                "FROM diagnosis "
+                "WHERE diagnosis.ecg_id = " + str(tempECGID)
+            ).fetchall()
+            getNewECG = False
+            for k in range(diags.__len__()):
+                for l in range(numArrhy):
+                    if i == l: #If current arrhythmia is equal to comparing one
+                        pass
+                    if diags[k] == idArray[l]: #If diagnosed arrhythmia is the same as a different requested arrhythmia
+                        j = j - 1 #Decrement j (don't count this arrhythmia
+                        getNewECG = True
+                        break
+                if getNewECG:
+                    break
+            if getNewECG:
+                pass
+            tempECGGraph = cur.execute(
+                "SELECT ecg.graph "
+                "FROM ecg "
+                "WHERE ecg.id = " + str(tempECGID)
+            ).fetchone()[0]
+            returnedEcgs[i][j] = tempECGGraph
     return returnedEcgs
 
 def get_test_ecgs(idArray, numEcg):
@@ -78,15 +101,38 @@ def get_test_ecgs(idArray, numEcg):
     cur = con.cursor()
     for i in range(numArrhy): # For each type of arrhythmia given
         for j in range(arrhyCount[i]): # For each ecg that will be fetched for a particular arrhythmia
-            res = cur.execute(
-                "SELECT ecg.graph "
+            tempECGID = cur.execute(
+                "SELECT ecg.id "
                 "FROM ecg, diagnosis "
                 "WHERE ecg.id = diagnosis.ecg_id "
                     "AND diagnosis.arrhythmia_id = " + str(idArray[i]) + " "
                 "ORDER BY RANDOM() "
                 "LIMIT 1"
-            )
-            returnedEcgs[i][j] = res.fetchone()
+            ).fetchone()[0]
+            diags = cur.execute(
+                "SELECT diagnosis.arrhythmia_id "
+                "FROM diagnosis "
+                "WHERE diagnosis.ecg_id = " + str(tempECGID)
+            ).fetchall()
+            getNewECG = False
+            for k in range(diags.__len__()):
+                for l in range(numArrhy):
+                    if i == l: #If current arrhythmia is equal to comparing one
+                        pass
+                    if diags[k] == idArray[l]: #If diagnosed arrhythmia is the same as a different requested arrhythmia
+                        j = j - 1 #Decrement j (don't count this arrhythmia
+                        getNewECG = True
+                        break
+                if getNewECG:
+                    break
+            if getNewECG:
+                pass
+            tempECGGraph = cur.execute(
+                "SELECT ecg.graph "
+                "FROM ecg "
+                "WHERE ecg.id = " + str(tempECGID)
+            ).fetchone()[0]
+            returnedEcgs[i][j] = tempECGGraph
     return returnedEcgs
 
 def getFirstEntry(abbreviationName):
