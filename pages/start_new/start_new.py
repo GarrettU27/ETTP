@@ -1,5 +1,7 @@
+import os.path
+
 import PyQt6
-from PyQt6.QtWidgets import QWidget, QGridLayout, QHBoxLayout, QComboBox
+from PyQt6.QtWidgets import QWidget, QGridLayout, QHBoxLayout, QComboBox, QVBoxLayout, QSpacerItem
 from arrhythmia import supported_arrhythmias
 from components.heading_label import HeadingLabel
 from components.main_button import MainButton
@@ -11,29 +13,50 @@ class StartNew(QWidget):
         super().__init__()
 
         self.heading = HeadingLabel(self.heading_text())
+        self.heading.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
+                                     PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
 
-        self.layout = QGridLayout(self)
-        self.layout.addWidget(self.heading, 0, 0)
+        self.layout = QVBoxLayout(self)
+        self.layout.addWidget(self.heading)
+        self.layout.setSpacing(30)
 
         for index, arrhythmia in enumerate(supported_arrhythmias):
-            self.layout.addWidget(MainCheckbox(arrhythmia.name), index + 1, 0)
+            self.layout.addWidget(MainCheckbox(arrhythmia.name))
 
         submission_row = QWidget()
-        submission_row.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.MinimumExpanding,
-                                     PyQt6.QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        submission_row.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
+                                     PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
 
         submission_layout = QHBoxLayout(submission_row)
         question_number = QComboBox()
-        question_number.addItems(str(num) for num in range(10))
+        question_number.addItems(str(num * 5) for num in range(1, 6))
+        question_number.setCurrentIndex(2)
         submission_layout.addWidget(question_number)
+        question_number.setStyleSheet("""
+            QComboBox {
+                font-family: "Encode Sans";
+                border: 1px solid #ddd;
+                padding: 0.4em;
+                font-size: 40px;
+                border-radius: 25%;
+            }
+
+            QComboBox::drop-down {
+                border: none;
+            }
+            
+            QComboBox::down-arrow {
+                image: url(images:dropdown.png);
+                padding-right: 40px;
+            }
+        """)
 
         submission_layout.addWidget(MainButton(self.begin_button_text()))
+        submission_layout.setSpacing(30)
 
-        submission_layout.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignVCenter)
-
-        submission_row.setLayout(QHBoxLayout(submission_row))
-
-        self.layout.addWidget(submission_row, len(supported_arrhythmias) + 1, 0)
+        self.layout.addWidget(submission_row)
+        self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
+                                     PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
 
     def heading_text(self) -> str:
         return "Heading"

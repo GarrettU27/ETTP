@@ -19,7 +19,6 @@ class MainButton(QPushButton):
                         background: #074EE8;
                         padding: 0.4em;
                         border-radius: 25%;
-                        margin-bottom: 30px;
                     }
 
                     QPushButton:hover {
