@@ -15,7 +15,7 @@ from pages.start_new.start_new_testing import StartNewTesting
 from pages.start_new.start_new_training import StartNewTraining
 from pages.testing import Testing
 from pages.training import Training
-from pages.welcome import Welcome
+from pages.home import Home
 
 
 
@@ -77,7 +77,7 @@ class MainWindow(QMainWindow):
 
         self.scroll.setStyleSheet("* { border: none; }")
 
-        welcome = Welcome()
+        welcome = Home()
         welcome.about_us_button.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
         self.stackedWidget.addWidget(welcome)
 

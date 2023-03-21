@@ -1,32 +1,32 @@
 import PyQt6
 from PyQt6.QtCore import Qt
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton
+from PyQt6.QtWidgets import QWidget, QLabel, QGridLayout, QVBoxLayout, QSpacerItem
 
+from components.heading_label import HeadingLabel
+from components.main_button import MainButton
 from generate_ecg_plot import get_ecg_svg
-import qtawesome as qta
 
 
 class Home(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.layout = QVBoxLayout()
-        self.setLayout(self.layout)
+        self.heading = HeadingLabel("Home")
+        self.about_us_button = MainButton("About Us")
+        self.training_button = MainButton("Train")
+        self.testing_button = MainButton("Test")
 
         qsw = QSvgWidget()
         qsw.load(get_ecg_svg())
         qsw.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
+        qsw.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
+                                              PyQt6.QtWidgets.QSizePolicy.Policy.Expanding)
 
-        label = QLabel()
-        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.layout = QVBoxLayout(self)
+        self.layout.setSpacing(30)
+        self.layout.addWidget(self.heading)
+        self.layout.addWidget(self.about_us_button)
+        self.layout.addWidget(self.training_button)
+        self.layout.addWidget(self.testing_button)
         self.layout.addWidget(qsw)
-
-        home_icon = qta.icon('fa5s.home')
-        self.button = QPushButton(home_icon, "Go to welcome")
-        self.text = QLabel("Hello World")
-
-        self.layout.addWidget(self.text)
-        self.layout.addWidget(self.button)
-
-        self.show()
