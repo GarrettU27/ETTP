@@ -26,7 +26,7 @@ class Home(QWidget):
         self.layout = QVBoxLayout(self)
         self.layout.setSpacing(30)
         self.layout.addWidget(self.heading)
-        self.layout.addWidget(self.about_us_button)
         self.layout.addWidget(self.training_button)
         self.layout.addWidget(self.testing_button)
+        self.layout.addWidget(self.about_us_button)
         self.layout.addWidget(qsw)

@@ -78,7 +78,10 @@ class MainWindow(QMainWindow):
         self.scroll.setStyleSheet("* { border: none; }")
 
         welcome = Home()
+        welcome.training_button.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(4))
+        welcome.testing_button.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(7))
         welcome.about_us_button.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
+
         self.stackedWidget.addWidget(welcome)
 
         about_us = AboutUs()
