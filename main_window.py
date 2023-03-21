@@ -1,19 +1,18 @@
 import PyQt6
 import qtawesome
 from PyQt6 import QtCore, QtWidgets
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QVBoxLayout, QWidget, QMainWindow, QStackedWidget, QHBoxLayout, \
-    QPushButton, QTreeWidgetItem, QScrollArea
+from PyQt6.QtWidgets import QWidget, QMainWindow, QStackedWidget, QHBoxLayout, \
+    QPushButton, QScrollArea
 
 from components.burger_item import BurgerItem
 from components.burger_menu import BurgerMenu
 from pages.about_us import AboutUs
-from pages.home import Home
 from pages.lead_placement import LeadPlacement
 from pages.read_ecg import ReadECG
-from pages.start_new_testing import StartNewTesting
-from pages.start_new_training import StartNewTraining
+from pages.start_new.start_new_testing import StartNewTesting
+from pages.start_new.start_new_training import StartNewTraining
 from pages.testing import Testing
 from pages.training import Training
 from pages.welcome import Welcome
@@ -111,24 +110,23 @@ class MainWindow(QMainWindow):
         about_us = BurgerItem(["About Us"], 1)
         about_us.setIcon(0, qtawesome.icon("fa5s.address-card"))
 
-        train = BurgerItem(["Train"], 2)
+        train = BurgerItem(["Train"], 4)
         train.setIcon(0, qtawesome.icon("fa5s.globe"))
 
-        train.addChild(BurgerItem(["Start New"], 4))
-        train.addChild(BurgerItem(["Reading an ECG Strip"], 5))
-        train.addChild(BurgerItem(["Lead Placements"], 6))
+        ecg_reading = BurgerItem(["ECG Reading"], 10)
+        ecg_reading.setIcon(0, qtawesome.icon("fa5s.book"))
 
-        test = BurgerItem(["Test"], 3)
+        ecg_reading.addChild(BurgerItem(["Reading an ECG Strip"], 5))
+        ecg_reading.addChild(BurgerItem(["Lead Placements"], 6))
+
+        test = BurgerItem(["Test"], 7)
         test.setIcon(0, qtawesome.icon("fa5s.pen-nib"))
 
-        test.addChild(BurgerItem(["Start New"], 7))
-        test.addChild(BurgerItem(["Last Score"], 8))
-        test.addChild(BurgerItem(["Resume"], 9))
-
         self.page_list.addTopLevelItem(home)
-        self.page_list.addTopLevelItem(about_us)
         self.page_list.addTopLevelItem(train)
         self.page_list.addTopLevelItem(test)
+        self.page_list.addTopLevelItem(ecg_reading)
+        self.page_list.addTopLevelItem(about_us)
         self.page_list.itemClicked.connect(self.switch_page)
 
     def switch_page(self, item):
