@@ -266,7 +266,7 @@ def save_as_png(file_name, path=DEFAULT_PATH, dpi=100, layout='tight'):
         layout   : Set equal to "tight" to include ax labels on saved image
     """
     plt.ioff()
-    plt.savefig(path + file_name + '.png', dpi=dpi, bbox_inches=layout)
+    plt.savefig(os.path.join(path, file_name + '.png'), dpi=dpi, bbox_inches=layout)
     plt.close()
 
 
