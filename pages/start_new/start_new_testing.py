@@ -13,7 +13,11 @@ class StartNewTesting(StartNew):
         super().__init__()
 
     def heading_text(self) -> str:
-        return "What Do You Want to be Tested On?"
+        # return "What Do You Want to be Tested On?"
+        return "Test"
+
+    def paragraph_text(self) -> str:
+        return "Select which arrhythmias you want to be tested on"
 
     def begin_button_text(self) -> str:
         return "Begin Test"

@@ -6,6 +6,7 @@ from arrhythmia import supported_arrhythmias
 from components.heading_label import HeadingLabel
 from components.main_button import MainButton
 from components.main_checkbox import MainCheckbox
+from components.paragraph_label import ParagraphLabel
 
 
 class StartNew(QWidget):
@@ -15,9 +16,13 @@ class StartNew(QWidget):
         self.heading = HeadingLabel(self.heading_text())
         self.heading.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
                                      PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
+        self.paragraph = ParagraphLabel(self.paragraph_text())
+        self.paragraph.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
+                                     PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
 
         self.layout = QVBoxLayout(self)
         self.layout.addWidget(self.heading)
+        self.layout.addWidget(self.paragraph)
         self.layout.setSpacing(30)
 
         for index, arrhythmia in enumerate(supported_arrhythmias):
@@ -28,17 +33,26 @@ class StartNew(QWidget):
                                      PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
 
         submission_layout = QHBoxLayout(submission_row)
+
+        question_number_layout = QVBoxLayout()
+
+        question_number_label = ParagraphLabel("Choose number of questions")
+        question_number_layout.addWidget(question_number_label)
+
         question_number = QComboBox()
         question_number.addItems(str(num * 5) for num in range(1, 6))
         question_number.setCurrentIndex(2)
-        submission_layout.addWidget(question_number)
+
+        question_number_layout.addWidget(question_number)
+        question_number_layout.setSpacing(7)
         question_number.setStyleSheet("""
             QComboBox {
                 font-family: "Encode Sans";
                 border: 1px solid #ddd;
                 padding: 0.4em;
-                font-size: 40px;
+                font-size: 25px;
                 border-radius: 25%;
+                margin: 0;
             }
 
             QComboBox::drop-down {
@@ -51,6 +65,8 @@ class StartNew(QWidget):
             }
         """)
 
+        submission_layout.addLayout(question_number_layout)
+
         submission_layout.addWidget(MainButton(self.begin_button_text()))
         submission_layout.setSpacing(30)
 
@@ -60,6 +76,9 @@ class StartNew(QWidget):
 
     def heading_text(self) -> str:
         return "Heading"
+
+    def paragraph_text(self) -> str:
+        return "Paragraph"
 
     def begin_button_text(self) -> str:
         return "Begin"

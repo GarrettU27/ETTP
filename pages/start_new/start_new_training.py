@@ -8,7 +8,11 @@ class StartNewTraining(StartNew):
         super().__init__()
 
     def heading_text(self) -> str:
-        return "What Do You Want to be Trained On?"
+        # return "What Do You Want to be Trained On?"
+        return "Train"
+
+    def paragraph_text(self) -> str:
+        return "Select which arrhythmias you want to learn how to identify"
 
     def begin_button_text(self) -> str:
         return "Begin Training"

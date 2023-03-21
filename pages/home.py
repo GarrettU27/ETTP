@@ -13,9 +13,9 @@ class Home(QWidget):
         super().__init__()
 
         self.heading = HeadingLabel("Home")
-        self.about_us_button = MainButton("About Us")
         self.training_button = MainButton("Train")
         self.testing_button = MainButton("Test")
+        self.about_us_button = MainButton("About Us")
 
         qsw = QSvgWidget()
         qsw.load(get_ecg_svg())
