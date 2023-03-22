@@ -3,7 +3,9 @@ import math
 import random
 from dataclasses import dataclass
 from sqlite3 import Cursor
-from typing import List, NamedTuple
+from typing import List, Callable
+
+from backend.generate_ecg_plot import create_test_ecg, create_train_ecg
 from sqlite_setup import get_sqlite_connection
 
 
@@ -48,7 +50,7 @@ def get_train_ecgs(arrhythmia_id_array: List[int], number_of_questions: int):
     for (arrhythmia_id, i) in enumerate(arrhythmia_id_array):
         tested_arrhythmias.append(Arrhythmia(id=str(arrhythmia_id), amount=arrhythmia_amounts[i]))
 
-    return create_return_array(tested_arrhythmias)
+    return create_return_array(tested_arrhythmias, create_train_ecg)
 
 
 def get_test_ecgs(arrhythmia_id_array: List[int], number_of_questions: int):
@@ -71,13 +73,13 @@ def get_test_ecgs(arrhythmia_id_array: List[int], number_of_questions: int):
     for (arrhythmia_id, i) in enumerate(arrhythmia_id_array):
         tested_arrhythmias.append(Arrhythmia(id=str(arrhythmia_id), amount=arrhythmia_amounts[i]))
 
-    questions = create_return_array(tested_arrhythmias)
+    questions = create_return_array(tested_arrhythmias, create_test_ecg)
     random.shuffle(questions)
 
     return questions
 
 
-def create_return_array(arrhythmias: List[Arrhythmia]):
+def create_return_array(arrhythmias: List[Arrhythmia], grapher: Callable) -> List[Question]:
     con = get_sqlite_connection()
     cur = con.cursor()
 
@@ -92,7 +94,7 @@ def create_return_array(arrhythmias: List[Arrhythmia]):
             patient_id = get_random_patient_id(cur, arrhythmia.id)
             ecg = get_patients_ecg(cur, patient_id)
             questions.append(Question(
-                ecg=ecg,
+                ecg=grapher(ecg),
                 correct_answer=get_arrhythmia_name(cur, arrhythmia.id),
                 choices=choices
             ))
