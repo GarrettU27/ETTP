@@ -22,7 +22,6 @@ class MainCheckbox(MainButton):
                     background: #44AF69;
                     padding: 0.4em;
                     border-radius: 25%;
-                    margin-bottom: 30px;
                 }
 
                 QPushButton:hover {
