@@ -156,6 +156,18 @@ def find3Waves(validHeartbeats, leeway):
             return start
         i += 1
 
+def makeRWaveAnnotation(validHeartbeats, start, offset):
+        for i in range(0, 3):
+            plt.axvspan(validHeartbeats[start+i].RWave.start - offset, validHeartbeats[start+i].RWave.end - offset, facecolor = 'orange', alpha = 0.5, label = 'R-Wave' if i == 0 else "")
+
+def makeTWaveAnnotation(validHeartbeats, start, offset):
+    for i in range(0, 3):
+        plt.axvspan(validHeartbeats[start+i].TWave.start - offset, validHeartbeats[start+i].TWave.end - offset, facecolor = 'red', alpha = 0.5, label = 'T-Wave' if i == 0 else "")
+
+def makePWaveAnnotation(validHeartbeats, start, offset):
+    for i in range(0, 3):
+        plt.axvspan(validHeartbeats[start+i].PWave.start - offset, validHeartbeats[start+i].PWave.end - offset, facecolor = 'green', alpha = 0.5, label = 'P-Wave' if i == 0 else "")
+
 
 # BAD DATA: 4, 6, 20, 31, 36
 
@@ -203,13 +215,10 @@ def makeGraph(name):
     # Matlab plotting stuff
     plt.plot(np_array[offset:validHeartbeats[start + 2].TWave.end + 200])
 
-    for i in range(0, 3):
-        plt.axvspan(validHeartbeats[start + i].RWave.start - offset, validHeartbeats[start + i].RWave.end - offset,
-                    facecolor='orange', alpha=0.5, label='R-Wave' if i == 0 else "")
-        plt.axvspan(validHeartbeats[start + i].TWave.start - offset, validHeartbeats[start + i].TWave.end - offset,
-                    facecolor='red', alpha=0.5, label='T-Wave' if i == 0 else "")
-        plt.axvspan(validHeartbeats[start + i].PWave.start - offset, validHeartbeats[start + i].PWave.end - offset,
-                    facecolor='green', alpha=0.5, label='P-Wave' if i == 0 else "")
+    #Calls the highlight annotation functions for each wave you need annotated in this ECG
+    makeRWaveAnnotation(validHeartbeats, start, offset)
+    makeTWaveAnnotation(validHeartbeats, start, offset)
+    makePWaveAnnotation(validHeartbeats, start, offset)
 
     plt.title(name)
     plt.legend()
