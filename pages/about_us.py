@@ -18,6 +18,7 @@ class AboutUs(QWidget):
         self.layout = QGridLayout(self)
         self.layout.setSpacing(16)
         self.layout.addWidget(self.heading, 0, 0, 1, 2)
+        self.heading.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Fixed, PyQt6.QtWidgets.QSizePolicy.Policy.Fixed)
 
         self.layout.addWidget(AboutUsPicture("../images/marie.jpg"), 1, 0)
         self.layout.addWidget(ParagraphLabel("Marie Hessefort"), 1, 1)

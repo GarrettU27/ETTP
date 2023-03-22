@@ -8,11 +8,16 @@ import sys
 from main_window import MainWindow
 
 
-app = QApplication(sys.argv)
+def main():
+    app = QApplication(sys.argv)
 
-QFontDatabase.addApplicationFont("./fonts/EncodeSans.ttf")
-QFontDatabase.addApplicationFont("./fonts/EncodeSansSC.ttf")
+    QFontDatabase.addApplicationFont("./fonts/EncodeSans.ttf")
+    QFontDatabase.addApplicationFont("./fonts/EncodeSansSC.ttf")
 
-window = MainWindow()
-window.show()
-sys.exit(app.exec())
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+    main()

@@ -96,6 +96,7 @@ class LeadPlacement(QWidget):
         image = AspectRatioImage()
         pixmap = QPixmap(os.path.join(os.path.dirname(__file__), "../images/lead_placement.png"))
         image.setPixmap(pixmap)
+        image.setMaximumHeight(800)
 
         layout2.addWidget(self.lead_placement_explanation)
         layout2.addWidget(image)
