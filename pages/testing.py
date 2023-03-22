@@ -4,7 +4,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 
 from components.heading_label import HeadingLabelTest
 from components.choice_button import ChoiceButtonLeft,ChoiceButtonRight
-from generate_ecg_plot import get_ecg_svg
+from backend.generate_ecg_plot import get_ecg_svg
 from Logic.testing import Testing_object
 
 class Testing(QWidget):

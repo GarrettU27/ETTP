@@ -1,11 +1,13 @@
 import random
+from backend.get_ecg_from_db import Question
+import io
 class Testing_object():
-    svg_files = []
-    arrhythmia = []
+    svg_files = [io.BytesIO]
+    arrhythmia = [Question]
     questions = 0
     answers = []
-    correct = []
-    choices = []
+    correct = [str]
+    choices = [[str]]
     index_Q = 0
     index_SVG = 0
 
@@ -61,9 +63,9 @@ class Testing_object():
         self.svg_files = []
         self.choices = []
         for i in range(len(self.arrhythmia)):
-            self.svg_files.append(self.arrhythmia[i][0])
-            self.choices.append(self.arrhythmia[i][1])
-            self.correct(self.arrhythmia[i][2])
+            self.svg_files.append(self.arrhythmia[i].ecg)
+            self.choices.append(self.arrhythmia[i].choices)
+            self.correct(self.arrhythmia[i].correct_answer)
     
             
         
