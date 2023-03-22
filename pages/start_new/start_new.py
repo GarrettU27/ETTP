@@ -12,7 +12,7 @@ from components.paragraph_label import ParagraphLabel
 
 
 class StartNew(QWidget):
-    def __init__(self):
+    def __init__(self, set_state):
         super().__init__()
 
         self.heading = HeadingLabel(self.heading_text())
@@ -72,6 +72,7 @@ class StartNew(QWidget):
 
         self.begin_button = MainButton(self.begin_button_text())
         submission_layout.addWidget(self.begin_button)
+        self.begin_button.clicked.connect(set_state)
         submission_layout.setSpacing(30)
 
         self.layout.addWidget(submission_row)

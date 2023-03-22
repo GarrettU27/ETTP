@@ -2,8 +2,8 @@ from pages.start_new.start_new import StartNew
 
 
 class StartNewTraining(StartNew):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, set_state):
+        super().__init__(set_state)
 
     def heading_text(self) -> str:
         return "Train"
