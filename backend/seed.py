@@ -4,8 +4,8 @@ from scipy.io import loadmat
 from sqlite_setup import get_sqlite_connection
 import csv
 
-path = "./a-large-scale-12-lead-electrocardiogram-database-for-arrhythmia-study-1.0.0/WFDBRecords"
-conditions_path = "./a-large-scale-12-lead-electrocardiogram-database-for-arrhythmia-study-1.0.0/ConditionNames_SNOMED-CT.csv"
+path = "../a-large-scale-12-lead-electrocardiogram-database-for-arrhythmia-study-1.0.0/WFDBRecords"
+conditions_path = "../a-large-scale-12-lead-electrocardiogram-database-for-arrhythmia-study-1.0.0/ConditionNames_SNOMED-CT.csv"
 con = get_sqlite_connection()
 cur = con.cursor()
 

@@ -1,11 +1,11 @@
 import PyQt6
 from PyQt6.QtCore import Qt
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QWidget, QLabel, QGridLayout, QVBoxLayout, QSpacerItem
+from PyQt6.QtWidgets import QWidget, QVBoxLayout
 
 from components.heading_label import HeadingLabel
 from components.main_button import MainButton
-from generate_ecg_plot import get_ecg_svg
+from backend.generate_ecg_plot import get_ecg_svg
 
 
 class Home(QWidget):

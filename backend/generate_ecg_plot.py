@@ -10,7 +10,7 @@ def convert_to_millivolts(microvolts: int):
 
 
 def get_ecg_svg():
-    mat = loadmat("JS00001.mat")
+    mat = loadmat("../JS00001.mat")
     data = mat["val"]
     ecg = []
 
@@ -24,7 +24,7 @@ def get_ecg_svg():
 
 
 def get_ecg_png():
-    mat = loadmat("JS00001.mat")
+    mat = loadmat("../JS00001.mat")
     data = mat["val"]
     ecg = []
 

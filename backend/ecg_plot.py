@@ -236,7 +236,7 @@ def plot_1(ecg, sample_rate=500, title='ECG', fig_width=15, fig_height=2, line_w
     _ax_plot(ax, np.arange(0, len(ecg) * step, step), ecg, seconds, line_w, ecg_amp, timetick)
 
 
-DEFAULT_PATH = './'
+DEFAULT_PATH = '../'
 show_counter = 1
 
 
