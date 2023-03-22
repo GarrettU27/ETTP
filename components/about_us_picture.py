@@ -8,7 +8,7 @@ class AboutUsPicture(QLabel):
     def __init__(self, filename):
         super().__init__()
 
-        pixmap = QPixmap(os.path.join(os.path.dirname(__file__), filename))
+        pixmap = QPixmap(filename)
         self.setPixmap(pixmap)
 
         self.setScaledContents(True)

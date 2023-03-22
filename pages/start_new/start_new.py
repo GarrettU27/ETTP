@@ -1,9 +1,7 @@
-import os.path
-from PyQt6 import QtGui, QtCore
-from PyQt6.QtCore import Qt
+from PyQt6 import QtCore
 from PyQt6.QtGui import QCursor
 import PyQt6
-from PyQt6.QtWidgets import QWidget, QGridLayout, QHBoxLayout, QComboBox, QVBoxLayout, QSpacerItem, QFrame
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QComboBox, QVBoxLayout, QSpacerItem
 from arrhythmia import supported_arrhythmias
 from components.heading_label import HeadingLabel
 from components.main_button import MainButton

@@ -126,7 +126,6 @@ class MainWindow(QMainWindow):
         )
         self.stacked_widget.addWidget(self.start_new_testing)
 
-
         self.testing_results = TestingResults()
         self.stacked_widget.addWidget(self.testing_results)
 
