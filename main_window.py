@@ -48,6 +48,7 @@ class MainWindow(QMainWindow):
 
         welcome = Welcome()
         welcome.about_us_button.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
+        welcome.testing_button.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(4))
         self.stackedWidget.addWidget(welcome)
 
         about_us = AboutUs()
@@ -67,6 +68,7 @@ class MainWindow(QMainWindow):
 
         read_ecg = ReadECG()
         self.stackedWidget.addWidget(read_ecg)
+
 
         self.page_list = BurgerMenu()
         home = QTreeWidgetItem(["Home"])
@@ -131,7 +133,7 @@ class MainWindow(QMainWindow):
                 self.stackedWidget.setCurrentIndex(1)
             case "Training":
                 self.stackedWidget.setCurrentIndex(2)
-            case "Testing":
+            case "Test":
                 self.stackedWidget.setCurrentIndex(3)
             case "Lead Placements":
                 self.stackedWidget.setCurrentIndex(5)
@@ -139,7 +141,6 @@ class MainWindow(QMainWindow):
                 self.stackedWidget.setCurrentIndex(6)
             case _:
                 self.stackedWidget.setCurrentIndex(0)
-
 
 
 
