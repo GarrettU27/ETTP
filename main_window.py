@@ -61,7 +61,7 @@ class MainWindow(QMainWindow):
 
         self.resize(screenSize.width(), screenSize.height())
         self.setWindowTitle("ETTP")
-        self.setWindowIcon(QIcon("icon.jpg"))
+        self.setWindowIcon(QIcon("images:icon.jpg"))
 
         self.scroll = None
         self.stacked_widget = None
@@ -127,15 +127,17 @@ class MainWindow(QMainWindow):
         self.stacked_widget.addWidget(self.start_new_testing)
 
 
-
         self.testing_results = TestingResults()
         self.stacked_widget.addWidget(self.testing_results)
 
-        self.start_new_training = StartNewTraining(lambda: (self.set_training_state(self.State.IN_PROGRESS), self.choose_training_page()))
-        self.stacked_widget.addWidget(self.start_new_training)
-
         self.training_questions = TrainingQuestions()
         self.stacked_widget.addWidget(self.training_questions)
+
+        self.start_new_training = StartNewTraining(
+            lambda: (self.set_training_state(self.State.IN_PROGRESS), self.choose_training_page()),
+            self.training_questions
+        )
+        self.stacked_widget.addWidget(self.start_new_training)
 
         self.training_results = TrainingResults()
         self.stacked_widget.addWidget(self.training_results)
