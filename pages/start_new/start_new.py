@@ -1,7 +1,9 @@
 import os.path
-
+from PyQt6 import QtGui, QtCore
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QCursor
 import PyQt6
-from PyQt6.QtWidgets import QWidget, QGridLayout, QHBoxLayout, QComboBox, QVBoxLayout, QSpacerItem
+from PyQt6.QtWidgets import QWidget, QGridLayout, QHBoxLayout, QComboBox, QVBoxLayout, QSpacerItem, QFrame
 from arrhythmia import supported_arrhythmias
 from components.heading_label import HeadingLabel
 from components.main_button import MainButton
@@ -45,6 +47,7 @@ class StartNew(QWidget):
 
         question_number_layout.addWidget(question_number)
         question_number_layout.setSpacing(7)
+        question_number.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         question_number.setStyleSheet("""
             QComboBox {
                 font-family: "Encode Sans";

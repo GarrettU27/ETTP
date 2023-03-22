@@ -1,11 +1,14 @@
 from PyQt6.QtWidgets import QPushButton
 from PyQt6.QtCore import Qt
+from PyQt6 import QtGui, QtCore
+from PyQt6.QtGui import QCursor
 
 
 class MainButton(QPushButton):
     def __init__(self, text):
         super().__init__(text)
         self.set_main_button_style()
+        self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
     def set_main_button_style(self):
         self.setStyleSheet("""
