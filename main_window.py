@@ -20,6 +20,13 @@ from pages.home import Home
 
 
 class MainWindow(QMainWindow):
+    home = None
+    about_us = None
+    testing = None
+    training = None
+    lead_placement = None
+    read_ecg = None
+
     def __init__(self):
         super().__init__()
 
@@ -77,52 +84,51 @@ class MainWindow(QMainWindow):
 
         self.scroll.setStyleSheet("* { border: none; }")
 
-        welcome = Home()
-        welcome.training_button.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(4))
-        welcome.testing_button.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(7))
-        welcome.about_us_button.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
+        self.about_us = AboutUs()
+        self.stackedWidget.addWidget(self.about_us)
 
-        self.stackedWidget.addWidget(welcome)
+        self.training = Training()
+        self.stackedWidget.addWidget(self.training)
 
-        about_us = AboutUs()
-        self.stackedWidget.addWidget(about_us)
+        self.testing = Testing()
+        self.stackedWidget.addWidget(self.testing)
 
-        training = Training()
-        self.stackedWidget.addWidget(training)
+        self.home = Home()
+        self.home.training_button.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.training))
+        self.home.testing_button.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.testing))
+        self.home.about_us_button.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.about_us))
 
-        testing = Testing()
-        self.stackedWidget.addWidget(testing)
+        self.stackedWidget.addWidget(self.home)
 
-        start_new_training = StartNewTraining()
-        self.stackedWidget.addWidget(start_new_training)
+        self.read_ecg = ReadECG()
+        self.stackedWidget.addWidget(self.read_ecg)
 
-        read_ecg = ReadECG()
-        self.stackedWidget.addWidget(read_ecg)
+        self.lead_placement = LeadPlacement()
+        self.stackedWidget.addWidget(self.lead_placement)
 
-        lead_placement = LeadPlacement()
-        self.stackedWidget.addWidget(lead_placement)
+        self.stackedWidget.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
+                                          PyQt6.QtWidgets.QSizePolicy.Policy.Expanding)
 
-        start_new_testing = StartNewTesting()
-        self.stackedWidget.addWidget(start_new_testing)
+        self.stackedWidget.setCurrentWidget(self.home)
 
     def create_page_list(self):
         self.page_list = BurgerMenu()
-        home = BurgerItem(["Home"], 0)
+        home = BurgerItem(["Home"], self.home)
         home.setIcon(0, qtawesome.icon("fa5s.home"))
 
-        about_us = BurgerItem(["About Us"], 1)
+        about_us = BurgerItem(["About Us"], self.about_us)
         about_us.setIcon(0, qtawesome.icon("fa5s.address-card"))
 
-        train = BurgerItem(["Train"], 4)
+        train = BurgerItem(["Train"], self.training)
         train.setIcon(0, qtawesome.icon("fa5s.globe"))
 
-        ecg_reading = BurgerItem(["ECG Reading"], 10)
+        ecg_reading = BurgerItem(["ECG Reading"], self.read_ecg)
         ecg_reading.setIcon(0, qtawesome.icon("fa5s.book"))
 
-        ecg_reading.addChild(BurgerItem(["Reading an ECG Strip"], 5))
-        ecg_reading.addChild(BurgerItem(["Lead Placements"], 6))
+        ecg_reading.addChild(BurgerItem(["Reading an ECG Strip"], self.read_ecg))
+        ecg_reading.addChild(BurgerItem(["Lead Placements"], self.lead_placement))
 
-        test = BurgerItem(["Test"], 7)
+        test = BurgerItem(["Test"], self.testing)
         test.setIcon(0, qtawesome.icon("fa5s.pen-nib"))
 
         self.page_list.addTopLevelItem(home)
@@ -133,7 +139,7 @@ class MainWindow(QMainWindow):
         self.page_list.itemClicked.connect(self.switch_page)
 
     def switch_page(self, item):
-        self.stackedWidget.setCurrentIndex(item.index)
+        self.stackedWidget.setCurrentWidget(item.widget)
 
 
 

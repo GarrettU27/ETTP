@@ -70,7 +70,8 @@ class StartNew(QWidget):
 
         submission_layout.addLayout(question_number_layout)
 
-        submission_layout.addWidget(MainButton(self.begin_button_text()))
+        self.begin_button = MainButton(self.begin_button_text())
+        submission_layout.addWidget(self.begin_button)
         submission_layout.setSpacing(30)
 
         self.layout.addWidget(submission_row)

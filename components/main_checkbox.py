@@ -1,3 +1,5 @@
+import PyQt6
+
 from components.main_button import MainButton
 
 

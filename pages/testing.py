@@ -1,15 +1,22 @@
-from PyQt6.QtWidgets import QWidget, QPushButton, QLabel, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QStackedWidget
+from pages.start_new.start_new_testing import StartNewTesting
+from pages.testing_questions import TestingQuestions
+from pages.testing_results import TestingResults
 
 
 class Testing(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.hello = ["Hallo Welt", "Hei maailma", "Hola Mundo", "Привет мир"]
+        self.stacked_widget = QStackedWidget(self)
 
-        self.button = QPushButton("Go to home")
-        self.text = QLabel("Hello World")
+        self.start_new = StartNewTesting()
+        self.stacked_widget.addWidget(self.start_new)
 
-        self.layout = QVBoxLayout(self)
-        self.layout.addWidget(self.text)
-        self.layout.addWidget(self.button)
+        self.testing_questions = TestingQuestions()
+        self.stacked_widget.addWidget(self.testing_questions)
+
+        self.testing_results = TestingResults()
+        self.stacked_widget.addWidget(self.testing_results)
+
+        self.start_new.begin_button.clicked.connect(lambda: self.stacked_widget.setCurrentWidget(self.testing_questions))
