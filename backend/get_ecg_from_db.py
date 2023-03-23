@@ -131,4 +131,4 @@ def get_arrhythmia_name(cur: Cursor, arrhythmia_id: str) -> str:
                     SELECT arrhythmia.name
                     FROM arrhythmia
                     WHERE arrhythmia.id = ? 
-                    """, (arrhythmia_id,)).fetchone()[0]
+                    """, (arrhythmia_id,)).fetchone()[0].title()
