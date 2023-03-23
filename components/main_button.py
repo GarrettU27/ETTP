@@ -36,6 +36,14 @@ class MainButton(QPushButton):
                     QPushButton:disabled:hover {
                         background: #E6E6E6;
                     }
+                    
+                    QPushButton:checked {
+                        background: #44AF69;
+                    }
+                    
+                    QPushButton:checked:hover {
+                        background: #368c54;
+                    }
                 """)
 
     def setEnabled(self, val: bool) -> None:
