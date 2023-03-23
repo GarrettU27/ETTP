@@ -289,7 +289,9 @@ def return_svg_bytes():
     fig.savefig(buf, format="svg")
     buf.seek(0)
 
-    return buf.read()
+    svg_bytes = buf.read()
+    plt.close()
+    return svg_bytes
 
 
 def return_png_bytes():
