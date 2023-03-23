@@ -2,6 +2,9 @@ import random
 from backend.get_ecg_from_db import Question
 import io
 class Testing_object():
+
+    #Class variables, don't worry about these
+    #They're just variables that the class needs to keep track of.
     svg_files = [io.BytesIO]
     arrhythmia = [Question]
     questions = 0
@@ -11,20 +14,27 @@ class Testing_object():
     index_Q = 0
     index_SVG = 0
 
+    #This function is run whenever a new test_object is created
     def __init__(self):
         answers = []
 
-    #This function will get the next arrhythmia from the list
+    #This function will get the next arrhythmia from the list and return the list of choices
+    #If the list of arrhythmia is at the end, it will return a list of 4 "X" characters.
+    #Applicable to the testing mode only really.
     def next_question(self):
-        if self.index != self.questions:
+        if self.index_Q != self.questions:
             choice_list = self.choices.copy()
             return choice_list
         else:
             return ["X","X","X","X"]
     
+    #This function will get and return the next list of SVG bits.
+    #These bits can be used with the self.qsw.load() function 
     def get_next_svg(self):
+        if()
         next_svg = self.svg_files[self.index_SVG]
         self.index_SVG += 1
+        return next_svg
     #This function will add a list of answers to the 
     def add_answers(self,q_ans):
         self.answers.append(q_ans)
@@ -65,7 +75,7 @@ class Testing_object():
         for i in range(len(self.arrhythmia)):
             self.svg_files.append(self.arrhythmia[i].ecg)
             self.choices.append(self.arrhythmia[i].choices)
-            self.correct(self.arrhythmia[i].correct_answer)
+            self.correct.append(self.arrhythmia[i].correct_answer)
     
             
         

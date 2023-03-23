@@ -22,7 +22,7 @@ class Question:
     choices: List[str]
 
 
-def get_train_ecgs(arrhythmia_id_array: List[int], number_of_questions: int):
+def get_training_questions(arrhythmia_id_array: List[int], number_of_questions: int):
     total_arrhythmias = len(arrhythmia_id_array)
     if number_of_questions < total_arrhythmias:
         raise ValueError("numEcg >= len(idArray) must be true")
@@ -47,13 +47,13 @@ def get_train_ecgs(arrhythmia_id_array: List[int], number_of_questions: int):
         arrhythmia_amounts[j] = arrhythmia_amounts[j] + 1
 
     tested_arrhythmias = []
-    for (arrhythmia_id, i) in enumerate(arrhythmia_id_array):
+    for (i, arrhythmia_id) in enumerate(arrhythmia_id_array):
         tested_arrhythmias.append(Arrhythmia(id=str(arrhythmia_id), amount=arrhythmia_amounts[i]))
 
     return create_return_array(tested_arrhythmias, create_train_ecg)
 
 
-def get_test_ecgs(arrhythmia_id_array: List[int], number_of_questions: int):
+def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: int):
     total_arrhythmias = len(arrhythmia_id_array)
     if number_of_questions < total_arrhythmias:
         raise ValueError("numEcg >= len(idArray) must be true")
@@ -70,7 +70,7 @@ def get_test_ecgs(arrhythmia_id_array: List[int], number_of_questions: int):
         arrhythmia_amounts[j] = arrhythmia_amounts[j] + 1
 
     tested_arrhythmias = []
-    for (arrhythmia_id, i) in enumerate(arrhythmia_id_array):
+    for (i, arrhythmia_id) in enumerate(arrhythmia_id_array):
         tested_arrhythmias.append(Arrhythmia(id=str(arrhythmia_id), amount=arrhythmia_amounts[i]))
 
     questions = create_return_array(tested_arrhythmias, create_test_ecg)

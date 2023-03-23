@@ -5,7 +5,6 @@ block_cipher = None
 
 added_files = [
     ('ETTP.db', '.'),
-    ('icon.jpg', '.'),
     ('JS00001.mat', '.'),
     ('fonts/*', 'fonts'),
     ('images/*', 'images')
