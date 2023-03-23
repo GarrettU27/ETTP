@@ -118,7 +118,10 @@ class MainWindow(QMainWindow):
         self.lead_placement = LeadPlacement()
         self.stacked_widget.addWidget(self.lead_placement)
 
-        self.testing_questions = TestingQuestions()
+        self.testing_results = TestingResults()
+        self.stacked_widget.addWidget(self.testing_results)
+
+        self.testing_questions = TestingQuestions(self.testing_results)
         self.stacked_widget.addWidget(self.testing_questions)
 
         self.start_new_testing = StartNewTesting(
@@ -126,10 +129,7 @@ class MainWindow(QMainWindow):
             self.testing_questions
         )
         self.stacked_widget.addWidget(self.start_new_testing)
-
-        self.testing_results = TestingResults()
-        self.stacked_widget.addWidget(self.testing_results)
-
+        
         self.training_questions = TrainingQuestions()
         self.stacked_widget.addWidget(self.training_questions)
 
