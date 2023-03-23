@@ -1,7 +1,7 @@
 import sqlite3
 import os
 from scipy.io import loadmat
-from sqlite_setup import get_sqlite_connection
+from backend.sqlite_setup import get_sqlite_connection
 import csv
 
 path = "a-large-scale-12-lead-electrocardiogram-database-for-arrhythmia-study-1.0.0/WFDBRecords"
