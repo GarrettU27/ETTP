@@ -6,11 +6,6 @@ from Logic.testing import Testing_object
 from backend.generate_ecg_plot import get_ecg_svg
 from components.choice_button import ChoiceButtonLeft, ChoiceButtonRight
 from components.heading_label import HeadingLabelTest
-
-from components.heading_label import HeadingLabelTest
-from components.choice_button import ChoiceButtonLeft,ChoiceButtonRight
-from backend.generate_ecg_plot import get_ecg_svg
-from Logic.testing import Testing_object
 from pages.testing_results import TestingResults
 
 
@@ -18,10 +13,9 @@ class TestingQuestions(QWidget):
     test_object = Testing_object
     choices = ["something", "Is", "Really", "Wrong"]
     ECG_data = []
-    test_results : TestingResults
-    
+    test_results: TestingResults
 
-    def __init__(self, test_results : TestingResults):
+    def __init__(self, test_results: TestingResults):
         super().__init__()
         self.qsw = QSvgWidget()
         self.test_object = Testing_object()
@@ -51,8 +45,6 @@ class TestingQuestions(QWidget):
         self.layout.addWidget(self.answer4, 7, 2, 1, 2)
         self.layout.addWidget(self.qsw, 1, 0, 3, 4)
 
-
-
     def update_nextQ(self, item):
         self.test_object.add_answers(item.text())
         self.choices = self.test_object.next_question()
@@ -61,7 +53,8 @@ class TestingQuestions(QWidget):
             print(self.test_object.correct)
             self.test_object.check_answers()
             print(self.test_object.correctAns)
-            self.test_results.update_page(self.test_object.questions,self.test_object.answers,self.test_object.correct,self.test_object.correctAns)
+            self.test_results.update_page(self.test_object.questions, self.test_object.answers,
+                                          self.test_object.correct, self.test_object.correctAns)
             return -1
         else:
             self.qsw.load(self.test_object.get_next_svg())

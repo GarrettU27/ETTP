@@ -1,12 +1,9 @@
 from PyQt6.QtWidgets import QPushButton
-from PyQt6.QtCore import Qt
 
 
 class ChoiceButtonLeft(QPushButton):
     def __init__(self, text):
         super().__init__(text)
-
-
 
         self.setStyleSheet("""
             QPushButton {
@@ -27,11 +24,11 @@ class ChoiceButtonLeft(QPushButton):
                 background: #063eb7;
             }
         """)
+
+
 class ChoiceButtonRight(QPushButton):
     def __init__(self, text):
         super().__init__(text)
-
-
 
         self.setStyleSheet("""
             QPushButton {
