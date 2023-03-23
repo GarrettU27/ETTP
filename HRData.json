@@ -1,0 +1,142 @@
+[
+ {
+   "PhysionetCode": 426783006,
+   "RhythmName": "Normal Sinus Rhythm",
+   "HeartRate_bpm": "60 - 100",
+   "Rhythm": "Regular, evenly spaced",
+   "P-wave": "Before each QRS, identical waves",
+   "PRInterval_seconds": "0.12 - 0.20",
+   "QRSComplex_seconds": "< 0.12",
+   "Notes": "This is the rhythm of a normal healthy heart. The sinus node is triggering the cardiac activation. "
+ },
+ {
+   "PhysionetCode": 426177001,
+   "RhythmName": "Sinus Bradycardia",
+   "HeartRate_bpm": "< 60",
+   "Rhythm": "Regular, evenly spaced",
+   "P-wave": "Before each QRS, identical waves",
+   "PRInterval_seconds": "0.12 - 0.20",
+   "QRSComplex_seconds": "< 0.12",
+   "Notes": "In this rhythm, the impulses originate at the SA node at a slow rate. This may be caused by increased vagal or parasympathetic tones."
+ },
+ {
+   "PhysionetCode": 427084000,
+   "RhythmName": "Sinus Tachycardia",
+   "HeartRate_bpm": "> 100",
+   "Rhythm": "Regular, evenly spaced",
+   "P-wave": "Before each QRS, identical waves",
+   "PRInterval_seconds": "0.12 - 0.20",
+   "QRSComplex_seconds": "< 0.12",
+   "Notes": "In this rhythm, the impulses originate at the SA node at a rapid rate. This may be caused by physical exercise, physical stress, or congestive heart failure."
+ },
+ {
+   "PhysionetCode": 164889003,
+   "RhythmName": "Atrial Fibrillation",
+   "HeartRate_bpm": "A: 350-650, V: slow to rapid",
+   "Rhythm": "Irregular spacing",
+   "P-wave": "very rapid irregular",
+   "PRInterval_seconds": "0.12 - 0.20",
+   "QRSComplex_seconds": "< 0.12",
+   "Notes": "In this rhythm, the impulses travel on chaotic, random pathways in the atria. This may be caused by rheumatic disease, atherosclerotic disease, hyperthyroidism, and pericarditis."
+ },
+ {
+   "PhysionetCode": 164890007,
+   "RhythmName": "Atrial Flutter",
+   "HeartRate_bpm": "220 - 300",
+   "Rhythm": "Regular or varying",
+   "P-wave": "Saw-toothed in appearance",
+   "PRInterval_seconds": "N/A",
+   "QRSComplex_seconds": "< 0.12",
+   "Notes": "In this rhythm, the impulses travel circularly in the atria. The HR is elevated to the point that the isoelectric interval between the end of T and beginning of P disappears. This may be caused by a reentrant atrial pathway."
+ },
+ {
+   "PhysionetCode": 270492004,
+   "RhythmName": "1st Degree AV Block",
+   "HeartRate_bpm": "60 - 100",
+   "Rhythm": "Regular, evenly spaced",
+   "P-wave": "Before each QRS",
+   "PRInterval_seconds": "> 0.2",
+   "QRSComplex_seconds": "< 0.12",
+   "Notes": "In this rhythm, the Atrioventricular, AV, conduction is lengthened. The P-wave always preceeds the QRS complex, but the PR interval is prolonged over 0.2 seconds."
+ },
+ {
+   "PhysionetCode": 195042002,
+   "RhythmName": "2nd Degree AV Block",
+   "HeartRate_bpm": "",
+   "Rhythm": "Regular",
+   "P-wave": "regular intervals",
+   "PRInterval_seconds": "regular",
+   "QRSComplex_seconds": "sometimes absent",
+   "Notes": "In this rhythm, the QRS complex is suddenly dropped and may not follow the P-wave. The PQ interval is longer than normal. If the PR-interval becomes longer over time until the QRS complex drops off, the second degree block is called a Wenkebach phenomenon."
+ },
+ {
+   "PhysionetCode": 27885002,
+   "RhythmName": "3rd Degree AV Block",
+   "HeartRate_bpm": "20 - 55",
+   "Rhythm": "Irregular spacing",
+   "P-wave": "out of sync with QRS, regular intervals",
+   "PRInterval_seconds": "regular",
+   "QRSComplex_seconds": "< 0.12",
+   "Notes": "In this rhythm, the impulses original at the AV node, and proceed to the ventricles, but the atrial and ventricular sides are not synchronous creating a complete lack of synchronism between the P-wave and the QRS complex. This is caused by a defect somewhere in the conduction system."
+ },
+ {
+   "PhysionetCode": 59118001,
+   "RhythmName": "Right Bundle Branch Block",
+   "HeartRate_bpm": "",
+   "Rhythm": "",
+   "P-wave": "",
+   "PRInterval_seconds": "",
+   "QRSComplex_seconds": "0.1> QRS >0.12",
+   "Notes": "In this rhythm, there is a defect in the right bundle-branch preventing the electrcal impulse from traveling to the right ventrical. Instead, the activation travels from the left ventricle to the right ventricle, then through the septal and right ventricular muscle mass. There is larger, but normal, activation in the left ventricle followed by a delayed activation of the right. The broad terminal S-wave in lead I, V5, and V6 illustrates the abnormal terminal QRS-vector directed to the right ventrical. Or this is seens as a double wide R-wave in lead VI (RSR' Complex)."
+ },
+ {
+   "PhysionetCode": 164909002,
+   "RhythmName": "Left Bundle Branch Block",
+   "HeartRate_bpm": "",
+   "Rhythm": "",
+   "P-wave": "",
+   "PRInterval_seconds": "",
+   "QRSComplex_seconds": "QRS >0.12",
+   "Notes": "In this rhythm, there is a defect in the left bundle-branch preventing the electrcal impulse from traveling to the left ventrical. Instead, the activation travels from the right ventricle to the left ventricle, then through the septal and left ventricular muscle mass. There is larger, but normal, activation in the right ventricle followed by a delayed activation of the left. The broad terminal S-wave in leads V1 and V2 illustrates the abnormal terminal QRS-vector directed to the left ventrical. Or this is seens as a double wide R-wave in leads V5 and V6 (RSR' Complex). "
+ },
+ {
+   "PhysionetCode": 74390002,
+   "RhythmName": "Wolff-Parkinson-White Syndrome",
+   "HeartRate_bpm": "",
+   "Rhythm": "",
+   "P-wave": "shortened PQ time",
+   "PRInterval_seconds": "0.12 - 0.20",
+   "QRSComplex_seconds": "QRS > 0.12",
+   "Notes": "In this rhythm, the QRS-complex initially exhibits an early upstroke. The cause of WPW is the passage of activation from the atrium directly to the ventriclar muscle via an abnormal route, called the bundle of Kent, which bypasses the AV juntions. There is a pre-excitation is caused when part of the ventricular muscle is activated before normal activation reaches it before normal activaion reaches it."
+ },
+ {
+   "PhysionetCode": 446358003,
+   "RhythmName": "Right Atrial Hypertrophy",
+   "HeartRate_bpm": "",
+   "Rhythm": "",
+   "P-wave": ">= 0.25 mV",
+   "PRInterval_seconds": "",
+   "QRSComplex_seconds": "",
+   "Notes": "In this rhythm, there is an increase in the atrial wall thickness, caused by right atrial overload from the electrical force being generated by the enlarged right atrium. The electrical force is in the direction of lead II, aVF, and III. This is caused by tricuspid valve disease, pulmonary valve disease, or pulmonary hypertension"
+ },
+ {
+   "PhysionetCode": 89792004,
+   "RhythmName": "Right Ventricular Hypertrophy",
+   "HeartRate_bpm": "",
+   "Rhythm": "",
+   "P-wave": "",
+   "PRInterval_seconds": "",
+   "QRSComplex_seconds": "",
+   "Notes": "This rhythm is caused by right ventricular overload. The cause can be pulmonary valve stenosis, tricuspid insufficiency, or pulmonary hypertension. Large R wave in leads V1 and V2, >= 0.7mV; wide S-wave in leads V1 and V2; wide R wave in V5 and V6"
+ },
+ {
+   "PhysionetCode": 164873001,
+   "RhythmName": "Left Ventricular Hypertrophy",
+   "HeartRate_bpm": "",
+   "Rhythm": "",
+   "P-wave": "",
+   "PRInterval_seconds": "",
+   "QRSComplex_seconds": "",
+   "Notes": "This rhythm is caused by left ventricular overload. This can be caused by mitral valve disease, aoric valve disease, systemic hypertension, or obstructive hypertrophic cardiomyopathy. There is an increase in the ventricular electric forces towards the left ventricle. Leads I, V5, and V6 have a tall R wave (>=3.5 mV), and leads III, V1, and V2 have a tall S wave (>=2.5 mV)"
+ }
+]
