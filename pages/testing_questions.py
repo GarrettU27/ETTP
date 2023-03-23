@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import QWidget, QPushButton, QGridLayout
 
 from Logic.testing import Testing_object
 from backend.generate_ecg_plot import get_ecg_svg
-from components.choice_button import ChoiceButtonLeft, ChoiceButtonRight
+from components.choice_button import ChoiceButton
 from components.heading_label import HeadingLabelTest
 from pages.testing_results import TestingResults
 
@@ -28,16 +28,17 @@ class TestingQuestions(QWidget):
         self.qsw.load(get_ecg_svg())
         self.qsw.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         self.title = HeadingLabelTest("Question")
-        self.answer1 = ChoiceButtonLeft(self.choices[0])
-        self.answer2 = ChoiceButtonRight(self.choices[1])
-        self.answer3 = ChoiceButtonLeft(self.choices[2])
-        self.answer4 = ChoiceButtonRight(self.choices[3])
+        self.answer1 = ChoiceButton(self.choices[0])
+        self.answer2 = ChoiceButton(self.choices[1])
+        self.answer3 = ChoiceButton(self.choices[2])
+        self.answer4 = ChoiceButton(self.choices[3])
         self.answer1.clicked.connect(lambda: self.update_nextQ(self.answer1))
         self.answer2.clicked.connect(lambda: self.update_nextQ(self.answer2))
         self.answer3.clicked.connect(lambda: self.update_nextQ(self.answer3))
         self.answer4.clicked.connect(lambda: self.update_nextQ(self.answer4))
         self.next = QPushButton(self)
         self.layout = QGridLayout(self)
+        self.layout.setSpacing(30)
         self.layout.addWidget(self.title, 0, 1, 1, 2)
         self.layout.addWidget(self.answer1, 6, 0, 1, 2)
         self.layout.addWidget(self.answer2, 6, 2, 1, 2)
@@ -76,4 +77,4 @@ class TestingQuestions(QWidget):
         self.answer1.setText(self.choices[0])
         self.answer2.setText(self.choices[1])
         self.answer3.setText(self.choices[2])
-        self.answer4.setText(self.choices[3])
+        # self.answer4.setText(self.choices[3])

@@ -1,7 +1,6 @@
-from PyQt6.QtWidgets import QPushButton
-from PyQt6.QtCore import Qt
-from PyQt6 import QtGui, QtCore
+from PyQt6 import QtCore
 from PyQt6.QtGui import QCursor
+from PyQt6.QtWidgets import QPushButton
 
 
 class MainButton(QPushButton):
@@ -43,5 +42,9 @@ class MainButton(QPushButton):
                     
                     QPushButton:checked:hover {
                         background: #368c54;
+                    }
+                    
+                    QPushButton#test_choice {
+                        padding: 0.765em;
                     }
                 """)
