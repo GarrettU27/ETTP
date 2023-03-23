@@ -5,6 +5,8 @@ from arrhythmia import supported_arrhythmias
 from components.heading_label import HeadingLabel
 from components.main_button import MainButton
 from components.main_checkbox import MainCheckbox
+from main_window import switch_page
+from main import window
 
 
 class StartNewTesting(QWidget):
@@ -26,8 +28,9 @@ class StartNewTesting(QWidget):
         question_number = QComboBox()
         question_number.addItems(str(num) for num in range(10))
         submission_layout.addWidget(question_number)
-
-        submission_layout.addWidget(MainButton("Begin Test"))
+        begin_test = MainButton("Begin Test")
+        begin_test.clicked.connect(lambda: print("BEgin"))
+        submission_layout.addWidget(begin_test)
 
         submission_layout.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignVCenter)
 

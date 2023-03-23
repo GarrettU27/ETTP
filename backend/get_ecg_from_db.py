@@ -6,7 +6,7 @@ from sqlite3 import Cursor
 from typing import List, Callable
 
 from backend.generate_ecg_plot import create_test_ecg, create_train_ecg
-from sqlite_setup import get_sqlite_connection
+from backend.sqlite_setup import get_sqlite_connection
 
 
 @dataclass
