@@ -10,6 +10,7 @@ class Testing_object():
     questions = 0
     answers = []
     correct = [str]
+    correctAns = [bool]
     choices = [[str]]
     index_Q = 0
     index_SVG = 0
@@ -41,11 +42,12 @@ class Testing_object():
     
     #This function checks the answers agains the passed in arrhythmia to check it's correctness
     def check_answers(self):
+        self.correctAns = []
         for i in range(self.questions):
-            if self.arhythmia == self.answers:
-                self.correct.append(True)
+            if self.correct[i] == self.answers[i]:
+                self.correctAns.append(True)
             else:
-                self.correct.append(False)
+                self.correctAns.append(False)
 
     #Returns the number of questions
     def get_questions(self):

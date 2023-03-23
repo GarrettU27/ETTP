@@ -11,16 +11,21 @@ from components.heading_label import HeadingLabelTest
 from components.choice_button import ChoiceButtonLeft,ChoiceButtonRight
 from backend.generate_ecg_plot import get_ecg_svg
 from Logic.testing import Testing_object
+from pages.testing_results import TestingResults
+
 
 class TestingQuestions(QWidget):
     test_object = Testing_object
     choices = ["something", "Is", "Really", "Wrong"]
     ECG_data = []
+    test_results : TestingResults
+    
 
-    def __init__(self):
+    def __init__(self, test_results : TestingResults):
         super().__init__()
         self.qsw = QSvgWidget()
         self.test_object = Testing_object()
+        self.test_results = test_results
         # self.choices = self.test_object.next_question()
 
         # get all of the necessary files required for creating the testing object here
@@ -39,7 +44,7 @@ class TestingQuestions(QWidget):
         self.answer4.clicked.connect(lambda: self.update_nextQ(self.answer4))
         self.next = QPushButton(self)
         self.layout = QGridLayout(self)
-        self.layout.addWidget(self.title, 0, 0, 1, 2)
+        self.layout.addWidget(self.title, 0, 1, 1, 2)
         self.layout.addWidget(self.answer1, 6, 0, 1, 2)
         self.layout.addWidget(self.answer2, 6, 2, 1, 2)
         self.layout.addWidget(self.answer3, 7, 0, 1, 2)
@@ -51,8 +56,12 @@ class TestingQuestions(QWidget):
     def update_nextQ(self, item):
         self.test_object.add_answers(item.text())
         self.choices = self.test_object.next_question()
-        print(self.choices)
         if self.choices[0] == "X":
+            print(self.test_object.answers)
+            print(self.test_object.correct)
+            self.test_object.check_answers()
+            print(self.test_object.correctAns)
+            self.test_results.update_page(self.test_object.questions,self.test_object.answers,self.test_object.correct,self.test_object.correctAns)
             return -1
         else:
             self.qsw.load(self.test_object.get_next_svg())
