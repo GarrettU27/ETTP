@@ -23,7 +23,8 @@ class Testing_object():
     #Applicable to the testing mode only really.
     def next_question(self):
         if self.index_Q != self.questions:
-            choice_list = self.choices.copy()
+            choice_list = self.choices[self.index_Q].copy()
+            self.index_Q += 1
             return choice_list
         else:
             return ["X","X","X","X"]
@@ -31,7 +32,6 @@ class Testing_object():
     #This function will get and return the next list of SVG bits.
     #These bits can be used with the self.qsw.load() function 
     def get_next_svg(self):
-        if()
         next_svg = self.svg_files[self.index_SVG]
         self.index_SVG += 1
         return next_svg
@@ -69,6 +69,7 @@ class Testing_object():
     def update_object(self):
         self.index_Q = 0
         self.index_SVG = 0
+        self.questions = len(self.arrhythmia)
         self.correct = []
         self.svg_files = []
         self.choices = []
