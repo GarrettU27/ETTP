@@ -4,7 +4,7 @@ import PyQt6
 import qtawesome
 from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtCore import QSize
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import QIcon, QCursor
 from PyQt6.QtWidgets import QWidget, QMainWindow, QStackedWidget, QHBoxLayout, \
     QPushButton, QScrollArea
 
@@ -73,6 +73,7 @@ class MainWindow(QMainWindow):
         burger_icon = qtawesome.icon("fa5s.bars")
         self.burger_button = QPushButton(burger_icon, "")
         self.burger_button.setIconSize(QSize(30, 30))
+        self.burger_button.setCursor(QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
         self.burger_button.setStyleSheet("""
             QPushButton { 
                 border: none; 
