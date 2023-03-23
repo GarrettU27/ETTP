@@ -1,3 +1,5 @@
+from enum import Enum
+
 import PyQt6
 import qtawesome
 from PyQt6 import QtCore, QtWidgets
@@ -13,13 +15,35 @@ from pages.lead_placement import LeadPlacement
 from pages.read_ecg import ReadECG
 from pages.start_new.start_new_testing import StartNewTesting
 from pages.start_new.start_new_training import StartNewTraining
-from pages.testing import Testing
-from pages.training import Training
+from pages.testing_questions import TestingQuestions
+from pages.testing_results import TestingResults
 from pages.home import Home
-
+from pages.training_questions import TrainingQuestions
+from pages.training_results import TrainingResults
 
 
 class MainWindow(QMainWindow):
+    class State(Enum):
+        NEW = 1
+        IN_PROGRESS = 2
+        DONE = 3
+
+    home = None
+    about_us = None
+    testing = None
+    training = None
+    lead_placement = None
+    read_ecg = None
+    start_new_testing = None
+    testing_questions = None
+    testing_results = None
+    start_new_training = None
+    training_questions = None
+    training_results = None
+
+    testing_state: State = State.NEW
+    training_state: State = State.NEW
+
     def __init__(self):
         super().__init__()
 
@@ -37,10 +61,10 @@ class MainWindow(QMainWindow):
 
         self.resize(screenSize.width(), screenSize.height())
         self.setWindowTitle("ETTP")
-        self.setWindowIcon(QIcon("icon.jpg"))
+        self.setWindowIcon(QIcon("images:icon.jpg"))
 
         self.scroll = None
-        self.stackedWidget = None
+        self.stacked_widget = None
         self.create_stacked_widget()
 
         self.page_list = None
@@ -71,58 +95,96 @@ class MainWindow(QMainWindow):
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
 
-        self.stackedWidget = QStackedWidget(self.scroll)
+        self.stacked_widget = QStackedWidget(self.scroll)
 
-        self.scroll.setWidget(self.stackedWidget)
+        self.scroll.setWidget(self.stacked_widget)
 
         self.scroll.setStyleSheet("* { border: none; }")
 
-        welcome = Home()
-        welcome.training_button.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(4))
-        welcome.testing_button.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(7))
-        welcome.about_us_button.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
+        self.about_us = AboutUs()
+        self.stacked_widget.addWidget(self.about_us)
 
-        self.stackedWidget.addWidget(welcome)
+        self.home = Home()
+        self.home.training_button.clicked.connect(lambda: self.stacked_widget.setCurrentWidget(self.start_new_training))
+        self.home.testing_button.clicked.connect(lambda: self.stacked_widget.setCurrentWidget(self.start_new_testing))
+        self.home.about_us_button.clicked.connect(lambda: self.stacked_widget.setCurrentWidget(self.about_us))
 
-        about_us = AboutUs()
-        self.stackedWidget.addWidget(about_us)
+        self.stacked_widget.addWidget(self.home)
 
-        training = Training()
-        self.stackedWidget.addWidget(training)
+        self.read_ecg = ReadECG()
+        self.stacked_widget.addWidget(self.read_ecg)
 
-        testing = Testing()
-        self.stackedWidget.addWidget(testing)
+        self.lead_placement = LeadPlacement()
+        self.stacked_widget.addWidget(self.lead_placement)
 
-        start_new_training = StartNewTraining()
-        self.stackedWidget.addWidget(start_new_training)
+        self.testing_questions = TestingQuestions()
+        self.stacked_widget.addWidget(self.testing_questions)
 
-        read_ecg = ReadECG()
-        self.stackedWidget.addWidget(read_ecg)
+        self.start_new_testing = StartNewTesting(
+            lambda: (self.set_testing_state(self.State.IN_PROGRESS), self.choose_testing_page()),
+            self.testing_questions
+        )
+        self.stacked_widget.addWidget(self.start_new_testing)
 
-        lead_placement = LeadPlacement()
-        self.stackedWidget.addWidget(lead_placement)
+        self.testing_results = TestingResults()
+        self.stacked_widget.addWidget(self.testing_results)
 
-        start_new_testing = StartNewTesting()
-        self.stackedWidget.addWidget(start_new_testing)
+        self.training_questions = TrainingQuestions()
+        self.stacked_widget.addWidget(self.training_questions)
+
+        self.start_new_training = StartNewTraining(
+            lambda: (self.set_training_state(self.State.IN_PROGRESS), self.choose_training_page()),
+            self.training_questions
+        )
+        self.stacked_widget.addWidget(self.start_new_training)
+
+        self.training_results = TrainingResults()
+        self.stacked_widget.addWidget(self.training_results)
+
+        self.stacked_widget.setCurrentWidget(self.home)
+
+    def choose_training_page(self):
+        match self.training_state:
+            case self.State.NEW:
+                self.stacked_widget.setCurrentWidget(self.start_new_training)
+            case self.State.IN_PROGRESS:
+                self.stacked_widget.setCurrentWidget(self.training_questions)
+            case self.State.DONE:
+                self.stacked_widget.setCurrentWidget(self.training_results)
+
+    def choose_testing_page(self):
+        match self.testing_state:
+            case self.State.NEW:
+                self.stacked_widget.setCurrentWidget(self.start_new_testing)
+            case self.State.IN_PROGRESS:
+                self.stacked_widget.setCurrentWidget(self.testing_questions)
+            case self.State.DONE:
+                self.stacked_widget.setCurrentWidget(self.testing_results)
+
+    def set_testing_state(self, testing_state: State):
+        self.testing_state = testing_state
+
+    def set_training_state(self, training_state: State):
+        self.training_state = training_state
 
     def create_page_list(self):
         self.page_list = BurgerMenu()
-        home = BurgerItem(["Home"], 0)
+        home = BurgerItem(["Home"], self.home)
         home.setIcon(0, qtawesome.icon("fa5s.home"))
 
-        about_us = BurgerItem(["About Us"], 1)
+        about_us = BurgerItem(["About Us"], self.about_us)
         about_us.setIcon(0, qtawesome.icon("fa5s.address-card"))
 
-        train = BurgerItem(["Train"], 4)
+        train = BurgerItem(["Train"], self.start_new_training)
         train.setIcon(0, qtawesome.icon("fa5s.globe"))
 
-        ecg_reading = BurgerItem(["ECG Reading"], 10)
+        ecg_reading = BurgerItem(["ECG Reading"], self.read_ecg)
         ecg_reading.setIcon(0, qtawesome.icon("fa5s.book"))
 
-        ecg_reading.addChild(BurgerItem(["Reading an ECG Strip"], 5))
-        ecg_reading.addChild(BurgerItem(["Lead Placements"], 6))
+        ecg_reading.addChild(BurgerItem(["Reading an ECG Strip"], self.read_ecg))
+        ecg_reading.addChild(BurgerItem(["Lead Placements"], self.lead_placement))
 
-        test = BurgerItem(["Test"], 7)
+        test = BurgerItem(["Test"], self.start_new_testing)
         test.setIcon(0, qtawesome.icon("fa5s.pen-nib"))
 
         self.page_list.addTopLevelItem(home)
@@ -133,7 +195,12 @@ class MainWindow(QMainWindow):
         self.page_list.itemClicked.connect(self.switch_page)
 
     def switch_page(self, item):
-        self.stackedWidget.setCurrentIndex(item.index)
+        if item.widget == self.start_new_training:
+            self.choose_training_page()
+        elif item.widget == self.start_new_training:
+            self.choose_testing_page()
+        else:
+            self.stacked_widget.setCurrentWidget(item.widget)
 
 
 

@@ -1,19 +1,19 @@
-import PyQt6
-import PyQt6.QtCore
-from PyQt6.QtWidgets import QWidget, QPushButton, QLabel, QVBoxLayout, QGridLayout, QSpacerItem, QHBoxLayout, QComboBox
-from arrhythmia import supported_arrhythmias
-from components.heading_label import HeadingLabel
-from components.main_button import MainButton
-from components.main_checkbox import MainCheckbox
+from backend.get_ecg_from_db import get_training_questions, get_testing_questions
 from pages.start_new.start_new import StartNew
+from pages.testing_questions import TestingQuestions
 
 
 class StartNewTesting(StartNew):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, set_state, testing_questions: TestingQuestions):
+        super().__init__(set_state)
+        self.testing_questions = testing_questions
+
+    def begin(self):
+        questions = get_testing_questions(self.get_arrhythmias(), int(self.question_number.currentText()))
+        self.testing_questions.set_ecg_data(questions)
+        self.set_state()
 
     def heading_text(self) -> str:
-        # return "What Do You Want to be Tested On?"
         return "Test"
 
     def paragraph_text(self) -> str:
