@@ -6,4 +6,4 @@ class TestingQuestions(QWidget):
         super().__init__()
 
     def set_ecg_data(self, questions):
-        print(questions)
+        print([question.correct_answer for question in questions])

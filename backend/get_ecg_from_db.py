@@ -3,10 +3,12 @@ import math
 import random
 from dataclasses import dataclass
 from sqlite3 import Cursor
-from typing import List, Callable
+from typing import List, Callable, Final
 
 from backend.generate_ecg_plot import create_test_ecg, create_train_ecg
 from backend.sqlite_setup import get_sqlite_connection
+
+SINUS_RHYTHM_ID: Final[int] = 54
 
 
 @dataclass
@@ -54,7 +56,7 @@ def get_training_questions(arrhythmia_id_array: List[int], number_of_questions: 
 
 
 def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: int):
-    total_arrhythmias = len(arrhythmia_id_array)
+    total_arrhythmias = len(arrhythmia_id_array) + 1
     if number_of_questions < total_arrhythmias:
         raise ValueError("numEcg >= len(idArray) must be true")
 
@@ -64,13 +66,15 @@ def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: i
 
     # The sum of all elements of arrhythmia amount must be equal to total_ecgs
     # However, each element in arrhythmia amount is already one, so we only
-    # need to add total_ecgs - total_arrhythmias more to the sum
+    # need to add total_ecgs - (total_arrhythmias + 1) more to the sum
     for i in range(number_of_questions - total_arrhythmias):
         j = random.randrange(0, total_arrhythmias)
         arrhythmia_amounts[j] = arrhythmia_amounts[j] + 1
 
+    tested_arrhythmia_ids = arrhythmia_id_array
+    tested_arrhythmia_ids.append(SINUS_RHYTHM_ID)
     tested_arrhythmias = []
-    for (i, arrhythmia_id) in enumerate(arrhythmia_id_array):
+    for (i, arrhythmia_id) in enumerate(tested_arrhythmia_ids):
         tested_arrhythmias.append(Arrhythmia(id=str(arrhythmia_id), amount=arrhythmia_amounts[i]))
 
     questions = create_return_array(tested_arrhythmias, create_test_ecg)
@@ -85,9 +89,6 @@ def create_return_array(arrhythmias: List[Arrhythmia], grapher: Callable) -> Lis
 
     questions = []
     choices = [get_arrhythmia_name(cur, arrhythmia.id) for arrhythmia in arrhythmias]
-
-    # add sinus rhythm to choices
-    choices.append(get_arrhythmia_name(cur, "54"))
 
     for arrhythmia in arrhythmias:
         for i in range(arrhythmia.amount):
