@@ -8,7 +8,7 @@ class MainButton(QPushButton):
     def __init__(self, text):
         super().__init__(text)
         self.set_main_button_style()
-        self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        self.setCursor(QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
 
     def set_main_button_style(self):
         self.setStyleSheet("""
@@ -27,4 +27,21 @@ class MainButton(QPushButton):
                     QPushButton:hover {
                         background: #063eb7;
                     }
+                    
+                    QPushButton:disabled {
+                        background: #E6E6E6;
+                        color: #626262;
+                    }
+                    
+                    QPushButton:disabled:hover {
+                        background: #E6E6E6;
+                    }
                 """)
+
+    def setEnabled(self, val: bool) -> None:
+        if val is True:
+            self.setCursor(QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
+        else:
+            self.setCursor(QCursor(QtCore.Qt.CursorShape.ArrowCursor))
+
+        super().setEnabled(val)

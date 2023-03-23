@@ -15,7 +15,7 @@ class StartNew(QWidget):
 
         self.heading = HeadingLabel(self.heading_text())
         self.heading.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
-                                     PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
+                                   PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
         self.paragraph = ParagraphLabel(self.paragraph_text())
         self.paragraph.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
                                      PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
@@ -31,6 +31,7 @@ class StartNew(QWidget):
 
         for index, arrhythmia in enumerate(supported_arrhythmias):
             checkbox = MainCheckbox(arrhythmia.name)
+            checkbox.clicked.connect(self.update_begin_button)
             self.checkboxes.append((checkbox, arrhythmia.id))
             self.layout.addWidget(checkbox)
 
@@ -51,7 +52,7 @@ class StartNew(QWidget):
 
         question_number_layout.addWidget(self.question_number)
         question_number_layout.setSpacing(7)
-        self.question_number.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        self.question_number.setCursor(QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
         self.question_number.setStyleSheet("""
             QComboBox {
                 font-family: "Encode Sans";
@@ -76,15 +77,22 @@ class StartNew(QWidget):
 
         self.begin_button = MainButton(self.begin_button_text())
         submission_layout.addWidget(self.begin_button)
+        self.begin_button.setEnabled(False)
         self.begin_button.clicked.connect(self.begin)
         submission_layout.setSpacing(30)
 
         self.layout.addWidget(submission_row)
         self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
-                                     PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
+                                              PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
 
     def begin(self):
         self.set_state()
+
+    def update_begin_button(self):
+        self.begin_button.setEnabled(self.can_begin())
+
+    def can_begin(self):
+        return len(self.get_arrhythmias()) > 0
 
     def get_arrhythmias(self):
         arrhythmias = []
@@ -103,5 +111,3 @@ class StartNew(QWidget):
 
     def begin_button_text(self) -> str:
         return "Begin"
-
-
