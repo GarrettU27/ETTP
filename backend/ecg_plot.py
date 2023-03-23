@@ -236,7 +236,7 @@ def plot_1(ecg, sample_rate=500, title='ECG', fig_width=15, fig_height=2, line_w
     _ax_plot(ax, np.arange(0, len(ecg) * step, step), ecg, seconds, line_w, ecg_amp, timetick)
 
 
-DEFAULT_PATH = './'
+DEFAULT_PATH = '../'
 show_counter = 1
 
 
@@ -266,7 +266,7 @@ def save_as_png(file_name, path=DEFAULT_PATH, dpi=100, layout='tight'):
         layout   : Set equal to "tight" to include ax labels on saved image
     """
     plt.ioff()
-    plt.savefig(path + file_name + '.png', dpi=dpi, bbox_inches=layout)
+    plt.savefig(os.path.join(path, file_name + '.png'), dpi=dpi, bbox_inches=layout)
     plt.close()
 
 
@@ -289,7 +289,9 @@ def return_svg_bytes():
     fig.savefig(buf, format="svg")
     buf.seek(0)
 
-    return buf.read()
+    svg_bytes = buf.read()
+    plt.close()
+    return svg_bytes
 
 
 def return_png_bytes():
