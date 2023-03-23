@@ -1,6 +1,9 @@
 import json
 import numpy as np
-from PyQt6.QtWidgets import QWidget, QLineEdit
+from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QGridLayout
+from PyQt6.QtCore import Qt
+from PyQt6.QtSvgWidgets import QSvgWidget
+
 from backend.generate_ecg_plot import get_ecg_svg
 
 ##from testing.py
@@ -14,6 +17,8 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from components.heading_label import HeadingLabelTest
 from backend.generate_ecg_plot import get_ecg_svg
 from Logic.testing import Testing_object
+from components.choice_button import ChoiceButtonNext
+
 
 # do we need global variables for the JSON dictonary to work?
 NormalSinusRhythm = np.array([])  # global variable
@@ -42,50 +47,50 @@ class Training_object():
             else:
                 return ["X", "X", "X", "X"]
 
-        def get_next_svg(self):
-            next_svg = self.svg_files[self.index_SVG]
-            self.index_SVG += 1
-            return next_svg
+    def get_next_svg(self):
+        next_svg = self.svg_files[self.index_SVG]
+        self.index_SVG += 1
+        return next_svg
 
-        # This function will add a list of answers to the
-        def add_answers(self, q_ans):
-            self.answers.append(q_ans)
+    # This function will add a list of answers to the
+    def add_answers(self, q_ans):
+        self.answers.append(q_ans)
 
-        # This function checks the answers agains the passed in arrhythmia to check it's correctness
-        def check_answers(self):
-            for i in range(self.questions):
-                if self.arhythmia == self.answers:
-                    self.correct.append(True)
-                else:
-                    self.correct.append(False)
+    # This function checks the answers agains the passed in arrhythmia to check it's correctness
+    def check_answers(self):
+        for i in range(self.questions):
+            if self.arhythmia == self.answers:
+                self.correct.append(True)
+            else:
+                self.correct.append(False)
 
-        # Returns the number of questions
-        def get_questions(self):
-            return self.questions
+    # Returns the number of questions
+    def get_questions(self):
+         return self.questions
 
-        # Returns the list of arhythmia
-        def get_arrhythmia(self):
-            return self.arrhythmia
+     # Returns the list of arhythmia
+    def get_arrhythmia(self):
+         return self.arrhythmia
 
-        def set_arrhythmia(self, arrhythmia):
-            self.arrhythmia = arrhythmia.copy()
+    def set_arrhythmia(self, arrhythmia):
+         self.arrhythmia = arrhythmia.copy()
 
-        def update_object(self):
-            self.index_Q = 0
-            self.index_SVG = 0
-            self.svg_files = []
-            for i in range(len(self.arrhythmia)):
-                self.svg_files.append(self.arrhythmia[i].ecg)
+    def update_object(self):
+         self.index_Q = 0
+         self.index_SVG = 0
+         self.svg_files = []
+         for i in range(len(self.arrhythmia)):
+             self.svg_files.append(self.arrhythmia[i].ecg)
 
 
 ##Marie's training code
-class TrainingQuestion(QWidget):
-    train_object = Training_object
+class TrainingQuestions(QWidget):
+    train_object = Training_object()
     ECG_data = []
 
     def __init__(self):
         super().__init__()
-
+        
         # read file
         with open('HRData.json', 'r') as myfile:
             self.data = myfile.read()
@@ -96,6 +101,8 @@ class TrainingQuestion(QWidget):
         self.hello = ["Hallo Welt", "Hei maailma", "Hola Mundo", "Привет мир"]
         self.button = QPushButton("I AM TRAINING PAGE")
         self.text = QLabel("Hello World")
+        self.title = HeadingLabelTest("You are Currently Training")
+        self.subtitle = HeadingLabelTest("'Hit the next button for the next ECG strip")
 
         self.qsw = QSvgWidget()
         self.qsw.load(get_ecg_svg())
@@ -108,12 +115,13 @@ class TrainingQuestion(QWidget):
 
     def update_nextQ(self, item):
         # self.train_object.add_answers(item.text())
-        # self.choices = self.train_object.next_question()
+        #self.choices = self.train_object.next_question()
         # if self.choices[0] == "X":
         #    return -1
         # else:
         self.qsw.load(self.train_object.get_next_svg())
-        self.title.setText("Question " + self.train_object.index + 1)
+        #self.title.setText("You are Currently Training " + self.train_object.index_Q + 1)
+        self.title.setText("You are Currently Training ")
         self.next.setText(self)
         # self.answer2.setText(self.choices[1])
         # self.answer3.setText(self.choices[2])
@@ -125,8 +133,10 @@ class TrainingQuestion(QWidget):
         self.train_object.update_object()
 
     def start_train(self):
-        self.choices = self.train_object.next_question()
-        self.title.setText("Question " + self.train_object.index + 1)
+        #self.choices = self.train_object.next_question()
+        #self.title.setText("You are Currently Training " + self.train_object.index_Q + 1)
+        self.title.setText("You are Currently Training ")
+        print("helo friend", self.train_object.get_next_svg())
         self.qsw.load(self.train_object.get_next_svg())
         self.next.setText(self)
         # self.answer2.setText(self.choices[1])
@@ -147,8 +157,8 @@ class TrainingQuestion(QWidget):
         # load in the SVG data stream
         self.textboxTitle = HeadingLabelTest("You are Currently Training")
         self.textboxSubtitle = QLineEdit('Hit the space bar to proceed to the next ECG strip')
-        self.next = NextButton(self)
-        # self.answer2 = ChoiceButtonRight(self.choices[1])
+        self.next = ChoiceButtonNext(self)
+        #self.next = ChoiceButtonRight(self)
         # self.answer3 = ChoiceButtonLeft(self.choices[2])
         # self.answer4 = ChoiceButtonRight(self.choices[3])
         self.next.clicked.connect(lambda: self.update_nextQ(self))
@@ -202,13 +212,13 @@ class TrainingQuestion(QWidget):
         self.layout.addWidget(self.subtitle, 0, 1, 1, 2)
 
         self.layout.addWidget(self.qsw, 2, 0, 5, 2)
-        self.addWidget(self.textboxRhythmName, 6, 0, 1, 2)
-        self.addWidget(self.textboxHR, 6, 2, 1, 2)
-        self.addWidget(self.textboxRhy, 6, 3, 1, 2)
-        self.addWidget(self.textboxPwav, 7, 4, 1, 2)
-        self.addWidget(self.textboxPRint, 7, 5, 1, 2)
-        self.addWidget(self.textboxQRScom, 7, 1, 1, 2)
-        self.addWidget(self.textboxNotes, 7, 2, 1, 2)
+        self.layout.addWidget(self.textboxRhythmName, 6, 0, 1, 2)
+        self.layout.addWidget(self.textboxHR, 6, 2, 1, 2)
+        self.layout.addWidget(self.textboxRhy, 6, 3, 1, 2)
+        self.layout.addWidget(self.textboxPwav, 7, 4, 1, 2)
+        self.layout.addWidget(self.textboxPRint, 7, 5, 1, 2)
+        self.layout.addWidget(self.textboxQRScom, 7, 1, 1, 2)
+        self.layout.addWidget(self.textboxNotes, 7, 2, 1, 2)
         self.layout.addWidget(self.next, 7, 3, 1, 2)
 
         self.start_train()
