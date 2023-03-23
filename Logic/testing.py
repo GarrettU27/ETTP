@@ -65,7 +65,7 @@ class Testing_object():
         for i in range(len(self.arrhythmia)):
             self.svg_files.append(self.arrhythmia[i].ecg)
             self.choices.append(self.arrhythmia[i].choices)
-            self.correct(self.arrhythmia[i].correct_answer)
+            self.correct.append(self.arrhythmia[i].correct_answer)
     
             
         
