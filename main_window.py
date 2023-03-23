@@ -11,13 +11,13 @@ from PyQt6.QtWidgets import QWidget, QMainWindow, QStackedWidget, QHBoxLayout, \
 from components.burger_item import BurgerItem
 from components.burger_menu import BurgerMenu
 from pages.about_us import AboutUs
+from pages.home import Home
 from pages.lead_placement import LeadPlacement
 from pages.read_ecg import ReadECG
 from pages.start_new.start_new_testing import StartNewTesting
 from pages.start_new.start_new_training import StartNewTraining
 from pages.testing_questions import TestingQuestions
 from pages.testing_results import TestingResults
-from pages.home import Home
 from pages.training_questions import TrainingQuestions
 from pages.training_results import TrainingResults
 
@@ -129,7 +129,7 @@ class MainWindow(QMainWindow):
             self.testing_questions
         )
         self.stacked_widget.addWidget(self.start_new_testing)
-        
+
         self.training_questions = TrainingQuestions()
         self.stacked_widget.addWidget(self.training_questions)
 
@@ -198,11 +198,7 @@ class MainWindow(QMainWindow):
     def switch_page(self, item):
         if item.widget == self.start_new_training:
             self.choose_training_page()
-        elif item.widget == self.start_new_training:
+        elif item.widget == self.start_new_testing:
             self.choose_testing_page()
         else:
             self.stacked_widget.setCurrentWidget(item.widget)
-
-
-
-

@@ -1,6 +1,7 @@
+import PyQt6
 from PyQt6.QtCore import Qt
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QWidget, QPushButton, QGridLayout
+from PyQt6.QtWidgets import QWidget, QPushButton, QGridLayout, QVBoxLayout
 
 from Logic.testing import Testing_object
 from backend.generate_ecg_plot import get_ecg_svg
@@ -27,6 +28,9 @@ class TestingQuestions(QWidget):
         # load in the SVG data stream
         self.qsw.load(get_ecg_svg())
         self.qsw.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
+        self.qsw.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
+                               PyQt6.QtWidgets.QSizePolicy.Policy.Expanding)
+
         self.title = HeadingLabelTest("Question")
         self.answer1 = ChoiceButton(self.choices[0])
         self.answer2 = ChoiceButton(self.choices[1])
@@ -37,14 +41,22 @@ class TestingQuestions(QWidget):
         self.answer3.clicked.connect(lambda: self.update_nextQ(self.answer3))
         self.answer4.clicked.connect(lambda: self.update_nextQ(self.answer4))
         self.next = QPushButton(self)
-        self.layout = QGridLayout(self)
+
+        self.layout = QVBoxLayout(self)
         self.layout.setSpacing(30)
-        self.layout.addWidget(self.title, 0, 1, 1, 2)
-        self.layout.addWidget(self.answer1, 6, 0, 1, 2)
-        self.layout.addWidget(self.answer2, 6, 2, 1, 2)
-        self.layout.addWidget(self.answer3, 7, 0, 1, 2)
-        self.layout.addWidget(self.answer4, 7, 2, 1, 2)
-        self.layout.addWidget(self.qsw, 1, 0, 3, 4)
+        self.layout.addWidget(self.title)
+        self.layout.addWidget(self.qsw)
+
+        self.grid = QGridLayout()
+        self.layout.addLayout(self.grid)
+
+        self.grid.addWidget(self.answer1, 0, 0)
+        self.grid.addWidget(self.answer2, 1, 0)
+        self.grid.addWidget(self.answer3, 0, 1)
+        self.grid.addWidget(self.answer4, 1, 1)
+
+        # self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
+        #                                       PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
 
     def update_nextQ(self, item):
         self.test_object.add_answers(item.text())
@@ -59,6 +71,7 @@ class TestingQuestions(QWidget):
             return -1
         else:
             self.qsw.load(self.test_object.get_next_svg())
+            self.qsw.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
             self.title.setText("Question " + str(self.test_object.index_Q))
             self.answer1.setText(self.choices[0])
             self.answer2.setText(self.choices[1])
@@ -74,6 +87,7 @@ class TestingQuestions(QWidget):
         self.choices = self.test_object.next_question()
         self.title.setText("Question " + str(self.test_object.index_Q))
         self.qsw.load(self.test_object.get_next_svg())
+        self.qsw.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         self.answer1.setText(self.choices[0])
         self.answer2.setText(self.choices[1])
         self.answer3.setText(self.choices[2])
