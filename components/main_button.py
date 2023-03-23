@@ -45,11 +45,3 @@ class MainButton(QPushButton):
                         background: #368c54;
                     }
                 """)
-
-    def setEnabled(self, val: bool) -> None:
-        if val is True:
-            self.setCursor(QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
-        else:
-            self.setCursor(QCursor(QtCore.Qt.CursorShape.ArrowCursor))
-
-        super().setEnabled(val)
