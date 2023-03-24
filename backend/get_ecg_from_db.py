@@ -21,7 +21,6 @@ class Arrhythmia:
 class Question:
     ecg: io.BytesIO
     correct_answer: str
-    choices: List[str]
 
 
 def get_training_questions(arrhythmia_id_array: List[int], number_of_questions: int):
@@ -55,7 +54,7 @@ def get_training_questions(arrhythmia_id_array: List[int], number_of_questions: 
     return create_return_array(tested_arrhythmias, create_train_ecg)
 
 
-def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: int):
+def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: int) -> (List[Question], List[str]):
     total_arrhythmias = len(arrhythmia_id_array) + 1
     if number_of_questions < total_arrhythmias:
         raise ValueError("numEcg >= len(idArray) must be true")
@@ -77,13 +76,13 @@ def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: i
     for (i, arrhythmia_id) in enumerate(tested_arrhythmia_ids):
         tested_arrhythmias.append(Arrhythmia(id=str(arrhythmia_id), amount=arrhythmia_amounts[i]))
 
-    questions = create_return_array(tested_arrhythmias, create_test_ecg)
+    questions, choices = create_return_array(tested_arrhythmias, create_test_ecg)
     random.shuffle(questions)
 
-    return questions
+    return questions, choices
 
 
-def create_return_array(arrhythmias: List[Arrhythmia], grapher: Callable) -> List[Question]:
+def create_return_array(arrhythmias: List[Arrhythmia], grapher: Callable) -> (List[Question], List[str]):
     con = get_sqlite_connection()
     cur = con.cursor()
 
@@ -97,10 +96,9 @@ def create_return_array(arrhythmias: List[Arrhythmia], grapher: Callable) -> Lis
             questions.append(Question(
                 ecg=grapher(ecg),
                 correct_answer=get_arrhythmia_name(cur, arrhythmia.id),
-                choices=choices
             ))
 
-    return questions
+    return questions, choices
 
 
 def get_random_patient_id(cur: Cursor, arrhythmia_id: str) -> str:

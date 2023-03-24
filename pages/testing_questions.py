@@ -1,45 +1,37 @@
+import math
+from typing import List
+
 import PyQt6
 from PyQt6.QtCore import Qt
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QWidget, QPushButton, QGridLayout, QVBoxLayout
 
-from Logic.testing import Testing_object
-from backend.generate_ecg_plot import get_ecg_svg
+from backend.get_ecg_from_db import Question
 from components.choice_button import ChoiceButton
-from components.heading_label import HeadingLabelTest
+from components.heading_label import HeadingLabel
 from pages.testing_results import TestingResults
 
 
 class TestingQuestions(QWidget):
-    test_object = Testing_object
-    choices = ["something", "Is", "Really", "Wrong"]
-    ECG_data = []
     test_results: TestingResults
+    correct = [str]
+    current_question = 0
+    total_questions: int
+
+    questions: List[Question]
+    answer_buttons: List[ChoiceButton] = []
+    answers: List[str] = []
+    choices: List[str] = []
 
     def __init__(self, test_results: TestingResults):
         super().__init__()
         self.qsw = QSvgWidget()
-        self.test_object = Testing_object()
         self.test_results = test_results
-        # self.choices = self.test_object.next_question()
 
-        # get all of the necessary files required for creating the testing object here
-
-        # load in the SVG data stream
-        self.qsw.load(get_ecg_svg())
-        self.qsw.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         self.qsw.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
                                PyQt6.QtWidgets.QSizePolicy.Policy.Expanding)
 
-        self.title = HeadingLabelTest("Question")
-        self.answer1 = ChoiceButton(self.choices[0])
-        self.answer2 = ChoiceButton(self.choices[1])
-        self.answer3 = ChoiceButton(self.choices[2])
-        self.answer4 = ChoiceButton(self.choices[3])
-        self.answer1.clicked.connect(lambda: self.update_nextQ(self.answer1))
-        self.answer2.clicked.connect(lambda: self.update_nextQ(self.answer2))
-        self.answer3.clicked.connect(lambda: self.update_nextQ(self.answer3))
-        self.answer4.clicked.connect(lambda: self.update_nextQ(self.answer4))
+        self.title = HeadingLabel("Question")
         self.next = QPushButton(self)
 
         self.layout = QVBoxLayout(self)
@@ -47,48 +39,58 @@ class TestingQuestions(QWidget):
         self.layout.addWidget(self.title)
         self.layout.addWidget(self.qsw)
 
+        self.layout.setAlignment(self.title, PyQt6.QtCore.Qt.AlignmentFlag.AlignCenter)
+
         self.grid = QGridLayout()
         self.layout.addLayout(self.grid)
 
-        self.grid.addWidget(self.answer1, 0, 0)
-        self.grid.addWidget(self.answer2, 1, 0)
-        self.grid.addWidget(self.answer3, 0, 1)
-        self.grid.addWidget(self.answer4, 1, 1)
-
-        # self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
-        #                                       PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
-
-    def update_nextQ(self, item):
-        self.test_object.add_answers(item.text())
-        self.choices = self.test_object.next_question()
-        if self.choices[0] == "X":
-            print(self.test_object.answers)
-            print(self.test_object.correct)
-            self.test_object.check_answers()
-            print(self.test_object.correctAns)
-            self.test_results.update_page(self.test_object.questions, self.test_object.answers,
-                                          self.test_object.correct, self.test_object.correctAns)
-            return -1
+    def show_next_question(self, previous_questions_answer: str):
+        self.answers.append(previous_questions_answer)
+        self.current_question += 1
+        if self.current_question >= self.total_questions:
+            self.test_results.update_page(self.total_questions, self.answers,
+                                          self.correct, self.check_answers())
         else:
-            self.qsw.load(self.test_object.get_next_svg())
-            self.qsw.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
-            self.title.setText("Question " + str(self.test_object.index_Q))
-            self.answer1.setText(self.choices[0])
-            self.answer2.setText(self.choices[1])
-            self.answer3.setText(self.choices[2])
-            self.answer4.setText(self.choices[3])
+            self.show_question()
 
-    def set_ecg_data(self, ecg_stuff):
-        self.ECG_data = ecg_stuff.copy()
-        self.test_object.set_arrhythmia(self.ECG_data)
-        self.test_object.update_object()
+    def start_new_test(self, questions: List[Question], choices: List[str]):
+        self.questions = questions
+        self.choices = choices
+        self.reset_test()
 
-    def start_test(self):
-        self.choices = self.test_object.next_question()
-        self.title.setText("Question " + str(self.test_object.index_Q))
-        self.qsw.load(self.test_object.get_next_svg())
+    def check_answers(self):
+        """
+        Checks if answers are correct
+        """
+        is_answer_correct = []
+        for (question, answer) in zip(self.questions, self.answers):
+            if question.correct_answer == answer:
+                is_answer_correct.append(True)
+            else:
+                is_answer_correct.append(False)
+
+        return is_answer_correct
+
+    def reset_test(self):
+        self.current_question = 0
+        self.total_questions = len(self.questions)
+
+        for answer_button in self.answer_buttons:
+            self.grid.removeWidget(answer_button)
+
+        self.answer_buttons = []
+
+        for choice in self.choices:
+            answer_button = ChoiceButton(choice)
+            answer_button.clicked.connect(lambda: self.show_next_question(choice))
+            self.answer_buttons.append(answer_button)
+
+        for (i, answer_button) in enumerate(self.answer_buttons):
+            self.grid.addWidget(answer_button, math.floor(i / 2), i % 2)
+
+        self.show_question()
+
+    def show_question(self):
+        self.title.setText("Question " + str(self.current_question + 1))
+        self.qsw.load(self.questions[self.current_question].ecg)
         self.qsw.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
-        self.answer1.setText(self.choices[0])
-        self.answer2.setText(self.choices[1])
-        self.answer3.setText(self.choices[2])
-        # self.answer4.setText(self.choices[3])
