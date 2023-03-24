@@ -41,32 +41,10 @@ class TestingQuestions(QWidget):
         self.grid = QGridLayout()
         self.layout.addLayout(self.grid)
 
-    def show_next_question(self, previous_questions_answer: str):
-        self.answers.append(previous_questions_answer)
-        self.current_question += 1
-        if self.current_question >= self.total_questions:
-            self.test_results.update_page(self.total_questions, self.answers,
-                                          self.correct, self.check_answers())
-        else:
-            self.show_question()
-
     def start_new_test(self, questions: List[Question], choices: List[str]):
         self.questions = questions
         self.choices = choices
         self.reset_test()
-
-    def check_answers(self):
-        """
-        Checks if answers are correct
-        """
-        is_answer_correct = []
-        for (question, answer) in zip(self.questions, self.answers):
-            if question.correct_answer == answer:
-                is_answer_correct.append(True)
-            else:
-                is_answer_correct.append(False)
-
-        return is_answer_correct
 
     def reset_test(self):
         self.current_question = 0
@@ -86,6 +64,14 @@ class TestingQuestions(QWidget):
             self.grid.addWidget(answer_button, math.floor(i / 2), i % 2)
 
         self.show_question()
+
+    def show_next_question(self, previous_questions_answer: str):
+        self.answers.append(previous_questions_answer)
+        self.current_question += 1
+        if self.current_question >= self.total_questions:
+            self.test_results.update_page(self.answers, self.correct)
+        else:
+            self.show_question()
 
     def show_question(self):
         self.title.setText(f"Test - Question {str(self.current_question + 1)}/{str(self.total_questions)}")

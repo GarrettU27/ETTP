@@ -7,15 +7,15 @@ class TestingResults(QWidget):
         super().__init__()
         self.layout = QVBoxLayout(self)
 
-    def update_page(self, questions, answers, correct, correctAns):
-        for i in range(questions):
-            if correctAns[i]:
-                myWidget = QLabel("Correct! Arrhythmia shown: " + str(answers[i]))
-                self.layout.addWidget(myWidget)
+    def update_page(self, answers, correct):
+        for answer, correct in zip(answers, correct):
+            if answer == correct:
+                answer_result = QLabel("Correct! Arrhythmia shown: " + str(answer))
+                self.layout.addWidget(answer_result)
             else:
-                myWidget = QLabel(
-                    "Incorrect! Arrhythmia answered: " + str(answers[i]) + " Correct arrhythmia: " + str(correct[i]))
-                self.layout.addWidget(myWidget)
+                answer_result = QLabel(
+                    "Incorrect! Arrhythmia answered: " + str(answer) + " Correct arrhythmia: " + str(correct))
+                self.layout.addWidget(answer_result)
 
     def clear_page(self):
 
