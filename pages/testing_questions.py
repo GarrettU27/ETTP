@@ -1,5 +1,5 @@
 import math
-from typing import List
+from typing import List, Callable
 
 import PyQt6
 from PyQt6.QtCore import Qt
@@ -15,7 +15,6 @@ from pages.testing_results import TestingResults
 
 class TestingQuestions(QWidget):
     test_results: TestingResults
-    correct = [str]
     current_question = 0
     total_questions: int
 
@@ -24,11 +23,12 @@ class TestingQuestions(QWidget):
     answers: List[str] = []
     choices: List[str] = []
 
-    def __init__(self, test_results: TestingResults):
+    def __init__(self, set_state: Callable, test_results: TestingResults):
         super().__init__()
-        self.qsw = QSvgWidget()
         self.test_results = test_results
+        self.set_state = set_state
 
+        self.qsw = QSvgWidget()
         self.qsw.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
                                PyQt6.QtWidgets.QSizePolicy.Policy.Expanding)
 
@@ -70,7 +70,8 @@ class TestingQuestions(QWidget):
         self.answers.append(previous_questions_answer)
         self.current_question += 1
         if self.current_question >= self.total_questions:
-            self.test_results.update_page(self.answers, self.correct)
+            self.test_results.update_page(self.answers, self.questions)
+            self.set_state()
         else:
             self.show_question()
 

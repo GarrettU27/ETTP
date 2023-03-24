@@ -121,7 +121,10 @@ class MainWindow(QMainWindow):
         self.testing_results = TestingResults()
         self.stacked_widget.addWidget(self.testing_results)
 
-        self.testing_questions = TestingQuestions(self.testing_results)
+        self.testing_questions = TestingQuestions(
+            lambda: (self.set_testing_state(self.State.DONE), self.choose_testing_page()),
+            self.testing_results
+        )
         self.stacked_widget.addWidget(self.testing_questions)
 
         self.start_new_testing = StartNewTesting(
