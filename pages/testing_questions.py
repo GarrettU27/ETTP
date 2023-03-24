@@ -1,8 +1,9 @@
+import io
 import math
 from typing import List, Callable
 
 import PyQt6
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSlot, QThreadPool, QRunnable, QMetaObject, Q_ARG
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout
 
@@ -10,6 +11,7 @@ from backend.generate_ecg_plot import create_test_ecg
 from backend.get_ecg_from_db import Question
 from components.choice_button import ChoiceButton
 from components.heading_label import HeadingLabel
+from components.waiting_spinner_widget import QtWaitingSpinner
 from pages.testing_results import TestingResults
 
 
@@ -33,6 +35,8 @@ class TestingQuestions(QWidget):
                                PyQt6.QtWidgets.QSizePolicy.Policy.Expanding)
 
         self.title = HeadingLabel("Test")
+
+        self.spinner = QtWaitingSpinner(self)
 
         self.layout = QVBoxLayout(self)
         self.layout.setSpacing(30)
@@ -64,7 +68,7 @@ class TestingQuestions(QWidget):
         for (i, answer_button) in enumerate(self.answer_buttons):
             self.grid.addWidget(answer_button, math.floor(i / 2), i % 2)
 
-        self.show_question()
+        self.load_question()
 
     def show_next_question(self, previous_questions_answer: str):
         self.answers.append(previous_questions_answer)
@@ -73,9 +77,31 @@ class TestingQuestions(QWidget):
             self.test_results.update_page(self.answers, self.questions)
             self.set_state()
         else:
-            self.show_question()
+            self.load_question()
 
-    def show_question(self):
+    def load_question(self):
+        self.spinner.start()
+        load_test_ecg = LoadTestECG(self)
+        QThreadPool.globalInstance().start(load_test_ecg)
+
+    @pyqtSlot(io.BytesIO)
+    def show_question(self, data):
+        self.spinner.stop()
+        self.adjustSize()
+
         self.title.setText(f"Test - Question {str(self.current_question + 1)}/{str(self.total_questions)}")
-        self.qsw.load(create_test_ecg(self.questions[self.current_question].ecg))
+
+        self.qsw.load(data)
         self.qsw.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
+
+
+# https://gist.github.com/eyllanesc/1a09157d17ba13d223c312b28a81c320
+class LoadTestECG(QRunnable):
+    def __init__(self, testing_questions: TestingQuestions):
+        QRunnable.__init__(self)
+        self.testing_questions = testing_questions
+
+    def run(self):
+        ecg = create_test_ecg(self.testing_questions.questions[self.testing_questions.current_question].ecg)
+        QMetaObject.invokeMethod(self.testing_questions, "show_question", Qt.ConnectionType.QueuedConnection,
+                                 Q_ARG(bytes, ecg))
