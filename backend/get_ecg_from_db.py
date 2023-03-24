@@ -3,9 +3,10 @@ import math
 import random
 from dataclasses import dataclass
 from sqlite3 import Cursor
-from typing import List, Callable, Final
+from typing import List, Final
 
-from backend.generate_ecg_plot import create_test_ecg, create_train_ecg
+import numpy.typing
+
 from backend.sqlite_setup import get_sqlite_connection
 
 SINUS_RHYTHM_ID: Final[int] = 54
@@ -19,7 +20,7 @@ class Arrhythmia:
 
 @dataclass
 class Question:
-    ecg: io.BytesIO
+    ecg: numpy.typing.NDArray
     correct_answer: str
 
 
@@ -51,7 +52,7 @@ def get_training_questions(arrhythmia_id_array: List[int], number_of_questions: 
     for (i, arrhythmia_id) in enumerate(arrhythmia_id_array):
         tested_arrhythmias.append(Arrhythmia(id=str(arrhythmia_id), amount=arrhythmia_amounts[i]))
 
-    return create_return_array(tested_arrhythmias, create_train_ecg)
+    return create_return_array(tested_arrhythmias)
 
 
 def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: int) -> (List[Question], List[str]):
@@ -76,13 +77,13 @@ def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: i
     for (i, arrhythmia_id) in enumerate(tested_arrhythmia_ids):
         tested_arrhythmias.append(Arrhythmia(id=str(arrhythmia_id), amount=arrhythmia_amounts[i]))
 
-    questions, choices = create_return_array(tested_arrhythmias, create_test_ecg)
+    questions, choices = create_return_array(tested_arrhythmias)
     random.shuffle(questions)
 
     return questions, choices
 
 
-def create_return_array(arrhythmias: List[Arrhythmia], grapher: Callable) -> (List[Question], List[str]):
+def create_return_array(arrhythmias: List[Arrhythmia]) -> (List[Question], List[str]):
     con = get_sqlite_connection()
     cur = con.cursor()
 
@@ -94,7 +95,7 @@ def create_return_array(arrhythmias: List[Arrhythmia], grapher: Callable) -> (Li
             patient_id = get_random_patient_id(cur, arrhythmia.id)
             ecg = get_patients_ecg(cur, patient_id)
             questions.append(Question(
-                ecg=grapher(ecg),
+                ecg=ecg,
                 correct_answer=get_arrhythmia_name(cur, arrhythmia.id),
             ))
 

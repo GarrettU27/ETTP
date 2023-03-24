@@ -6,6 +6,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout
 
+from backend.generate_ecg_plot import create_test_ecg
 from backend.get_ecg_from_db import Question
 from components.choice_button import ChoiceButton
 from components.heading_label import HeadingLabel
@@ -75,5 +76,5 @@ class TestingQuestions(QWidget):
 
     def show_question(self):
         self.title.setText(f"Test - Question {str(self.current_question + 1)}/{str(self.total_questions)}")
-        self.qsw.load(self.questions[self.current_question].ecg)
+        self.qsw.load(create_test_ecg(self.questions[self.current_question].ecg))
         self.qsw.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
