@@ -4,7 +4,7 @@ from typing import List
 import PyQt6
 from PyQt6.QtCore import Qt
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QWidget, QPushButton, QGridLayout, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout
 
 from backend.get_ecg_from_db import Question
 from components.choice_button import ChoiceButton
@@ -31,15 +31,12 @@ class TestingQuestions(QWidget):
         self.qsw.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
                                PyQt6.QtWidgets.QSizePolicy.Policy.Expanding)
 
-        self.title = HeadingLabel("Question")
-        self.next = QPushButton(self)
+        self.title = HeadingLabel("Test")
 
         self.layout = QVBoxLayout(self)
         self.layout.setSpacing(30)
         self.layout.addWidget(self.title)
         self.layout.addWidget(self.qsw)
-
-        self.layout.setAlignment(self.title, PyQt6.QtCore.Qt.AlignmentFlag.AlignCenter)
 
         self.grid = QGridLayout()
         self.layout.addLayout(self.grid)
@@ -91,6 +88,6 @@ class TestingQuestions(QWidget):
         self.show_question()
 
     def show_question(self):
-        self.title.setText("Question " + str(self.current_question + 1))
+        self.title.setText(f"Test - Question {str(self.current_question + 1)}/{str(self.total_questions)}")
         self.qsw.load(self.questions[self.current_question].ecg)
         self.qsw.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
