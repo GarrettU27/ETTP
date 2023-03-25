@@ -1,5 +1,6 @@
 import io
 import math
+from functools import partial
 from typing import List, Callable
 
 import PyQt6
@@ -74,7 +75,7 @@ class TestingQuestions(QWidget):
 
         for choice in self.choices:
             answer_button = ChoiceButton(choice)
-            answer_button.clicked.connect(lambda: self.show_next_question(choice))
+            answer_button.clicked.connect(partial(self.show_next_question, choice))
             self.answer_buttons.append(answer_button)
 
         for (i, answer_button) in enumerate(self.answer_buttons):

@@ -1,7 +1,9 @@
 from typing import List
 
 import PyQt6
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSpacerItem
+import qtawesome
+from PyQt6.QtCore import QSize
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSpacerItem, QGridLayout
 
 from backend.get_ecg_from_db import Question
 from components.heading_label import HeadingLabel
@@ -12,22 +14,61 @@ class TestingResults(QWidget):
     def __init__(self):
         super().__init__()
         self.layout = QVBoxLayout(self)
-        self.heading = HeadingLabel("Test")
-        self.layout.addWidget(self.heading)
         self.layout.setSpacing(30)
 
+        self.heading = HeadingLabel("Test")
+        self.subheading = ParagraphLabel("See what you need to study next")
+        self.score = ParagraphLabel("Your total score: ", 30)
+
+        self.layout.addWidget(self.heading)
+        self.layout.addWidget(self.subheading)
+        self.layout.addWidget(self.score)
+
+        self.grid = QGridLayout(self)
+        self.grid.setSpacing(30)
+        self.grid.setHorizontalSpacing(60)
+        self.layout.addLayout(self.grid)
+
     def update_page(self, answers, questions: List[Question]):
-        for answer, question in zip(answers, questions):
+        self.grid.addItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
+                                      PyQt6.QtWidgets.QSizePolicy.Policy.Fixed), 0, 3)
+        number_correct = 0
+
+        for i, (answer, question) in enumerate(zip(answers, questions)):
+            answer_label = ParagraphLabel(f"{i + 1}. {answer}", 40)
+            answer_label.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
+                                       PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
+
             if answer == question.correct_answer:
-                answer_result = ParagraphLabel(f"Correct! Arrhythmia shown: {str(answer)}")
-                self.layout.addWidget(answer_result)
+                number_correct += 1
+                self.grid.addWidget(answer_label, i, 0)
+
+                check_widget = qtawesome.IconWidget()
+                check_icon = qtawesome.icon("fa5s.check", color='green')
+                check_widget.setIcon(check_icon)
+                check_widget.setIconSize(QSize(40, 40))
+                check_widget.update()
+                self.grid.addWidget(check_widget, i, 1)
             else:
-                answer_result = ParagraphLabel(
-                    f"Incorrect! Arrhythmia answered: {str(answer)}. Correct arrhythmia: {str(question.correct_answer)}")
-                self.layout.addWidget(answer_result)
+                self.grid.addWidget(answer_label, i, 0)
+
+                x_widget = qtawesome.IconWidget()
+                x_icon = qtawesome.icon("fa5s.times", color='red')
+                x_widget.setIcon(x_icon)
+                x_widget.setIconSize(QSize(40, 40))
+                x_widget.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Fixed,
+                                       PyQt6.QtWidgets.QSizePolicy.Policy.Fixed)
+                x_widget.update()
+                self.grid.addWidget(x_widget, i, 1)
+
+                note_label = ParagraphLabel(f"Correct answer: {question.correct_answer}", 40)
+                note_label.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
+                                         PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
+                self.grid.addWidget(note_label, i, 2)
 
         self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
                                               PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
+        self.score.setText(f"Your total score: {number_correct}/{len(questions)}")
 
     def clear_page(self):
 
