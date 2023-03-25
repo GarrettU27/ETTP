@@ -4,6 +4,7 @@ from typing import List, Callable
 
 import PyQt6
 from PyQt6.QtCore import Qt, pyqtSlot, QThreadPool, QRunnable, QMetaObject, Q_ARG
+from PyQt6.QtGui import QColor
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout
 
@@ -36,7 +37,17 @@ class TestingQuestions(QWidget):
 
         self.title = HeadingLabel("Test")
 
-        self.spinner = QtWaitingSpinner(self)
+        self.spinner = QtWaitingSpinner(self, True, True)
+
+        self.spinner.setRoundness(70.0)
+        self.spinner.setMinimumTrailOpacity(15.0)
+        self.spinner.setTrailFadePercentage(70.0)
+        self.spinner.setNumberOfLines(12)
+        self.spinner.setLineLength(10)
+        self.spinner.setLineWidth(5)
+        self.spinner.setInnerRadius(10)
+        self.spinner.setRevolutionsPerSecond(2.5)
+        self.spinner.setColor(QColor(0, 0, 0))
 
         self.layout = QVBoxLayout(self)
         self.layout.setSpacing(30)
@@ -45,6 +56,7 @@ class TestingQuestions(QWidget):
 
         self.grid = QGridLayout()
         self.layout.addLayout(self.grid)
+        self.spinner.raise_()
 
     def start_new_test(self, questions: List[Question], choices: List[str]):
         self.questions = questions
