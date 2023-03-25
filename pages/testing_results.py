@@ -7,11 +7,12 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSpacerItem, QGridLayout
 
 from backend.get_ecg_from_db import Question
 from components.heading_label import HeadingLabel
+from components.main_button import MainButton
 from components.paragraph_label import ParagraphLabel
 
 
 class TestingResults(QWidget):
-    def __init__(self):
+    def __init__(self, set_state):
         super().__init__()
         self.layout = QVBoxLayout(self)
         self.layout.setSpacing(30)
@@ -29,9 +30,20 @@ class TestingResults(QWidget):
         self.grid.setHorizontalSpacing(60)
         self.layout.addLayout(self.grid)
 
+        new_test_button = MainButton("Start new test")
+        new_test_button.clicked.connect(set_state)
+        self.layout.addWidget(new_test_button)
+
+        self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
+                                              PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
+
     def update_page(self, answers, questions: List[Question]):
-        self.grid.addItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
-                                      PyQt6.QtWidgets.QSizePolicy.Policy.Fixed), 0, 3)
+        self.clear_page()
+        
+        # This can move items closer together if needed
+        # self.grid.addItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
+        #                               PyQt6.QtWidgets.QSizePolicy.Policy.Fixed), 0, 3)
+
         number_correct = 0
 
         for i, (answer, question) in enumerate(zip(answers, questions)):
@@ -66,8 +78,6 @@ class TestingResults(QWidget):
                                          PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
                 self.grid.addWidget(note_label, i, 2)
 
-        self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
-                                              PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
         self.score.setText(f"Your total score: {number_correct}/{len(questions)}")
 
     def clear_page(self):
@@ -75,9 +85,9 @@ class TestingResults(QWidget):
         # https://stackoverflow.com/questions/4528347/clear-all-widgets-in-a-layout-in-pyqt
 
         # Too lazy am I? Too Bad!
-        for i in reversed(range(self.layout.count())):
-            widgetToRemove = self.layout.itemAt(i).widget()
+        for i in reversed(range(self.grid.count())):
+            widget_to_remove = self.grid.itemAt(i).widget()
             # remove it from the layout list
-            self.layout.removeWidget(widgetToRemove)
+            self.grid.removeWidget(widget_to_remove)
             # remove it from the gui
-            widgetToRemove.setParent(None)
+            widget_to_remove.setParent(None)

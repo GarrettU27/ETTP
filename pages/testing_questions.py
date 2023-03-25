@@ -67,6 +67,7 @@ class TestingQuestions(QWidget):
     def reset_test(self):
         self.current_question = 0
         self.total_questions = len(self.questions)
+        self.answers = []
 
         for answer_button in self.answer_buttons:
             self.grid.removeWidget(answer_button)
