@@ -3,7 +3,6 @@ import numpy as np
 from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QGridLayout
 from PyQt6.QtCore import Qt
 from PyQt6.QtSvgWidgets import QSvgWidget
-
 from backend.generate_ecg_plot import get_ecg_svg
 
 ##from testing.py
@@ -48,7 +47,11 @@ class Training_object():
                 return ["X", "X", "X", "X"]
 
     def get_next_svg(self):
-        next_svg = self.svg_files[self.index_SVG]
+        if self.index_SVG < len(self.svg_files):
+            next_svg = self.svg_files[self.index_SVG]
+        else:
+            next_svg = None
+
         self.index_SVG += 1
         return next_svg
 
@@ -138,7 +141,7 @@ class TrainingQuestions(QWidget):
         self.title.setText("You are Currently Training ")
         print("helo friend", self.train_object.get_next_svg())
         self.qsw.load(self.train_object.get_next_svg())
-        self.next.setText(self)
+        #self.next.setText(self)
         # self.answer2.setText(self.choices[1])
         # self.answer3.setText(self.choices[2])
         # self.answer4.setText(self.choices[3])
