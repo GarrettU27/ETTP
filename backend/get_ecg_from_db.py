@@ -7,6 +7,7 @@ from typing import List, Final
 
 import numpy.typing
 
+from backend.arrhythmia_annotation import ArrhythmiaAnnotation, get_arrhythmia_annotation
 from backend.sqlite_setup import get_sqlite_connection
 
 SINUS_RHYTHM_ID: Final[int] = 54
@@ -24,17 +25,23 @@ class Question:
     correct_answer: str
 
 
-def get_training_questions(arrhythmia_id_array: List[int], number_of_questions: int):
+@dataclass
+class Flashcard:
+    ecg: numpy.typing.NDArray
+    arrhythmia_annotation: ArrhythmiaAnnotation
+
+
+def get_training_flashcards(arrhythmia_id_array: List[int], number_of_flashcards: int) -> List[Flashcard]:
     total_arrhythmias = len(arrhythmia_id_array)
-    if number_of_questions < total_arrhythmias:
+    if number_of_flashcards < total_arrhythmias:
         raise ValueError("numEcg >= len(idArray) must be true")
 
     # Decide number of ECGs for each arrhythmia
     random.seed()
 
     # Calculate the number of ECGs each arrhythmia can have while keeping below the requested number of ECGs
-    questions_per_arrhythmia = math.floor(number_of_questions / total_arrhythmias)
-    arrhythmia_amounts = [questions_per_arrhythmia] * total_arrhythmias  # Each arrhythmia gets base number of ECGs
+    flashcards_per_arrhythmia = math.floor(number_of_flashcards / total_arrhythmias)
+    arrhythmia_amounts = [flashcards_per_arrhythmia] * total_arrhythmias  # Each arrhythmia gets base number of ECGs
 
     # Distribute any extra question slots amongst the different
     # arrhythmias. This happens when the number of arrhythmias
@@ -42,17 +49,31 @@ def get_training_questions(arrhythmia_id_array: List[int], number_of_questions: 
     # a user may want to test on 6 arrhythmias but ask for 20 questions
     # In that case, there will be 2 questions which will have an ECG
     # randomly assigned
-    for i in range(number_of_questions - (questions_per_arrhythmia * total_arrhythmias)):
+    for i in range(number_of_flashcards - (flashcards_per_arrhythmia * total_arrhythmias)):
         j = random.randrange(0, total_arrhythmias)
-        while arrhythmia_amounts[j] > questions_per_arrhythmia:
+        while arrhythmia_amounts[j] > flashcards_per_arrhythmia:
             j = random.randrange(0, total_arrhythmias)
         arrhythmia_amounts[j] = arrhythmia_amounts[j] + 1
 
-    tested_arrhythmias = []
+    trained_arrhythmias = []
     for (i, arrhythmia_id) in enumerate(arrhythmia_id_array):
-        tested_arrhythmias.append(Arrhythmia(id=str(arrhythmia_id), amount=arrhythmia_amounts[i]))
+        trained_arrhythmias.append(Arrhythmia(id=str(arrhythmia_id), amount=arrhythmia_amounts[i]))
 
-    return create_return_array(tested_arrhythmias)
+    con = get_sqlite_connection()
+    cur = con.cursor()
+
+    flashcards = []
+
+    for arrhythmia in trained_arrhythmias:
+        for i in range(arrhythmia.amount):
+            patient_id = get_random_patient_id(cur, arrhythmia.id)
+            ecg = get_patients_ecg(cur, patient_id)
+            flashcards.append(Flashcard(
+                ecg=ecg,
+                arrhythmia_annotation=get_arrhythmia_annotation(arrhythmia.id)
+            ))
+
+    return flashcards
 
 
 def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: int) -> (List[Question], List[str]):
@@ -77,20 +98,13 @@ def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: i
     for (i, arrhythmia_id) in enumerate(tested_arrhythmia_ids):
         tested_arrhythmias.append(Arrhythmia(id=str(arrhythmia_id), amount=arrhythmia_amounts[i]))
 
-    questions, choices = create_return_array(tested_arrhythmias)
-    random.shuffle(questions)
-
-    return questions, choices
-
-
-def create_return_array(arrhythmias: List[Arrhythmia]) -> (List[Question], List[str]):
     con = get_sqlite_connection()
     cur = con.cursor()
 
     questions = []
-    choices = [get_arrhythmia_name(cur, arrhythmia.id) for arrhythmia in arrhythmias]
+    choices = [get_arrhythmia_name(cur, arrhythmia.id) for arrhythmia in tested_arrhythmias]
 
-    for arrhythmia in arrhythmias:
+    for arrhythmia in tested_arrhythmias:
         for i in range(arrhythmia.amount):
             patient_id = get_random_patient_id(cur, arrhythmia.id)
             ecg = get_patients_ecg(cur, patient_id)
@@ -99,6 +113,7 @@ def create_return_array(arrhythmias: List[Arrhythmia]) -> (List[Question], List[
                 correct_answer=get_arrhythmia_name(cur, arrhythmia.id),
             ))
 
+    random.shuffle(questions)
     return questions, choices
 
 

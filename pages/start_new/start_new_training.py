@@ -1,16 +1,16 @@
-from backend.get_ecg_from_db import get_training_questions
+from backend.get_ecg_from_db import get_training_flashcards
 from pages.start_new.start_new import StartNew
-from pages.training_questions import TrainingQuestions
+from pages.training_flashcards import TrainingFlashcards
 
 
 class StartNewTraining(StartNew):
-    def __init__(self, set_state, training_questions: TrainingQuestions):
+    def __init__(self, set_state, training_questions: TrainingFlashcards):
         super().__init__(set_state)
         self.training_questions = training_questions
 
     def begin(self):
-        questions = get_training_questions(self.get_arrhythmias(), int(self.question_number.currentText()))
-        self.training_questions.set_ecg_data(questions)
+        flashcards = get_training_flashcards(self.get_arrhythmias(), int(self.question_number.currentText()))
+        self.training_questions.start_new_training(flashcards)
         self.set_state()
 
     def heading_text(self) -> str:
@@ -21,3 +21,6 @@ class StartNewTraining(StartNew):
 
     def begin_button_text(self) -> str:
         return "Begin Training"
+
+    def number_text(self) -> str:
+        return "Choose number of cards"

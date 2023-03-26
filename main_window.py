@@ -18,8 +18,7 @@ from pages.start_new.start_new_testing import StartNewTesting
 from pages.start_new.start_new_training import StartNewTraining
 from pages.testing_questions import TestingQuestions
 from pages.testing_results import TestingResults
-from pages.training_questions import TrainingQuestions
-from pages.training_results import TrainingResults
+from pages.training_flashcards import TrainingFlashcards
 
 
 class MainWindow(QMainWindow):
@@ -135,7 +134,9 @@ class MainWindow(QMainWindow):
         )
         self.stacked_widget.addWidget(self.start_new_testing)
 
-        self.training_questions = TrainingQuestions()
+        self.training_questions = TrainingFlashcards(
+            lambda: (self.set_training_state(self.State.NEW), self.choose_training_page())
+        )
         self.stacked_widget.addWidget(self.training_questions)
 
         self.start_new_training = StartNewTraining(
@@ -143,9 +144,6 @@ class MainWindow(QMainWindow):
             self.training_questions
         )
         self.stacked_widget.addWidget(self.start_new_training)
-
-        self.training_results = TrainingResults()
-        self.stacked_widget.addWidget(self.training_results)
 
         self.stacked_widget.setCurrentWidget(self.home)
 
@@ -155,8 +153,6 @@ class MainWindow(QMainWindow):
                 self.stacked_widget.setCurrentWidget(self.start_new_training)
             case self.State.IN_PROGRESS:
                 self.stacked_widget.setCurrentWidget(self.training_questions)
-            case self.State.DONE:
-                self.stacked_widget.setCurrentWidget(self.training_results)
 
     def choose_testing_page(self):
         match self.testing_state:

@@ -1,7 +1,8 @@
+import PyQt6
 from PyQt6 import QtCore
 from PyQt6.QtGui import QCursor
-import PyQt6
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QComboBox, QVBoxLayout, QSpacerItem
+
 from arrhythmia import supported_arrhythmias
 from components.heading_label import HeadingLabel
 from components.main_button import MainButton
@@ -43,7 +44,7 @@ class StartNew(QWidget):
 
         question_number_layout = QVBoxLayout()
 
-        question_number_label = ParagraphLabel("Choose number of questions")
+        question_number_label = ParagraphLabel(self.number_text())
         question_number_layout.addWidget(question_number_label)
 
         self.question_number = QComboBox()
@@ -111,3 +112,6 @@ class StartNew(QWidget):
 
     def begin_button_text(self) -> str:
         return "Begin"
+
+    def number_text(self) -> str:
+        return "Number"

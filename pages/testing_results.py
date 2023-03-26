@@ -25,7 +25,7 @@ class TestingResults(QWidget):
         self.layout.addWidget(self.subheading)
         self.layout.addWidget(self.score)
 
-        self.grid = QGridLayout(self)
+        self.grid = QGridLayout()
         self.grid.setSpacing(30)
         self.grid.setHorizontalSpacing(60)
         self.layout.addLayout(self.grid)
@@ -39,7 +39,7 @@ class TestingResults(QWidget):
 
     def update_page(self, answers, questions: List[Question]):
         self.clear_page()
-        
+
         # This can move items closer together if needed
         # self.grid.addItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
         #                               PyQt6.QtWidgets.QSizePolicy.Policy.Fixed), 0, 3)

@@ -23,3 +23,6 @@ class StartNewTesting(StartNew):
 
     def begin_button_text(self) -> str:
         return "Begin Test"
+
+    def number_text(self) -> str:
+        return "Choose number of questions"
