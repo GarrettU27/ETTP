@@ -5,7 +5,7 @@ import PyQt6
 from PyQt6.QtCore import Qt, pyqtSlot, QThreadPool, QRunnable, QMetaObject, Q_ARG
 from PyQt6.QtGui import QColor
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QHBoxLayout
 
 from backend.generate_ecg_plot import create_test_ecg
 from backend.get_ecg_from_db import Flashcard
@@ -63,14 +63,22 @@ class TrainingFlashcards(QWidget):
         self.grid.addWidget(self.pr_label, 0, 1)
         self.grid.addWidget(self.qrs_label, 1, 1)
         self.grid.addWidget(self.note_label, 2, 1)
-
         self.grid.setSpacing(15)
 
         self.layout.addLayout(self.grid)
 
+        self.card_movement_row = QHBoxLayout()
+        self.card_movement_row.setSpacing(30)
+
+        self.previous_button = MainButton("Previous")
+        self.card_movement_row.addWidget(self.previous_button)
+        self.previous_button.clicked.connect(self.show_previous_flashcard)
+
         self.next_button = MainButton("Next")
-        self.layout.addWidget(self.next_button)
+        self.card_movement_row.addWidget(self.next_button)
         self.next_button.clicked.connect(self.show_next_flashcard)
+
+        self.layout.addLayout(self.card_movement_row)
 
         self.spinner.raise_()
 
@@ -89,6 +97,12 @@ class TrainingFlashcards(QWidget):
             self.set_state()
         else:
             self.load_flashcard()
+
+    def show_previous_flashcard(self):
+        self.current_flashcard -= 1
+        if self.current_flashcard < 0:
+            self.current_flashcard = 0
+        self.load_flashcard()
 
     def load_flashcard(self):
         self.spinner.start()
@@ -111,6 +125,11 @@ class TrainingFlashcards(QWidget):
         self.pr_label.setText(f"PR Interval (seconds): {current_card.arrhythmia_annotation.pr_interval}")
         self.qrs_label.setText(f"QRS Complex (seconds): {current_card.arrhythmia_annotation.qrs_complex}")
         self.note_label.setText(f"Note: {current_card.arrhythmia_annotation.note}")
+
+        if self.current_flashcard == 0:
+            self.previous_button.setEnabled(False)
+        else:
+            self.previous_button.setEnabled(True)
 
         self.qsw.load(data)
         self.qsw.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
