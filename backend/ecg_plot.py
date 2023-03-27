@@ -301,20 +301,20 @@ def return_png_bytes():
     plt.ioff()
 
     buf = io.BytesIO()
-    fig.savefig(buf, format="png", dpi=150)
+    fig.savefig(buf, format="png", dpi=300)
     buf.seek(0)
 
     # compress image
     # https://stackoverflow.com/questions/10784652/png-options-to-produce-smaller-file-size-when-using-savefig
     # https://stackoverflow.com/questions/35004067/compress-png-image-in-python-using-pil
-    image = Image.open(buf)
-    compressed_image = image.convert('RGB').convert('P', palette=Image.ADAPTIVE)
+    # image = Image.open(buf)
+    # compressed_image = image.convert('RGB').convert('P', palette=Image.ADAPTIVE)
+    #
+    # buf2 = io.BytesIO()
+    # image.save(buf2, format='PNG')
+    # buf2.seek(0)
 
-    buf2 = io.BytesIO()
-    compressed_image.save(buf2, format='PNG')
-    buf2.seek(0)
-
-    return buf2.read()
+    return buf.read()
 
 
 def save_as_jpg(file_name, path=DEFAULT_PATH):

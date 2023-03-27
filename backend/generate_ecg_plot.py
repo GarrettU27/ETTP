@@ -4,7 +4,7 @@ import numpy as np
 from scipy.io import loadmat
 
 from backend.annotations import plot12ECGs
-from backend.ecg_plot import plot, return_svg_bytes
+from backend.ecg_plot import plot, return_png_bytes, return_svg_bytes
 
 
 def convert_to_millivolts(microvolts: int):
@@ -26,11 +26,11 @@ def get_ecg_svg():
     return return_svg_bytes()
 
 
-def create_test_ecg(data) -> io.BytesIO:
+def create_train_ecg(data) -> io.BytesIO:
     return plot12ECGs(data)
 
 
-def create_train_ecg(data) -> io.BytesIO:
+def create_test_ecg(data) -> io.BytesIO:
     ecg = []
 
     for ecg_lead in data:
@@ -39,4 +39,4 @@ def create_train_ecg(data) -> io.BytesIO:
     ecg = np.array(ecg)
 
     plot(ecg, columns=4)
-    return return_svg_bytes()
+    return return_png_bytes()

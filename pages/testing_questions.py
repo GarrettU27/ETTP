@@ -5,14 +5,16 @@ from typing import List, Callable
 
 import PyQt6
 from PyQt6.QtCore import Qt, pyqtSlot, QThreadPool, QRunnable, QMetaObject, Q_ARG
-from PyQt6.QtGui import QColor
+from components.aspect_ratio_image import AspectRatioImage
+from PyQt6.QtGui import QColor, QPixmap, QImage
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QSpacerItem
 
 from backend.generate_ecg_plot import create_test_ecg
 from backend.get_ecg_from_db import Question
 from components.choice_button import ChoiceButton
 from components.heading_label import HeadingLabel
+from components.image_widget import ImageWidget
 from components.waiting_spinner_widget import QtWaitingSpinner
 from pages.testing_results import TestingResults
 
@@ -32,9 +34,9 @@ class TestingQuestions(QWidget):
         self.test_results = test_results
         self.set_state = set_state
 
-        self.qsw = QSvgWidget()
-        self.qsw.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
-                               PyQt6.QtWidgets.QSizePolicy.Policy.Expanding)
+        self.ecg_plot = AspectRatioImage()
+        self.ecg_plot.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
+                               PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
 
         self.title = HeadingLabel("Test")
 
@@ -53,11 +55,13 @@ class TestingQuestions(QWidget):
         self.layout = QVBoxLayout(self)
         self.layout.setSpacing(30)
         self.layout.addWidget(self.title)
-        self.layout.addWidget(self.qsw)
+        self.layout.addWidget(self.ecg_plot)
 
         self.grid = QGridLayout()
         self.layout.addLayout(self.grid)
         self.spinner.raise_()
+
+        self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
 
     def start_new_test(self, questions: List[Question], choices: List[str]):
         self.questions = questions
@@ -105,8 +109,9 @@ class TestingQuestions(QWidget):
 
         self.title.setText(f"Test - Question {str(self.current_question + 1)}/{str(self.total_questions)}")
 
-        self.qsw.load(data)
-        self.qsw.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
+        pixmap = QPixmap()
+        pixmap.loadFromData(data)
+        self.ecg_plot.setPixmap(pixmap)
 
 
 # https://gist.github.com/eyllanesc/1a09157d17ba13d223c312b28a81c320

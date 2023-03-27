@@ -2,6 +2,7 @@
 
 from PyQt6.QtWidgets import QLabel
 from PyQt6 import QtGui, QtCore
+from PyQt6.QtGui import QPainter
 from PyQt6.QtCore import Qt, QSize
 
 
@@ -27,7 +28,9 @@ class AspectRatioImage(QLabel):
         return QSize(w, self.heightForWidth(w))
 
     def scaledPixmap(self):
-        return self.pix.scaled(self.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        p = self.pix.scaled(self.size() * self.devicePixelRatio(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        p.setDevicePixelRatio(self.devicePixelRatio())
+        return p
 
     def resizeEvent(self, e: QtGui.QResizeEvent) -> None:
         if self.pix is not None:
