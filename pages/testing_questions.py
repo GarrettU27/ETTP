@@ -14,7 +14,6 @@ from backend.generate_ecg_plot import create_test_ecg
 from backend.get_ecg_from_db import Question
 from components.choice_button import ChoiceButton
 from components.heading_label import HeadingLabel
-from components.image_widget import ImageWidget
 from components.waiting_spinner_widget import QtWaitingSpinner
 from pages.testing_results import TestingResults
 
