@@ -1,7 +1,3 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import numpy as np
 import pandas as pd
 import neurokit2 as nk
@@ -9,20 +5,7 @@ from mat4py import loadmat
 import scipy.io
 import matplotlib.pyplot as plt
 import sys
-
-
-class Heartbeat:
-
-    def __init__(self, TWave, PWave, RWave):
-        self.TWave = TWave
-        self.PWave = PWave
-        self.RWave = RWave
-
-
-class wave:
-    def __init__(self, start, end):
-        self.start = start
-        self.end = end
+import io
 
 
 def pointFinder(startR, endR, startT, endT, startP, endP, signal_cwt):
@@ -72,6 +55,20 @@ def cleanArrays(start, end, leeway):
             x += 1
 
     return listWaves
+
+
+class Heartbeat:
+
+    def __init__(self, TWave, PWave, RWave):
+        self.TWave = TWave
+        self.PWave = PWave
+        self.RWave = RWave
+
+
+class wave:
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
 
 
 def createHeartbeats(TWave, PWave, RWave):
@@ -156,30 +153,20 @@ def find3Waves(validHeartbeats, leeway):
             return start
         i += 1
 
-def makeRWaveAnnotation(validHeartbeats, start, offset):
-        for i in range(0, 3):
-            plt.axvspan(validHeartbeats[start+i].RWave.start - offset, validHeartbeats[start+i].RWave.end - offset, facecolor = 'orange', alpha = 0.5, label = 'R-Wave' if i == 0 else "")
-
-def makeTWaveAnnotation(validHeartbeats, start, offset):
+def makeRWaveAnnotation(validHeartbeats, start, offset, ax):
     for i in range(0, 3):
-        plt.axvspan(validHeartbeats[start+i].TWave.start - offset, validHeartbeats[start+i].TWave.end - offset, facecolor = 'red', alpha = 0.5, label = 'T-Wave' if i == 0 else "")
+        ax.axvspan(validHeartbeats[start+i].RWave.start - offset, validHeartbeats[start+i].RWave.end - offset, facecolor = 'orange', alpha = 0.5, label = 'R-Wave' if i == 0 else "")
 
-def makePWaveAnnotation(validHeartbeats, start, offset):
+def makeTWaveAnnotation(validHeartbeats, start, offset, ax):
     for i in range(0, 3):
-        plt.axvspan(validHeartbeats[start+i].PWave.start - offset, validHeartbeats[start+i].PWave.end - offset, facecolor = 'green', alpha = 0.5, label = 'P-Wave' if i == 0 else "")
+        ax.axvspan(validHeartbeats[start + i].TWave.start - offset, validHeartbeats[start + i].TWave.end - offset,facecolor='red', alpha=0.5, label='T-Wave' if i == 0 else "")
 
+def makePWaveAnnotation(validHeartbeats, start, offset, ax):
+    for i in range(0, 3):
+        ax.axvspan(validHeartbeats[start+i].PWave.start - offset, validHeartbeats[start+i].PWave.end - offset, facecolor = 'green', alpha = 0.5, label = 'P-Wave' if i == 0 else "")
 
-# BAD DATA: 4, 6, 20, 31, 36
+def scanData(np_array):
 
-def makeGraph(name):
-    data = scipy.io.loadmat(name)
-
-    mat_list = []
-
-    for j in range(5000):
-        mat_list.append(data['val'][1][j])
-
-    np_array = np.array(mat_list)
     _, rpeaks = nk.ecg_peaks(np_array, sampling_rate=500)
 
     signal_cwt, waves_cwt = nk.ecg_delineate(np_array, rpeaks, sampling_rate=500, method="cwt")
@@ -209,20 +196,154 @@ def makeGraph(name):
     if start == None:
         sys.exit("There are not 3 valid heartbeats in a row")
 
-    # offset to make the graph look better
-    offset = validHeartbeats[start].PWave.start - 100
+    # declares where the startPoint is
+    startPoint = validHeartbeats[start].PWave.start - 100
+    endPoint = validHeartbeats[start + 2].TWave.end + 200
 
-    # Matlab plotting stuff
-    plt.plot(np_array[offset:validHeartbeats[start + 2].TWave.end + 200])
+    return startPoint, validHeartbeats, start, endPoint
 
-    #Calls the highlight annotation functions for each wave you need annotated in this ECG
-    makeRWaveAnnotation(validHeartbeats, start, offset)
-    makeTWaveAnnotation(validHeartbeats, start, offset)
-    makePWaveAnnotation(validHeartbeats, start, offset)
+def return_svg_bytes():
+    fig = plt.gcf()
+    plt.ioff()
 
-    plt.title(name)
-    plt.legend()
+    buf = io.BytesIO()
+    fig.savefig(buf, format="svg")
+    buf.seek(0)
+
+    return buf.read()
+
+def plotLead1(ax, data, annotate, startPoint, endPoint):
+    ax.set_title('Lead 1')
+
+    if annotate == 'none':
+        ax.plot(data[startPoint:endPoint])
+
+
+def plotLead2(ax, data, annotate, startPoint, endPoint):
+    ax.set_title('Lead 2')
+
+    if annotate == 'none':
+        ax.plot(data[startPoint:endPoint])
+
+    elif annotate == 'basic':
+
+        startPoint, validHeartbeats, start, endPoint = scanData(data)
+        ax.plot(data[startPoint:endPoint])
+
+        makeRWaveAnnotation(validHeartbeats, start, startPoint, ax)
+        makeTWaveAnnotation(validHeartbeats, start, startPoint, ax)
+        makePWaveAnnotation(validHeartbeats, start, startPoint, ax)
+
+        ax.legend()
+
+
+def plotLead3(ax, data, annotate, startPoint, endPoint):
+    ax.set_title('Lead 3')
+
+    if annotate == 'none':
+        ax.plot(data[startPoint:endPoint])
+
+
+def plotLeadaVR(ax, data, annotate, startPoint, endPoint):
+    ax.set_title('Lead aVR')
+
+    if annotate == 'none':
+        ax.plot(data[startPoint:endPoint])
+
+
+def plotLeadaVL(ax, data, annotate, startPoint, endPoint):
+    ax.set_title('Lead aVL')
+
+    if annotate == 'none':
+        ax.plot(data[startPoint:endPoint])
+
+
+def plotLeadaVF(ax, data, annotate, startPoint, endPoint):
+    ax.set_title('Lead aVF')
+
+    if annotate == 'none':
+        ax.plot(data[startPoint:endPoint])
+
+
+def plotLeadV1(ax, data, annotate, startPoint, endPoint):
+    ax.set_title('Lead V1')
+
+    if annotate == 'none':
+        ax.plot(data[startPoint:endPoint])
+
+
+def plotLeadV2(ax, data, annotate, startPoint, endPoint):
+    ax.set_title('Lead V2')
+
+    if annotate == 'none':
+        ax.plot(data[startPoint:endPoint])
+
+
+def plotLeadV3(ax, data, annotate, startPoint, endPoint):
+    ax.set_title('Lead V3')
+
+    if annotate == 'none':
+        ax.plot(data[startPoint:endPoint])
+
+def plotLeadV4(ax, data, annotate, startPoint, endPoint):
+    ax.set_title('Lead V4')
+
+    if annotate == 'none':
+        ax.plot(data[startPoint:endPoint])
+
+
+def plotLeadV5(ax, data, annotate, startPoint, endPoint):
+    ax.set_title('Lead V5')
+
+    if annotate == 'none':
+        ax.plot(data[startPoint:endPoint])
+
+
+def plotLeadV6(ax, data, annotate, startPoint, endPoint):
+    ax.set_title('Lead V6')
+
+    if annotate == 'none':
+        ax.plot(data[startPoint:endPoint])
+
+
+def plot12ECGs(data, nameOfArrhythmia):
+    annotations = []
+    fig, axs = plt.subplots(nrows=3, ncols=4, figsize=(20, 20))
+
+    # Sets up our 12 axis
+    ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8, ax9, ax10, ax11, ax12 = axs.flatten()
+
+    #setting it to basic for now
+    nameOfArrhythmia = 'basic'
+
+    # This is where we will change what each arrhythmia does
+    if nameOfArrhythmia == 'basic':
+        annotations = ['none', 'none', 'none', 'none', 'basic', 'none', 'none', 'none', 'none', 'none', 'none', 'none']
+
+        # We need to get the startpoint and endpoints for the graphs first
+        # In the basic example, we are annotating lead 2 so we will get those start/endpoints for the whole graph
+        startPoint, _, _, endPoint = scanData(data['val'][1])
+
+    # Plotting leads in order
+    # We will have to custom code the annotations array for every annotation we do
+    # This means that setting the annotations must be done for every case
+    # And every case we do must be added to the plotting functions above
+    plotLead1(ax1, data['val'][0], annotations[0], startPoint, endPoint)
+    plotLeadaVR(ax2, data['val'][3], annotations[1], startPoint, endPoint)
+    plotLeadV1(ax3, data['val'][6], annotations[2], startPoint, endPoint)
+    plotLeadV4(ax4, data['val'][9], annotations[3], startPoint, endPoint)
+    plotLead2(ax5, data['val'][1], annotations[4], startPoint, endPoint)
+    plotLeadaVL(ax6, data['val'][4], annotations[5], startPoint, endPoint)
+    plotLeadV2(ax7, data['val'][7], annotations[6], startPoint, endPoint)
+    plotLeadV5(ax8, data['val'][10], annotations[7], startPoint, endPoint)
+    plotLead3(ax9, data['val'][2], annotations[8], startPoint, endPoint)
+    plotLeadaVF(ax10, data['val'][5], annotations[9], startPoint, endPoint)
+    plotLeadV3(ax11, data['val'][8], annotations[10], startPoint, endPoint)
+    plotLeadV6(ax12, data['val'][11], annotations[11], startPoint, endPoint)
+
     plt.show()
 
-    # Saves the plot as an svg file
-    plt.savefig("test1", format="svg", dpi=1200)
+    # getting the svgbites of our figure and returning it
+    svgBites = return_svg_bytes()
+    return svgBites
+
