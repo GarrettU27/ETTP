@@ -1,9 +1,10 @@
-import base64
 import io
 
-from backend.ecg_plot import plot, plot_12, plot_1, show, return_svg_bytes, return_png_bytes
-from scipy.io import loadmat
 import numpy as np
+from scipy.io import loadmat
+
+from backend.annotations import plot12ECGs
+from backend.ecg_plot import plot, return_svg_bytes
 
 
 def convert_to_millivolts(microvolts: int):
@@ -26,15 +27,7 @@ def get_ecg_svg():
 
 
 def create_test_ecg(data) -> io.BytesIO:
-    ecg = []
-
-    for ecg_lead in data:
-        ecg.append([convert_to_millivolts(bits) for bits in ecg_lead][0:1300])
-
-    ecg = np.array(ecg)
-
-    plot(ecg, columns=4)
-    return return_svg_bytes()
+    return plot12ECGs(data)
 
 
 def create_train_ecg(data) -> io.BytesIO:

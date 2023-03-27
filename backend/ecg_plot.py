@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 # code pulled from https://github.com/dy1901/ecg_plot
-import base64
-import urllib
 
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.ticker import AutoMinorLocator
+import io
 import os
 from math import ceil
-import io
+
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
 from PIL import Image
+from matplotlib.ticker import AutoMinorLocator
+
+matplotlib.use('agg')
 
 
 def _ax_plot(ax, x, y, secs=10, lwidth=0.5, amplitude_ecg=1.8, time_ticks=0.2):
@@ -313,7 +315,6 @@ def return_png_bytes():
     buf2.seek(0)
 
     return buf2.read()
-
 
 
 def save_as_jpg(file_name, path=DEFAULT_PATH):
