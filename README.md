@@ -25,7 +25,7 @@ This is the repository for the ECG Training Tool Project, or ETTP for short. It 
 3. Then, run the following command
    
    ```bash
-   pip install numpy matplotlib scipy neurokit2 PyQt6 qtawesome
+   pip install -r requirements.txt
    ```
 
 4. To run the application, run the following command
@@ -53,6 +53,14 @@ This is the repository for the ECG Training Tool Project, or ETTP for short. It 
    ```
 
 8. To run the application, find the app's executable, which will  `dist/main/main.exe`
+
+# Adding Libraries
+
+If you add libraries to the project, you need to make sure those additional libraries are included in the `requirements.txt` file. After installing whatever libraries with `pip install`, simply run the following command to output the current libraries `pip` has installed (please make sure you run this in a virtual environment, if you don't, you might add a lot of library requirements that have nothing to do with the project)
+
+```bash
+pip freeze > requirements.txt
+```
 
 # Recommended Dev Tools
 
