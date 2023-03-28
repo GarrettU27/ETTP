@@ -5,15 +5,14 @@ from typing import List, Callable
 
 import PyQt6
 from PyQt6.QtCore import Qt, pyqtSlot, QThreadPool, QRunnable, QMetaObject, Q_ARG
-from components.aspect_ratio_image import AspectRatioImage
-from PyQt6.QtGui import QColor, QPixmap, QImage
-from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QSpacerItem
+from PyQt6.QtGui import QColor, QPixmap
+from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout
 
 from backend.generate_ecg_plot import create_test_ecg
 from backend.get_ecg_from_db import Question
 from components.choice_button import ChoiceButton
 from components.heading_label import HeadingLabel
+from components.image_widget import ImageWidget
 from components.waiting_spinner_widget import QtWaitingSpinner
 from pages.testing_results import TestingResults
 
@@ -33,9 +32,9 @@ class TestingQuestions(QWidget):
         self.test_results = test_results
         self.set_state = set_state
 
-        self.ecg_plot = AspectRatioImage()
+        self.ecg_plot = ImageWidget()
         self.ecg_plot.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
-                               PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
+                                    PyQt6.QtWidgets.QSizePolicy.Policy.Expanding)
 
         self.title = HeadingLabel("Test")
 
@@ -60,7 +59,8 @@ class TestingQuestions(QWidget):
         self.layout.addLayout(self.grid)
         self.spinner.raise_()
 
-        self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
+        # self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
+        #                                       PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
 
     def start_new_test(self, questions: List[Question], choices: List[str]):
         self.questions = questions

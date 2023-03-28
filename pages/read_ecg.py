@@ -1,13 +1,10 @@
-import os
-
 import PyQt6
-from PyQt6 import QtGui
-from PyQt6.QtCore import QSize, QRect
+from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QTextEdit, QWidget, QLabel, QSizePolicy
+from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget
 
-from components.aspect_ratio_image import AspectRatioImage
 from components.heading_label import HeadingLabel
+from components.image_widget import ImageWidget
 from components.resizing_text_edit import ResizingTextEdit
 
 
@@ -51,8 +48,8 @@ class ReadECG(QWidget):
             it represents 0.5 mV.</p>
         """)
 
-        self.image = AspectRatioImage()
-        self.pixmap = QPixmap(os.path.join(os.path.dirname(__file__), "../images/read_ecg.png"))
+        self.image = ImageWidget(True)
+        self.pixmap = QPixmap("images:read_ecg.png")
         self.image.setPixmap(self.pixmap)
         self.image.setMaximumHeight(800)
 

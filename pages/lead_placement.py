@@ -1,12 +1,10 @@
-import os
-
 import PyQt6
-from PyQt6.QtCore import QSize, QRect
+from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QTextEdit, QWidget, QLabel
+from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget
 
-from components.aspect_ratio_image import AspectRatioImage
 from components.heading_label import HeadingLabel
+from components.image_widget import ImageWidget
 from components.resizing_text_edit import ResizingTextEdit
 
 
@@ -93,8 +91,8 @@ class LeadPlacement(QWidget):
 
         self.layout.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignLeft)
 
-        image = AspectRatioImage()
-        pixmap = QPixmap(os.path.join(os.path.dirname(__file__), "../images/lead_placement.png"))
+        image = ImageWidget(True)
+        pixmap = QPixmap('images:lead_placement.png')
         image.setPixmap(pixmap)
         image.setMaximumHeight(800)
 
