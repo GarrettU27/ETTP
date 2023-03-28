@@ -20,14 +20,17 @@ class ImageWidget(QWidget):
         scaled_pixmap = self.scaledPixmap()
 
         if scaled_pixmap is not None:
-            x = int(self.rect().center().x() - scaled_pixmap.rect().width() / 2)
-            y = int(self.rect().center().y() - scaled_pixmap.rect().height() / 2)
+            width = int(scaled_pixmap.rect().width() / self.devicePixelRatio())
+            height = int(scaled_pixmap.rect().height() / self.devicePixelRatio())
+
+            x = int(self.rect().center().x() - width / 2)
+            y = int(self.rect().center().y() - height / 2)
 
             if self.align_left:
-                painter.drawPixmap(scaled_pixmap.rect(),
+                painter.drawPixmap(scaled_pixmap.rect() / self.devicePixelRatio(),
                                    scaled_pixmap)
             else:
-                painter.drawPixmap(QRect(x, y, scaled_pixmap.rect().width(), scaled_pixmap.rect().height()),
+                painter.drawPixmap(QRect(x, y, width, height),
                                    scaled_pixmap)
 
     def setPixmap(self, p: QtGui.QPixmap) -> None:

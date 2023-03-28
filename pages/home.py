@@ -1,6 +1,6 @@
 import PyQt6
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtWidgets import QWidget, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSpacerItem
 
 from backend.generate_ecg_plot import get_ecg_svg
 from components.heading_label import HeadingLabel
@@ -17,12 +17,11 @@ class Home(QWidget):
         self.testing_button = MainButton("Test")
         self.about_us_button = MainButton("About Us")
 
-        qsw = ImageWidget()
+        image = ImageWidget()
         pix = QPixmap()
         pix.loadFromData(get_ecg_svg())
-        qsw.setPixmap(pix)
-        # qsw.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
-        qsw.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
+        image.setPixmap(pix)
+        image.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
                           PyQt6.QtWidgets.QSizePolicy.Policy.Expanding)
 
         self.layout = QVBoxLayout(self)
@@ -31,4 +30,4 @@ class Home(QWidget):
         self.layout.addWidget(self.training_button)
         self.layout.addWidget(self.testing_button)
         self.layout.addWidget(self.about_us_button)
-        self.layout.addWidget(qsw)
+        self.layout.addWidget(image)
