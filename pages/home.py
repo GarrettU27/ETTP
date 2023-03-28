@@ -31,3 +31,10 @@ class Home(QWidget):
         self.layout.addWidget(self.testing_button)
         self.layout.addWidget(self.about_us_button)
         self.layout.addWidget(image)
+
+        self.layout.setStretch(self.layout.indexOf(image), 2)
+
+        self.layout.addStretch(1)
+
+        # self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
+        #                                       PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))

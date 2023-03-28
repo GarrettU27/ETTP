@@ -27,7 +27,7 @@ class ImageWidget(QWidget):
             y = int(self.rect().center().y() - height / 2)
 
             if self.align_left:
-                painter.drawPixmap(scaled_pixmap.rect() / self.devicePixelRatio(),
+                painter.drawPixmap(QRect(0, 0, width, height),
                                    scaled_pixmap)
             else:
                 painter.drawPixmap(QRect(x, y, width, height),
