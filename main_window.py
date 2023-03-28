@@ -95,6 +95,11 @@ class MainWindow(QMainWindow):
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
 
+        # There's a bug that causes the app to crash if the vertical scrollbar appears due to an
+        # AspectRatioImage resizing. To deal with that, we just always keep the scrollbar on.
+        # There potentially is a better solution, but this will work for now
+        self.scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+
         self.stacked_widget = QStackedWidget(self.scroll)
 
         self.scroll.setWidget(self.stacked_widget)

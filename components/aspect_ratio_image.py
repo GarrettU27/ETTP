@@ -1,9 +1,8 @@
 # https://stackoverflow.com/questions/8211982/qt-resizing-a-qlabel-containing-a-qpixmap-while-keeping-its-aspect-ratio
 
-from PyQt6.QtWidgets import QLabel
 from PyQt6 import QtGui, QtCore
-from PyQt6.QtGui import QPainter
 from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtWidgets import QLabel
 
 
 class AspectRatioImage(QLabel):
@@ -28,10 +27,12 @@ class AspectRatioImage(QLabel):
         return QSize(w, self.heightForWidth(w))
 
     def scaledPixmap(self):
-        p = self.pix.scaled(self.size() * self.devicePixelRatio(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        p = self.pix.scaled(self.size() * self.devicePixelRatio(), Qt.AspectRatioMode.KeepAspectRatio,
+                            Qt.TransformationMode.SmoothTransformation)
         p.setDevicePixelRatio(self.devicePixelRatio())
         return p
 
     def resizeEvent(self, e: QtGui.QResizeEvent) -> None:
+        super().resizeEvent(e)
         if self.pix is not None:
             QLabel.setPixmap(self, self.scaledPixmap())
