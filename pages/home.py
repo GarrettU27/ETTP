@@ -1,6 +1,6 @@
 import PyQt6
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSpacerItem
+from PyQt6.QtWidgets import QWidget, QVBoxLayout
 
 from backend.generate_ecg_plot import get_ecg_svg
 from components.heading_label import HeadingLabel
@@ -26,7 +26,7 @@ class Home(QWidget):
         pix.loadFromData(get_ecg_svg())
         image.setPixmap(pix)
         image.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
-                          PyQt6.QtWidgets.QSizePolicy.Policy.Expanding)
+                            PyQt6.QtWidgets.QSizePolicy.Policy.Expanding)
 
         self.layout = QVBoxLayout(self)
         self.layout.setSpacing(30)
@@ -35,10 +35,6 @@ class Home(QWidget):
         self.layout.addWidget(self.testing_button)
         self.layout.addWidget(self.about_us_button)
         self.layout.addWidget(image)
-
-        self.layout.setStretch(self.layout.indexOf(image), 2)
-
-        self.layout.addStretch(1)
 
         # self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
         #                                       PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))

@@ -131,16 +131,15 @@ class MainWindow(QMainWindow):
         self.testing_results = ScrollablePage(self.testing_results_widget)
         self.stacked_widget.addWidget(self.testing_results)
 
-        self.testing_questions_widget = TestingQuestions(
+        self.testing_questions = TestingQuestions(
             lambda: (self.set_testing_state(self.State.DONE), self.choose_testing_page()),
             self.testing_results_widget
         )
-        self.testing_questions = ScrollablePage(self.testing_questions_widget)
         self.stacked_widget.addWidget(self.testing_questions)
 
         self.start_new_testing_widget = StartNewTesting(
             lambda: (self.set_testing_state(self.State.IN_PROGRESS), self.choose_testing_page()),
-            self.testing_questions_widget
+            self.testing_questions
         )
         self.start_new_testing = ScrollablePage(self.start_new_testing_widget)
         self.stacked_widget.addWidget(self.start_new_testing)

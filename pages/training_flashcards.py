@@ -2,6 +2,7 @@ import io
 from typing import List, Callable
 
 import PyQt6
+from PyQt6 import QtGui
 from PyQt6.QtCore import Qt, pyqtSlot, QThreadPool, QRunnable, QMetaObject, Q_ARG
 from PyQt6.QtGui import QColor, QPixmap
 from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QHBoxLayout
@@ -81,6 +82,11 @@ class TrainingFlashcards(QWidget):
         self.layout.addLayout(self.card_movement_row)
 
         self.spinner.raise_()
+
+    # As far as I can tell, compresses things down by hinting it should be
+    # at maximum the screen's height
+    def resizeEvent(self, e: QtGui.QResizeEvent) -> None:
+        self.setMaximumHeight(self.screen().geometry().height())
 
     def start_new_training(self, flashcards: List[Flashcard]):
         self.flashcards = flashcards
