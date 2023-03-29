@@ -4,9 +4,10 @@ from functools import partial
 from typing import List, Callable
 
 import PyQt6
+from PyQt6 import QtGui
 from PyQt6.QtCore import Qt, pyqtSlot, QThreadPool, QRunnable, QMetaObject, Q_ARG
 from PyQt6.QtGui import QColor, QPixmap
-from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QSpacerItem
 
 from backend.generate_ecg_plot import create_test_ecg
 from backend.get_ecg_from_db import Question
@@ -33,7 +34,7 @@ class TestingQuestions(QWidget):
         self.set_state = set_state
 
         self.ecg_plot = ImageWidget()
-        self.ecg_plot.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
+        self.ecg_plot.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
                                     PyQt6.QtWidgets.QSizePolicy.Policy.Expanding)
 
         self.title = HeadingLabel("Test")
@@ -59,8 +60,8 @@ class TestingQuestions(QWidget):
         self.layout.addLayout(self.grid)
         self.spinner.raise_()
 
-        # self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
-        #                                       PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
+        self.layout.setStretch(self.layout.indexOf(self.ecg_plot), 1)
+        self.layout.addStretch(1)
 
     def start_new_test(self, questions: List[Question], choices: List[str]):
         self.questions = questions
@@ -82,10 +83,31 @@ class TestingQuestions(QWidget):
             answer_button.clicked.connect(partial(self.show_next_question, choice))
             self.answer_buttons.append(answer_button)
 
+        self.update_buttons_font_size()
+
         for (i, answer_button) in enumerate(self.answer_buttons):
             self.grid.addWidget(answer_button, math.floor(i / 2), i % 2)
 
         self.load_question()
+
+    def resizeEvent(self, e: QtGui.QResizeEvent) -> None:
+        self.update_buttons_font_size()
+
+    def update_buttons_font_size(self):
+        button_font_size = 40
+
+        # this 'magic' 795 number came from using a pixel ruler on my
+        # computer to determine when the button becomes too wide
+        # I just end up using this as the break point for all
+        # size updates
+        if self.width() <= 795:
+            button_font_size = 20
+            self.layout.setStretch(self.layout.indexOf(self.ecg_plot), 1)
+        else:
+            self.layout.setStretch(self.layout.indexOf(self.ecg_plot), 2)
+
+        for answer_button in self.answer_buttons:
+            answer_button.set_font_size(button_font_size)
 
     def show_next_question(self, previous_questions_answer: str):
         self.answers.append(previous_questions_answer)

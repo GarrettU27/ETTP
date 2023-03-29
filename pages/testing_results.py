@@ -2,6 +2,7 @@ from typing import List
 
 import PyQt6
 import qtawesome
+from PyQt6 import QtGui
 from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSpacerItem, QGridLayout
 
@@ -12,6 +13,10 @@ from components.paragraph_label import ParagraphLabel
 
 
 class TestingResults(QWidget):
+    answer_labels: List[ParagraphLabel] = []
+    note_labels: List[ParagraphLabel] = []
+    icons: List[qtawesome.IconWidget] = []
+
     def __init__(self, set_state):
         super().__init__()
         self.layout = QVBoxLayout(self)
@@ -50,6 +55,7 @@ class TestingResults(QWidget):
             answer_label = ParagraphLabel(f"{i + 1}. {answer}", 40)
             answer_label.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
                                        PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
+            self.answer_labels.append(answer_label)
 
             if answer == question.correct_answer:
                 number_correct += 1
@@ -61,6 +67,8 @@ class TestingResults(QWidget):
                 check_widget.setIconSize(QSize(40, 40))
                 check_widget.update()
                 self.grid.addWidget(check_widget, i, 1)
+
+                self.icons.append(check_widget)
             else:
                 self.grid.addWidget(answer_label, i, 0)
 
@@ -73,12 +81,41 @@ class TestingResults(QWidget):
                 x_widget.update()
                 self.grid.addWidget(x_widget, i, 1)
 
+                self.icons.append(x_widget)
+
                 note_label = ParagraphLabel(f"Correct answer: {question.correct_answer}", 40)
                 note_label.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
                                          PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
+                self.note_labels.append(note_label)
                 self.grid.addWidget(note_label, i, 2)
 
         self.score.setText(f"Your total score: {number_correct}/{len(questions)}")
+        self.update_buttons_font_size()
+
+    def resizeEvent(self, e: QtGui.QResizeEvent) -> None:
+        self.update_buttons_font_size()
+
+    def update_buttons_font_size(self):
+        button_font_size = 40
+
+        # I upped it to 900 here
+        if self.width() <= 900:
+            button_font_size = 20
+            self.grid.setSpacing(15)
+            self.grid.setHorizontalSpacing(30)
+        else:
+            self.grid.setSpacing(30)
+            self.grid.setHorizontalSpacing(60)
+
+        for answer_label in self.answer_labels:
+            answer_label.set_font_size(button_font_size)
+
+        for note_label in self.note_labels:
+            note_label.set_font_size(button_font_size)
+
+        for icon in self.icons:
+            icon.setIconSize(QSize(button_font_size, button_font_size))
+            icon.update()
 
     def clear_page(self):
 
