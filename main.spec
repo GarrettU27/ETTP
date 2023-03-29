@@ -15,7 +15,7 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=added_files,
-    hiddenimports=[],
+    hiddenimports=['sklearn.metrics._pairwise_distances_reduction._datasets_pair', 'sklearn.metrics._pairwise_distances_reduction._middle_term_computer'],
     hookspath=[],
     hooksconfig={
         "matplotlib": {
@@ -36,7 +36,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='main',
+    name='ETTP',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
