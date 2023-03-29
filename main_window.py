@@ -6,7 +6,7 @@ from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QIcon, QCursor
 from PyQt6.QtWidgets import QWidget, QMainWindow, QStackedWidget, QHBoxLayout, \
-    QPushButton, QScrollArea
+    QPushButton
 
 from components.burger_item import BurgerItem
 from components.burger_menu import BurgerMenu
@@ -14,6 +14,7 @@ from pages.about_us import AboutUs
 from pages.home import Home
 from pages.lead_placement import LeadPlacement
 from pages.read_ecg import ReadECG
+from pages.scrollable_page import ScrollablePage
 from pages.start_new.start_new_testing import StartNewTesting
 from pages.start_new.start_new_training import StartNewTraining
 from pages.testing_questions import TestingQuestions
@@ -85,28 +86,28 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.page_list)
         layout.addWidget(self.burger_button)
         layout.setAlignment(self.burger_button, PyQt6.QtCore.Qt.AlignmentFlag.AlignTop)
-        layout.addWidget(self.scroll)
+        layout.addWidget(self.stacked_widget)
         default_window.setLayout(layout)
 
         self.setCentralWidget(default_window)
 
     def create_stacked_widget(self):
         # https://stackoverflow.com/questions/12781407/how-do-i-resize-the-contents-of-a-qscrollarea-as-more-widgets-are-placed-inside
-        self.scroll = QScrollArea()
-        self.scroll.setWidgetResizable(True)
+        # self.scroll = QScrollArea()
+        # self.scroll.setWidgetResizable(True)
 
         # There's a bug that causes the app to crash if the vertical scrollbar appears due to an
         # AspectRatioImage resizing. To deal with that, we just always keep the scrollbar on.
         # There potentially is a better solution, but this will work for now
-        self.scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        # self.scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
 
-        self.stacked_widget = QStackedWidget(self.scroll)
+        self.stacked_widget = QStackedWidget(self)
 
-        self.scroll.setWidget(self.stacked_widget)
+        # self.scroll.setWidget(self.stacked_widget)
+        #
+        # self.scroll.setStyleSheet("* { border: none; }")
 
-        self.scroll.setStyleSheet("* { border: none; }")
-
-        self.about_us = AboutUs()
+        self.about_us = ScrollablePage(AboutUs())
         self.stacked_widget.addWidget(self.about_us)
 
         self.home = Home()
@@ -116,10 +117,10 @@ class MainWindow(QMainWindow):
 
         self.stacked_widget.addWidget(self.home)
 
-        self.read_ecg = ReadECG()
+        self.read_ecg = ScrollablePage(ReadECG())
         self.stacked_widget.addWidget(self.read_ecg)
 
-        self.lead_placement = LeadPlacement()
+        self.lead_placement = ScrollablePage(LeadPlacement())
         self.stacked_widget.addWidget(self.lead_placement)
 
         self.testing_results = TestingResults(
