@@ -7,7 +7,7 @@ import PyQt6
 from PyQt6 import QtGui
 from PyQt6.QtCore import Qt, pyqtSlot, QThreadPool, QRunnable, QMetaObject, Q_ARG
 from PyQt6.QtGui import QColor, QPixmap
-from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QSpacerItem
+from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout
 
 from backend.generate_ecg_plot import create_test_ecg
 from backend.get_ecg_from_db import Question
@@ -60,9 +60,6 @@ class TestingQuestions(QWidget):
         self.layout.addLayout(self.grid)
         self.spinner.raise_()
 
-        self.layout.setStretch(self.layout.indexOf(self.ecg_plot), 1)
-        self.layout.addStretch(1)
-
     def start_new_test(self, questions: List[Question], choices: List[str]):
         self.questions = questions
         self.choices = choices
@@ -102,9 +99,6 @@ class TestingQuestions(QWidget):
         # size updates
         if self.width() <= 795:
             button_font_size = 20
-            self.layout.setStretch(self.layout.indexOf(self.ecg_plot), 1)
-        else:
-            self.layout.setStretch(self.layout.indexOf(self.ecg_plot), 2)
 
         for answer_button in self.answer_buttons:
             answer_button.set_font_size(button_font_size)

@@ -98,8 +98,8 @@ class TestingResults(QWidget):
     def update_buttons_font_size(self):
         button_font_size = 40
 
-        # I upped it to 900 here
-        if self.width() <= 900:
+        # Magic size I measured again
+        if self.width() <= 1380:
             button_font_size = 20
             self.grid.setSpacing(15)
             self.grid.setHorizontalSpacing(30)

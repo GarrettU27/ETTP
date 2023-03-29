@@ -8,7 +8,6 @@ from math import ceil
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image
 from matplotlib.ticker import AutoMinorLocator
 
 matplotlib.use('agg')
@@ -313,6 +312,8 @@ def return_png_bytes():
     # buf2 = io.BytesIO()
     # image.save(buf2, format='PNG')
     # buf2.seek(0)
+
+    plt.close()
 
     return buf.read()
 
