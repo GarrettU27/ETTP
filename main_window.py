@@ -1,4 +1,5 @@
 from enum import Enum
+from functools import partial
 
 import PyQt6
 import qtawesome
@@ -110,10 +111,11 @@ class MainWindow(QMainWindow):
         self.about_us = ScrollablePage(AboutUs())
         self.stacked_widget.addWidget(self.about_us)
 
-        self.home = Home()
-        self.home.training_button.clicked.connect(lambda: self.stacked_widget.setCurrentWidget(self.start_new_training))
-        self.home.testing_button.clicked.connect(lambda: self.stacked_widget.setCurrentWidget(self.start_new_testing))
-        self.home.about_us_button.clicked.connect(lambda: self.stacked_widget.setCurrentWidget(self.about_us))
+        self.home = ScrollablePage(Home(
+            self.choose_training_page,
+            self.choose_testing_page,
+            partial(self.stacked_widget.setCurrentWidget, self.about_us))
+        )
 
         self.stacked_widget.addWidget(self.home)
 
@@ -123,32 +125,37 @@ class MainWindow(QMainWindow):
         self.lead_placement = ScrollablePage(LeadPlacement())
         self.stacked_widget.addWidget(self.lead_placement)
 
-        self.testing_results = TestingResults(
+        self.testing_results_widget = TestingResults(
             lambda: (self.set_testing_state(self.State.NEW), self.choose_testing_page())
         )
+        self.testing_results = ScrollablePage(self.testing_results_widget)
         self.stacked_widget.addWidget(self.testing_results)
 
-        self.testing_questions = TestingQuestions(
+        self.testing_questions_widget = TestingQuestions(
             lambda: (self.set_testing_state(self.State.DONE), self.choose_testing_page()),
-            self.testing_results
+            self.testing_results_widget
         )
+        self.testing_questions = ScrollablePage(self.testing_questions_widget)
         self.stacked_widget.addWidget(self.testing_questions)
 
-        self.start_new_testing = StartNewTesting(
+        self.start_new_testing_widget = StartNewTesting(
             lambda: (self.set_testing_state(self.State.IN_PROGRESS), self.choose_testing_page()),
-            self.testing_questions
+            self.testing_questions_widget
         )
+        self.start_new_testing = ScrollablePage(self.start_new_testing_widget)
         self.stacked_widget.addWidget(self.start_new_testing)
 
-        self.training_questions = TrainingFlashcards(
+        self.training_questions_widget = TrainingFlashcards(
             lambda: (self.set_training_state(self.State.NEW), self.choose_training_page())
         )
+        self.training_questions = ScrollablePage(self.training_questions_widget)
         self.stacked_widget.addWidget(self.training_questions)
 
-        self.start_new_training = StartNewTraining(
+        self.start_new_training_widget = StartNewTraining(
             lambda: (self.set_training_state(self.State.IN_PROGRESS), self.choose_training_page()),
-            self.training_questions
+            self.training_questions_widget
         )
+        self.start_new_training = ScrollablePage(self.start_new_training_widget)
         self.stacked_widget.addWidget(self.start_new_training)
 
         self.stacked_widget.setCurrentWidget(self.home)

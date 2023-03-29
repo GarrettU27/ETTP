@@ -9,13 +9,17 @@ from components.main_button import MainButton
 
 
 class Home(QWidget):
-    def __init__(self):
+    def __init__(self, start_new_training_function, start_new_testing_function, about_us_function):
         super().__init__()
 
         self.heading = HeadingLabel("Home")
         self.training_button = MainButton("Train")
         self.testing_button = MainButton("Test")
         self.about_us_button = MainButton("About Us")
+
+        self.training_button.clicked.connect(start_new_training_function)
+        self.testing_button.clicked.connect(start_new_testing_function)
+        self.about_us_button.clicked.connect(about_us_function)
 
         image = ImageWidget()
         pix = QPixmap()

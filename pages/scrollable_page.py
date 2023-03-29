@@ -1,4 +1,6 @@
-from PyQt6.QtWidgets import QScrollArea, QFrame, QVBoxLayout
+import PyQt6
+from PyQt6 import QtGui
+from PyQt6.QtWidgets import QScrollArea, QFrame, QVBoxLayout, QSpacerItem
 
 
 class ScrollablePage(QScrollArea):
