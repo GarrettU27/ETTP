@@ -1,10 +1,11 @@
-import neurokit2 as nk
-import matplotlib.pyplot as plt
-import sys
 import io
+import sys
+
+import matplotlib.pyplot as plt
+import neurokit2 as nk
 
 
-def pointFinder(startR, endR, startT, endT, startP, endP, signal_cwt):
+def point_finder(startR, endR, startT, endT, startP, endP, signal_cwt):
     # all this does is finds the starts and endpoints for every heartbeat found in the signal
     for i in range(5000):
         if signal_cwt['ECG_R_Onsets'][i] != 0:
@@ -149,20 +150,26 @@ def find3Waves(validHeartbeats, leeway):
             return start
         i += 1
 
+
 def makeRWaveAnnotation(validHeartbeats, start, offset, ax):
     for i in range(0, 3):
-        ax.axvspan(validHeartbeats[start+i].RWave.start - offset, validHeartbeats[start+i].RWave.end - offset, facecolor = 'orange', alpha = 0.5, label = 'R-Wave' if i == 0 else "")
+        ax.axvspan(validHeartbeats[start + i].RWave.start - offset, validHeartbeats[start + i].RWave.end - offset,
+                   facecolor='orange', alpha=0.5, label='R-Wave' if i == 0 else "")
+
 
 def makeTWaveAnnotation(validHeartbeats, start, offset, ax):
     for i in range(0, 3):
-        ax.axvspan(validHeartbeats[start + i].TWave.start - offset, validHeartbeats[start + i].TWave.end - offset,facecolor='red', alpha=0.5, label='T-Wave' if i == 0 else "")
+        ax.axvspan(validHeartbeats[start + i].TWave.start - offset, validHeartbeats[start + i].TWave.end - offset,
+                   facecolor='red', alpha=0.5, label='T-Wave' if i == 0 else "")
+
 
 def makePWaveAnnotation(validHeartbeats, start, offset, ax):
     for i in range(0, 3):
-        ax.axvspan(validHeartbeats[start+i].PWave.start - offset, validHeartbeats[start+i].PWave.end - offset, facecolor = 'green', alpha = 0.5, label = 'P-Wave' if i == 0 else "")
+        ax.axvspan(validHeartbeats[start + i].PWave.start - offset, validHeartbeats[start + i].PWave.end - offset,
+                   facecolor='green', alpha=0.5, label='P-Wave' if i == 0 else "")
+
 
 def scanData(np_array):
-
     _, rpeaks = nk.ecg_peaks(np_array, sampling_rate=500)
 
     signal_cwt, waves_cwt = nk.ecg_delineate(np_array, rpeaks, sampling_rate=500, method="cwt")
@@ -197,6 +204,7 @@ def scanData(np_array):
     endPoint = validHeartbeats[start + 2].TWave.end + 200
 
     return startPoint, validHeartbeats, start, endPoint
+
 
 def return_svg_bytes():
     fig = plt.gcf()
@@ -297,6 +305,7 @@ def plotRedLines(ax, startPoint, endPoint, y_min, y_max):
                 y2 = y_min * (i / 3) + y_min * (1 / 3) * (j / 5)
             ax.axhline(y=y1, linestyle='-', linewidth=1, color=(1, 0.7, 0.7), zorder=1)
             ax.axhline(y=y2, linestyle='-', linewidth=1, color=(1, 0.7, 0.7), zorder=1)
+
 
 def plotLead1(ax, data, annotate, startPoint, endPoint):
     plotSetup(ax, startPoint, endPoint, 'I')
@@ -442,4 +451,3 @@ def plot12ECGs(data, nameOfArrhythmia):
     # getting the svgbites of our figure and returning it
     svgBites = return_svg_bytes()
     return svgBites
-

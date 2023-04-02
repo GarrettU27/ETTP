@@ -1,19 +1,13 @@
-import io
 from typing import List, Callable
 
-import PyQt6
 from PyQt6 import QtGui
-from PyQt6.QtCore import Qt, pyqtSlot, QThreadPool, QRunnable, QMetaObject, Q_ARG
-from PyQt6.QtGui import QColor, QPixmap
 from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QHBoxLayout
 
-from backend.generate_ecg_plot import create_test_ecg
 from backend.get_ecg_from_db import Flashcard
+from components.ecg_plot import ECGPlot
 from components.heading_label import HeadingLabel
-from components.image_widget import ImageWidget
 from components.main_button import MainButton
 from components.paragraph_label import ParagraphLabel
-from components.waiting_spinner_widget import QtWaitingSpinner
 
 
 class TrainingFlashcards(QWidget):
@@ -25,29 +19,14 @@ class TrainingFlashcards(QWidget):
         super().__init__()
         self.set_state = set_state
 
-        self.image = ImageWidget()
-        self.image.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
-                                 PyQt6.QtWidgets.QSizePolicy.Policy.Expanding)
-
+        self.ecg_plot = ECGPlot()
         self.title = HeadingLabel("Train")
         self.arrhythmia_name = ParagraphLabel("Normal Sinus Rhythm", 40)
-
-        self.spinner = QtWaitingSpinner(self, True, True)
-
-        self.spinner.setRoundness(70.0)
-        self.spinner.setMinimumTrailOpacity(15.0)
-        self.spinner.setTrailFadePercentage(70.0)
-        self.spinner.setNumberOfLines(12)
-        self.spinner.setLineLength(10)
-        self.spinner.setLineWidth(5)
-        self.spinner.setInnerRadius(10)
-        self.spinner.setRevolutionsPerSecond(2.5)
-        self.spinner.setColor(QColor(0, 0, 0))
 
         self.layout = QVBoxLayout(self)
         self.layout.setSpacing(30)
         self.layout.addWidget(self.title)
-        self.layout.addWidget(self.image)
+        self.layout.addWidget(self.ecg_plot)
         self.layout.addWidget(self.arrhythmia_name)
 
         self.grid = QGridLayout()
@@ -81,8 +60,6 @@ class TrainingFlashcards(QWidget):
 
         self.layout.addLayout(self.card_movement_row)
 
-        self.spinner.raise_()
-
     # As far as I can tell, compresses things down by hinting it should be
     # at maximum the screen's height
     def resizeEvent(self, e: QtGui.QResizeEvent) -> None:
@@ -95,29 +72,22 @@ class TrainingFlashcards(QWidget):
     def reset_training(self):
         self.total_flashcards = len(self.flashcards)
         self.current_flashcard = 0
-        self.load_flashcard()
+        self.show_flashcard()
 
     def show_next_flashcard(self):
         self.current_flashcard += 1
         if self.current_flashcard >= self.total_flashcards:
             self.set_state()
         else:
-            self.load_flashcard()
+            self.show_flashcard()
 
     def show_previous_flashcard(self):
         self.current_flashcard -= 1
         if self.current_flashcard < 0:
             self.current_flashcard = 0
-        self.load_flashcard()
+        self.show_flashcard()
 
-    def load_flashcard(self):
-        self.spinner.start()
-        load_test_ecg = LoadTrainingECG(self)
-        QThreadPool.globalInstance().start(load_test_ecg)
-
-    @pyqtSlot(io.BytesIO)
-    def show_flashcard(self, data):
-        self.spinner.stop()
+    def show_flashcard(self):
         self.adjustSize()
 
         current_card = self.flashcards[self.current_flashcard]
@@ -137,18 +107,4 @@ class TrainingFlashcards(QWidget):
         else:
             self.previous_button.setEnabled(True)
 
-        pixmap = QPixmap()
-        pixmap.loadFromData(data)
-        self.image.setPixmap(pixmap)
-
-
-# https://gist.github.com/eyllanesc/1a09157d17ba13d223c312b28a81c320
-class LoadTrainingECG(QRunnable):
-    def __init__(self, training_flashcards: TrainingFlashcards):
-        QRunnable.__init__(self)
-        self.training_flashcards = training_flashcards
-
-    def run(self):
-        ecg = create_test_ecg(self.training_flashcards.flashcards[self.training_flashcards.current_flashcard].ecg)
-        QMetaObject.invokeMethod(self.training_flashcards, "show_flashcard", Qt.ConnectionType.QueuedConnection,
-                                 Q_ARG(bytes, ecg))
+        self.ecg_plot.plot_ecg(self.flashcards[self.current_flashcard].ecg)

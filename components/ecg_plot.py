@@ -15,7 +15,6 @@ matplotlib.use('QtAgg')
 
 class ECGPlot(QWidget):
     lead_index = ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
-    display_factor = 1
     line_width = 1
 
     def __init__(self, title='ECG 12'):
@@ -40,51 +39,48 @@ class ECGPlot(QWidget):
         layout.addWidget(self.canvas)
         self.setLayout(layout)
 
-    def update_plot(self, ecg_data, sample_rate=500, columns=4, row_height=6):
+    def plot_ecg(self, ecg_data, sample_rate=500, number_of_columns=4, row_height=6):
         self.ax.cla()
-        self.plot_ecg(ecg_data, sample_rate, columns, row_height)
-        self.canvas.draw()
 
-    def plot_ecg(self, ecg_data, sample_rate=500, columns=4, row_height=6):
-        lead_order = list(range(0, len(ecg_data)))
-        sections = len(ecg_data[0]) / sample_rate
-        leads = len(lead_order)
-        rows = int(ceil(leads / columns))
+        total_sections = len(ecg_data[0]) / sample_rate
+        total_leads = len(ecg_data)
+        total_rows = int(ceil(total_leads / number_of_columns))
 
-        self.setup_grid(sections, rows, columns, row_height)
+        self.setup_grid(total_sections, total_rows, number_of_columns, row_height)
 
-        display_factor = self.display_factor ** 0.5
         color_line = (0, 0, 0)
 
-        for column in range(0, columns):
-            for row in range(0, rows):
-                if column * rows + row < leads:
-                    y_offset = -(row_height / 2) * ceil(row % rows)
-                    x_offset = 0
-                    t_lead = lead_order[column * rows + row]
+        for current_column_number in range(0, number_of_columns):
+            for current_row_number in range(0, total_rows):
 
-                    if column > 0:
-                        x_offset = sections * column
-                        self.ax.plot([x_offset, x_offset],
-                                     [ecg_data[t_lead][0] + y_offset - 0.3, ecg_data[t_lead][0] + y_offset + 0.3],
-                                     linewidth=self.line_width * display_factor, color=color_line)
+                current_lead_number = current_column_number * total_rows + current_row_number
+                if current_lead_number < total_leads:
+                    y_offset = -(row_height / 2) * ceil(current_row_number % total_rows)
+                    x_offset = 0
+                    current_lead = ecg_data[current_lead_number]
+
+                    if current_column_number > 0:
+                        x_offset = total_sections * current_column_number
+                        self.create_separator_line(x_offset, current_lead[0] + y_offset)
 
                     step = 1.0 / sample_rate
-                    self.ax.text(x_offset + 0.07, y_offset - 0.5, self.lead_index[t_lead], fontsize=9 * display_factor)
+                    self.ax.text(x_offset + 0.07, y_offset - 0.5, self.lead_index[current_lead_number], fontsize=9)
                     self.ax.plot(
-                        np.arange(0, len(ecg_data[t_lead]) * step, step) + x_offset,
-                        ecg_data[t_lead] + y_offset,
-                        linewidth=self.line_width * display_factor,
+                        np.arange(0, len(current_lead) * step, step) + x_offset,
+                        ecg_data[current_lead_number] + y_offset,
+                        linewidth=self.line_width,
                         color=color_line
                     )
 
-    def setup_grid(self, sections, rows, columns=4, row_height=6):
+        self.canvas.draw()
+
+    def setup_grid(self, total_sections, total_rows, total_columns=4, row_height=6):
         color_major = (1, 0, 0)
         color_minor = (1, 0.7, 0.7)
 
         x_min = 0
-        x_max = columns * sections
-        y_min = row_height / 4 - (rows / 2) * row_height
+        x_max = total_columns * total_sections
+        y_min = row_height / 4 - (total_rows / 2) * row_height
         y_max = row_height / 4
 
         self.ax.set_xticks(np.arange(x_min, x_max, 0.2))
@@ -97,8 +93,16 @@ class ECGPlot(QWidget):
 
         self.ax.xaxis.set_minor_locator(AutoMinorLocator(5))
 
-        self.ax.grid(which='major', linestyle='-', linewidth=0.5 * self.display_factor, color=color_major)
-        self.ax.grid(which='minor', linestyle='-', linewidth=0.5 * self.display_factor, color=color_minor)
+        self.ax.grid(which='major', linestyle='-', linewidth=0.5, color=color_major)
+        self.ax.grid(which='minor', linestyle='-', linewidth=0.5, color=color_minor)
 
         self.ax.set_ylim(y_min, y_max)
         self.ax.set_xlim(x_min, x_max)
+
+    def create_separator_line(self, x_offset, y_offset):
+        separator_line_height = 0.6
+        separator_color = (0, 0, 0)
+
+        self.ax.plot([x_offset, x_offset],
+                     [y_offset - separator_line_height / 2, y_offset + separator_line_height / 2],
+                     linewidth=self.line_width, color=separator_color)

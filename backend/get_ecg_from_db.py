@@ -9,7 +9,6 @@ import numpy as np
 import numpy.typing
 
 from backend.arrhythmia_annotation import ArrhythmiaAnnotation, get_arrhythmia_annotation
-from backend.generate_ecg_plot import convert_to_millivolts
 from backend.sqlite_setup import get_sqlite_connection
 
 SINUS_RHYTHM_ID: Final[int] = 54
@@ -31,6 +30,11 @@ class Question:
 class Flashcard:
     ecg: numpy.typing.NDArray
     arrhythmia_annotation: ArrhythmiaAnnotation
+
+
+def convert_to_millivolts(microvolts: int):
+    # the data is in microvolts, convert to millivolts
+    return microvolts / 1000
 
 
 def get_training_flashcards(arrhythmia_id_array: List[int], number_of_flashcards: int) -> List[Flashcard]:
@@ -69,7 +73,15 @@ def get_training_flashcards(arrhythmia_id_array: List[int], number_of_flashcards
     for arrhythmia in trained_arrhythmias:
         for i in range(arrhythmia.amount):
             patient_id = get_random_patient_id(cur, arrhythmia.id)
-            ecg = get_patients_ecg(cur, patient_id)
+            ecg_raw = get_patients_ecg(cur, patient_id)
+
+            ecg = []
+
+            for ecg_lead in ecg_raw:
+                ecg.append([convert_to_millivolts(bits) for bits in ecg_lead][0:1300])
+
+            ecg = np.array(ecg)
+
             flashcards.append(Flashcard(
                 ecg=ecg,
                 arrhythmia_annotation=get_arrhythmia_annotation(arrhythmia.id)

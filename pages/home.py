@@ -34,7 +34,7 @@ class Home(QWidget):
 
         ecg = np.array(ecg)
         ecg_plot = ECGPlot()
-        ecg_plot.update_plot(ecg)
+        ecg_plot.plot_ecg(ecg)
 
         self.layout = QVBoxLayout(self)
         self.layout.setSpacing(30)

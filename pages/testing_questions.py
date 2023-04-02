@@ -93,4 +93,4 @@ class TestingQuestions(QWidget):
 
     def show_question(self):
         self.title.setText(f"Test - Question {str(self.current_question + 1)}/{str(self.total_questions)}")
-        self.ecg_plot.update_plot(self.questions[self.current_question].ecg)
+        self.ecg_plot.plot_ecg(self.questions[self.current_question].ecg)
