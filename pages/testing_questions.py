@@ -4,6 +4,7 @@ from functools import partial
 from typing import List, Callable
 
 import PyQt6
+from PyQt6 import QtGui
 from PyQt6.QtCore import Qt, pyqtSlot, QThreadPool, QRunnable, QMetaObject, Q_ARG
 from PyQt6.QtGui import QColor, QPixmap
 from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout
@@ -85,6 +86,9 @@ class TestingQuestions(QWidget):
             self.grid.addWidget(answer_button, math.floor(i / 2), i % 2)
 
         self.load_question()
+
+    def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
+        self.update_buttons_font_size()
 
     def update_buttons_font_size(self):
         button_font_size = 40
