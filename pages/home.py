@@ -33,7 +33,8 @@ class Home(QWidget):
             ecg.append([convert_to_millivolts(bits) for bits in ecg_lead][0:1300])
 
         ecg = np.array(ecg)
-        ecg_plot = ECGPlot(ecg)
+        ecg_plot = ECGPlot()
+        ecg_plot.update_plot(ecg)
 
         self.layout = QVBoxLayout(self)
         self.layout.setSpacing(30)

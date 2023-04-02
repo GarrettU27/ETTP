@@ -1,18 +1,14 @@
-import io
 import math
 from functools import partial
 from typing import List, Callable
 
-from PyQt6.QtCore import Qt, pyqtSlot, QRunnable, QMetaObject, Q_ARG
-from PyQt6.QtGui import QColor
+from PyQt6 import QtGui
 from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout
 
-from backend.generate_ecg_plot import create_test_ecg
 from backend.get_ecg_from_db import Question
 from components.choice_button import ChoiceButton
 from components.ecg_plot import ECGPlot
 from components.heading_label import HeadingLabel
-from components.waiting_spinner_widget import QtWaitingSpinner
 from pages.testing_results import TestingResults
 
 
@@ -32,19 +28,7 @@ class TestingQuestions(QWidget):
         self.set_state = set_state
 
         self.title = HeadingLabel("Test")
-        self.ecg_plot = QWidget()
-
-        self.spinner = QtWaitingSpinner(self, True, True)
-
-        self.spinner.setRoundness(70.0)
-        self.spinner.setMinimumTrailOpacity(15.0)
-        self.spinner.setTrailFadePercentage(70.0)
-        self.spinner.setNumberOfLines(12)
-        self.spinner.setLineLength(10)
-        self.spinner.setLineWidth(5)
-        self.spinner.setInnerRadius(10)
-        self.spinner.setRevolutionsPerSecond(2.5)
-        self.spinner.setColor(QColor(0, 0, 0))
+        self.ecg_plot = ECGPlot()
 
         self.layout = QVBoxLayout(self)
         self.layout.setSpacing(30)
@@ -53,7 +37,7 @@ class TestingQuestions(QWidget):
 
         self.grid = QGridLayout()
         self.layout.addLayout(self.grid)
-        self.spinner.raise_()
+        self.layout.addStretch(1)
 
     def start_new_test(self, questions: List[Question], choices: List[str]):
         self.questions = questions
@@ -80,7 +64,10 @@ class TestingQuestions(QWidget):
         for (i, answer_button) in enumerate(self.answer_buttons):
             self.grid.addWidget(answer_button, math.floor(i / 2), i % 2)
 
-        self.load_question()
+        self.show_question()
+
+    def resizeEvent(self, e: QtGui.QResizeEvent) -> None:
+        self.update_buttons_font_size()
 
     def update_buttons_font_size(self):
         button_font_size = 40
@@ -102,44 +89,8 @@ class TestingQuestions(QWidget):
             self.test_results.update_page(self.answers, self.questions)
             self.set_state()
         else:
-            self.load_question()
+            self.show_question()
 
-    def load_question(self):
+    def show_question(self):
         self.title.setText(f"Test - Question {str(self.current_question + 1)}/{str(self.total_questions)}")
-
-        if type(self.ecg_plot) is QWidget:
-            plot = ECGPlot(self.questions[self.current_question].ecg)
-            self.layout.replaceWidget(self.ecg_plot, plot)
-            self.layout.update()
-            self.ecg_plot = plot
-            self.spinner.raise_()
-        else:
-            self.ecg_plot.update_plot(self.questions[self.current_question].ecg)
-
-    @pyqtSlot(io.BytesIO)
-    def show_question(self, data):
-        self.spinner.stop()
-        self.adjustSize()
-
-        self.title.setText(f"Test - Question {str(self.current_question + 1)}/{str(self.total_questions)}")
-
-        if type(self.ecg_plot) is QWidget:
-            plot = ECGPlot(self.questions[self.current_question].ecg)
-            self.layout.replaceWidget(self.ecg_plot, plot)
-            self.ecg_plot = plot
-            self.spinner.raise_()
-        else:
-            self.ecg_plot.update_plot(self.questions[self.current_question].ecg)
-            self.layout.replaceWidget(self.ecg_plot, self.ecg_plot)
-
-
-# https://gist.github.com/eyllanesc/1a09157d17ba13d223c312b28a81c320
-class LoadTestECG(QRunnable):
-    def __init__(self, testing_questions: TestingQuestions):
-        QRunnable.__init__(self)
-        self.testing_questions = testing_questions
-
-    def run(self):
-        ecg = create_test_ecg(self.testing_questions.questions[self.testing_questions.current_question].ecg)
-        QMetaObject.invokeMethod(self.testing_questions, "show_question", Qt.ConnectionType.QueuedConnection,
-                                 Q_ARG(bytes, ecg))
+        self.ecg_plot.update_plot(self.questions[self.current_question].ecg)
