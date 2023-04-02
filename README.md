@@ -8,58 +8,44 @@ This is the repository for the ECG Training Tool Project, or ETTP for short. It 
 
 1. Install [Python 3.11.2](https://www.python.org/downloads/) (current latest installation of Python)
 
-2. For installing the Python libraries, I heavily recommend creating a virtual environment first. First, you will create a virtual environment with the following command
+2. To help make the management of dependencies easier, we use [Pipenv](https://pipenv.pypa.io/en/latest/). This library handles creating the proper virtual environment, tracking dependencies, and resolving dependency issues. To use it, first run this command
    
    ```bash
-   python -m venv venv
-   ```
-   
-   After that, you run the script you generated to activate your virtual environment. On Windows, that would look like the following
-   
-   ```bash
-   .\venv\Scripts\activate
-   ```
-   
-   Note that you might need to enable the ability to run scripts on your system
-
-3. Then, run the following command
-   
-   ```bash
-   pip install -r requirements.txt
+   pip install --user pipenv
    ```
 
-4. To run the application, run the following command
+3. After that, we want to install the current set of dependnecies required by the project. Navigate your terminal so that the current directory is the project root directory and run the following command
    
    ```bash
-   python main.py
+   python -m pipenv sync
    ```
 
-5. To seed the database, run the following command
+4. To run the application, you need to run the python file in such a way that it uses the `pipenv` dependencies. One way is to access the `pipenv` shell and then run the app normally. The other method is to run the following command
    
    ```bash
-   python seed.py
+   python -m pipenv run python main.py
    ```
 
-6. To compile the application into an executable, first install the `pyinstaller` library like so
+5. To seed the database, the same principle holds. But, just run the following command
    
    ```bash
-   pip install -U pyinstaller
+   python -m pipenv run python seed.py
    ```
 
-7. Then, simply compile using the `spec` file in the root directory. In other words, run the following command
+6. To compile the application into an executable, you need to run `pyinstaller` on the `main.spec`, which are the compilation settings. To do that, run the following command
    
    ```bash
-   pyinstaller main.spec
+   python -m pipenv run pyinstaller main.spec
    ```
 
-8. To run the application, find the app's executable, which will  `dist/main/main.exe`
+7. To run the application, find the app's executable, which will `dist/main/main.exe`
 
 # Adding Libraries
 
-If you add libraries to the project, you need to make sure those additional libraries are included in the `requirements.txt` file. After installing whatever libraries with `pip install`, simply run the following command to output the current libraries `pip` has installed (please make sure you run this in a virtual environment, if you don't, you might add a lot of library requirements that have nothing to do with the project)
+If you add libraries to the project, you will want to install them using `pipenv` to ensure the newly installed libraries are tracked. To install a library with `pipenv`, simply run
 
 ```bash
-pip freeze > requirements.txt
+python -m pipenv install <library_name>
 ```
 
 # Recommended Dev Tools
