@@ -3,16 +3,15 @@ import math
 from functools import partial
 from typing import List, Callable
 
-import PyQt6
-from PyQt6.QtCore import Qt, pyqtSlot, QThreadPool, QRunnable, QMetaObject, Q_ARG
-from PyQt6.QtGui import QColor, QPixmap
+from PyQt6.QtCore import Qt, pyqtSlot, QRunnable, QMetaObject, Q_ARG
+from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout
 
 from backend.generate_ecg_plot import create_test_ecg
 from backend.get_ecg_from_db import Question
 from components.choice_button import ChoiceButton
+from components.ecg_plot import ECGPlot
 from components.heading_label import HeadingLabel
-from components.image_widget import ImageWidget
 from components.waiting_spinner_widget import QtWaitingSpinner
 from pages.testing_results import TestingResults
 
@@ -32,11 +31,8 @@ class TestingQuestions(QWidget):
         self.test_results = test_results
         self.set_state = set_state
 
-        self.ecg_plot = ImageWidget()
-        self.ecg_plot.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
-                                    PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
-
         self.title = HeadingLabel("Test")
+        self.ecg_plot = QWidget()
 
         self.spinner = QtWaitingSpinner(self, True, True)
 
@@ -109,9 +105,16 @@ class TestingQuestions(QWidget):
             self.load_question()
 
     def load_question(self):
-        self.spinner.start()
-        load_test_ecg = LoadTestECG(self)
-        QThreadPool.globalInstance().start(load_test_ecg)
+        self.title.setText(f"Test - Question {str(self.current_question + 1)}/{str(self.total_questions)}")
+
+        if type(self.ecg_plot) is QWidget:
+            plot = ECGPlot(self.questions[self.current_question].ecg)
+            self.layout.replaceWidget(self.ecg_plot, plot)
+            self.layout.update()
+            self.ecg_plot = plot
+            self.spinner.raise_()
+        else:
+            self.ecg_plot.update_plot(self.questions[self.current_question].ecg)
 
     @pyqtSlot(io.BytesIO)
     def show_question(self, data):
@@ -120,9 +123,14 @@ class TestingQuestions(QWidget):
 
         self.title.setText(f"Test - Question {str(self.current_question + 1)}/{str(self.total_questions)}")
 
-        pixmap = QPixmap()
-        pixmap.loadFromData(data)
-        self.ecg_plot.setPixmap(pixmap)
+        if type(self.ecg_plot) is QWidget:
+            plot = ECGPlot(self.questions[self.current_question].ecg)
+            self.layout.replaceWidget(self.ecg_plot, plot)
+            self.ecg_plot = plot
+            self.spinner.raise_()
+        else:
+            self.ecg_plot.update_plot(self.questions[self.current_question].ecg)
+            self.layout.replaceWidget(self.ecg_plot, self.ecg_plot)
 
 
 # https://gist.github.com/eyllanesc/1a09157d17ba13d223c312b28a81c320

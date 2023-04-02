@@ -5,9 +5,11 @@ from dataclasses import dataclass
 from sqlite3 import Cursor
 from typing import List, Final
 
+import numpy as np
 import numpy.typing
 
 from backend.arrhythmia_annotation import ArrhythmiaAnnotation, get_arrhythmia_annotation
+from backend.generate_ecg_plot import convert_to_millivolts
 from backend.sqlite_setup import get_sqlite_connection
 
 SINUS_RHYTHM_ID: Final[int] = 54
@@ -107,7 +109,15 @@ def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: i
     for arrhythmia in tested_arrhythmias:
         for i in range(arrhythmia.amount):
             patient_id = get_random_patient_id(cur, arrhythmia.id)
-            ecg = get_patients_ecg(cur, patient_id)
+            ecg_raw = get_patients_ecg(cur, patient_id)
+
+            ecg = []
+
+            for ecg_lead in ecg_raw:
+                ecg.append([convert_to_millivolts(bits) for bits in ecg_lead][0:1300])
+
+            ecg = np.array(ecg)
+
             questions.append(Question(
                 ecg=ecg,
                 correct_answer=get_arrhythmia_name(cur, arrhythmia.id),
