@@ -13,6 +13,8 @@ This is the repository for the ECG Training Tool Project, or ETTP for short. It 
    ```bash
    pip install --user pipenv
    ```
+   
+   Note: `pipenv` sets the requirement of the project to use a specific version of python. If you're on mac, you can simply install [pyenv](https://github.com/pyenv/pyenv) and let `pipenv` handle installing the right version. On windows, you'll have to install the right version yourself, but you can use the windows version of `pyenv`: [pyenv-win](https://github.com/pyenv-win/pyenv-win) (though, I don't know whether `pipenv` will use it to set python versions for you automatically)
 
 3. After that, we want to install the current set of dependnecies required by the project. Navigate your terminal so that the current directory is the project root directory and run the following command
    
