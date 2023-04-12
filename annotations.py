@@ -192,9 +192,7 @@ def makePWaveAnnotation(validHeartbeats, start, offset, ax, numHighlights):
 
 def scanDataRedone(np_array):
     cleaned_ecg = nk.ecg_clean(np_array, sampling_rate=500)
-    _, info = nk.ecg_peaks(cleaned_ecg, sampling_rate=500)
-    rpeaks = info["ECG_R_Peaks"]
-    heartbeats_dict = nk.ecg_segment(cleaned_ecg, rpeaks, sampling_rate=500)
+    heartbeats_dict = nk.ecg_segment(cleaned_ecg, sampling_rate=500)
 
     for key, value in heartbeats_dict.items():
         print(value[['Index', 'Signal']].reset_index(drop=True))
