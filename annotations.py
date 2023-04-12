@@ -75,8 +75,8 @@ class wave:
 # If one of them works, returns the first triplet that works
 # Otherwise, return false
 def check_t_wave(t_wave, p_waves, r_waves):
-    for p_wave in p_waves:
-        for r_wave in r_waves:
+    for r_wave in r_waves:
+        for p_wave in p_waves:
             if t_wave.start > r_wave.start > p_wave.start:
                 return t_wave, p_wave, r_wave
 
