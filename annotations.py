@@ -711,3 +711,8 @@ def plot12ECGs(data, nameOfArrhythmia):
     svgBites = return_svg_bytes()
     return svgBites
 
+
+if __name__ == '__main__':
+    mat = loadmat("annotation_test_data/working/JS00008.mat")
+    print(mat)
+    plot12ECGs(mat, 'basic')
