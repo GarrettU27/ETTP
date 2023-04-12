@@ -71,28 +71,82 @@ class wave:
         self.end = end
 
 
-# Checks t wave against all possible other p_waves and r_waves
-# If one of them works, returns the first triplet that works
-# Otherwise, return false
 def check_t_wave(t_wave, p_waves, r_waves):
-    for r_wave in r_waves:
-        for p_wave in p_waves:
+    for p_wave in p_waves:
+        for r_wave in r_waves:
             if t_wave.start > r_wave.start > p_wave.start:
                 return t_wave, p_wave, r_wave
 
     return False
 
 
-def create_heartbeats(t_waves, p_waves, r_waves):
+def createHeartbeats(t_waves, p_waves, r_waves):
+    # Finding the smallest array
+    j = min(len(t_waves), len(p_waves), len(r_waves)) - 1
+
+    pwave_index = 0
+    rwave_index = 0
+    twave_index = 0
     heartbeat_list = []
 
-    # Checks each t wave against all the other p and r waves. If a triplet is found, add it and move
-    # onto the next t wave
-    for t_wave in t_waves:
-        valid_triplet = check_t_wave(t_wave, p_waves, r_waves)
+    # This goes through all our waves and tries to find valid triplets, where there's first a t wave, then an r wave
+    # and finally a p wave. Once it finds a valid triplet, its added to the list of heartbeats
+    while pwave_index < j or rwave_index < j or twave_index < j:
+        r_start = r_waves[rwave_index].start
+        p_start = p_waves[pwave_index].start
+        t_start = t_waves[twave_index].start
 
-        if valid_triplet:
-            heartbeat_list.append(Heartbeat(*valid_triplet))
+        # check T against P
+        if t_start > p_start:
+            pwave_index += 1
+
+        # check P against R
+        if p_start > r_start:
+            rwave_index += 1
+
+        # check T against R
+        if t_start > r_start:
+            rwave_index += 1
+
+        # if missing P-wave
+        # validating that P-wave is higher than the other two waves and that the other two waves are correct
+        if r_start < p_start and p_start > t_start > r_start:
+            # if the p-wave is higher than the other two, the other two waves become invalid and we iterate
+            rwave_index += 1
+            twave_index += 1
+
+        # if missing R-wave
+        # Validating start of RWave is greater than TWave and the other two waves are vaild
+        elif r_start > t_start > p_start:
+            pwave_index += 1
+            twave_index += 1
+
+        # If P-Wave and R-Wave are missing
+        elif p_start > t_start and r_start > t_start:
+            twave_index += 1
+
+        # if missing T-Wave
+        # if T-Wave is in the next heartbeat
+        elif t_start > p_waves[pwave_index + 1].start:
+            # if P-Wave is in the next heartbeat
+            if p_start > r_start:
+                rwave_index += 1
+
+            # If R-Wave is in the next heartbeat
+            elif r_start > p_waves[pwave_index + 1].start:
+                pwave_index += 1
+
+            # Just the T-Wave is in the next heartbeat
+            else:
+                pwave_index += 1
+                rwave_index += 1
+
+        # if wave is valid
+        elif t_start > r_start > p_start:
+            heartbeat_list.append(Heartbeat(t_waves[twave_index], p_waves[pwave_index], r_waves[rwave_index]))
+            pwave_index += 1
+            rwave_index += 1
+            twave_index += 1
 
     return heartbeat_list
 
@@ -136,6 +190,16 @@ def makePWaveAnnotation(validHeartbeats, start, offset, ax, numHighlights):
                    zorder=2, facecolor='green', alpha=0.5, label='P-Wave' if i == 0 else "")
 
 
+def scanDataRedone(np_array):
+    cleaned_ecg = nk.ecg_clean(np_array, sampling_rate=500)
+    _, info = nk.ecg_peaks(cleaned_ecg, sampling_rate=500)
+    rpeaks = info["ECG_R_Peaks"]
+    heartbeats_dict = nk.ecg_segment(cleaned_ecg, rpeaks, sampling_rate=500)
+
+    for key, value in heartbeats_dict.items():
+        print(value)
+
+
 def scanData(np_array):
     _, rpeaks = nk.ecg_peaks(np_array, sampling_rate=500)
 
@@ -157,7 +221,7 @@ def scanData(np_array):
     RWaves = cleanArrays(startR, endR, 150)
 
     # finds and stores all valid heartbeats into the heartbeat class
-    validHeartbeats = create_heartbeats(TWaves, PWaves, RWaves)
+    validHeartbeats = createHeartbeats(TWaves, PWaves, RWaves)
 
     # Finds 3 heartbeats in a row that we can output
     start = find3Waves(validHeartbeats, 700)
@@ -687,5 +751,6 @@ def plot12ECGs(data, nameOfArrhythmia):
 
 if __name__ == '__main__':
     mat = loadmat("annotation_test_data/working/JS00008.mat")
-    print(mat)
-    plot12ECGs(mat, 'Atrial Fibrillation')
+    scanDataRedone(mat['val'][1])
+    # print(mat)
+    # plot12ECGs(mat, 'Atrial Fibrillation')
