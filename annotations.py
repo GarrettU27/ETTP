@@ -1,9 +1,11 @@
-import neurokit2 as nk
-import sys
 import io
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 import math
+import sys
+
+import matplotlib.patches as patches
+import matplotlib.pyplot as plt
+import neurokit2 as nk
+from scipy.io import loadmat
 
 
 def pointFinder(startR, endR, startT, endT, startP, endP, signal_cwt):
@@ -71,64 +73,61 @@ class wave:
 
 def createHeartbeats(TWave, PWave, RWave):
     # Finding the smallest array
-    if len(TWave) - 1 < len(PWave) - 1:
-        if len(TWave) - 1 < len(RWave) - 1:
-            j = len(TWave) - 1
-        else:
-            j = len(RWave) - 1
-    # If PWave is smaller than TWave
-    else:
-        if len(PWave) - 1 < len(RWave) - 1:
-            j = len(PWave) - 1
-        else:
-            j = len(RWave) - 1
+    j = min(len(TWave), len(PWave), len(RWave)) - 1
 
-    x = 0
-    y = 0
-    z = 0
-    heartbeatList = []
-    while x < j or y < j or z < j:
+    pwave_index = 0
+    rwave_index = 0
+    twave_index = 0
+    heartbeat_list = []
+
+    # This goes through the waves and checks to ensure that the TWave is the tallest, the RWave is the second tallest
+    # and the PWave is the shortest. Once all criteria are met, they are put together to form a heartbeat
+    while pwave_index < j or rwave_index < j or twave_index < j:
+        pwave_magnitude = PWave[pwave_index].start
+        rwave_magnitude = RWave[rwave_index].start
+        twave_magnitude = TWave[twave_index].start
+
         # if missing P-wave
-        # validating that P-wave is higher than the other two waves and that the other two waves are correct
-        if RWave[y].start < PWave[x].start and PWave[x].start > TWave[z].start and RWave[y].start < TWave[z].start:
+        # validating that P-wave is higher than the other two waves and that the other two waves are correct    
+        if rwave_magnitude < pwave_magnitude and pwave_magnitude > twave_magnitude and rwave_magnitude < twave_magnitude:
             # if the p-wave is higher than the other two, the other two waves become invalid and we iterate
-            y += 1
-            z += 1
+            rwave_index += 1
+            twave_index += 1
 
         # if missing R-wave
         # Validating start of RWave is greater than TWave and the other two waves are vaild
-        elif RWave[y].start > TWave[z].start and PWave[x].start < TWave[z].start:
-            x += 1
-            z += 1
+        elif rwave_magnitude > twave_magnitude and pwave_magnitude < twave_magnitude:
+            pwave_index += 1
+            twave_index += 1
 
         # If P-Wave and R-Wave are missing
-        elif PWave[x].start > TWave[z].start and RWave[y].start > TWave[z].start:
-            z += 1
+        elif pwave_magnitude > twave_magnitude and rwave_magnitude > twave_magnitude:
+            twave_index += 1
 
         # if missing T-Wave
         # if T-Wave is in the next heartbeat
-        elif TWave[z].start > PWave[x + 1].start:
+        elif twave_magnitude > PWave[pwave_index + 1].start:
             # if P-Wave is in the next heartbeat
-            if PWave[x].start > RWave[y].start:
-                y += 1
+            if pwave_magnitude > rwave_magnitude:
+                rwave_index += 1
 
             # If R-Wave is in the next heartbeat
-            elif RWave[y].start > PWave[x + 1].start:
-                x += 1
+            elif rwave_magnitude > PWave[pwave_index + 1].start:
+                pwave_index += 1
 
             # Just the T-Wave is in the next heartbeat
             else:
-                x += 1
-                y += 1
+                pwave_index += 1
+                rwave_index += 1
 
         # if wave is valid
-        elif RWave[y].start < TWave[z].start and RWave[y].start > PWave[x].start:
-            heartbeatList.append(Heartbeat(TWave[z], PWave[x], RWave[y]))
-            x += 1
-            y += 1
-            z += 1
+        elif rwave_magnitude < twave_magnitude and rwave_magnitude > pwave_magnitude:
+            heartbeat_list.append(Heartbeat(TWave[twave_index], PWave[pwave_index], RWave[rwave_index]))
+            pwave_index += 1
+            rwave_index += 1
+            twave_index += 1
 
-    return heartbeatList
+    return heartbeat_list
 
 
 def find3Waves(validHeartbeats, leeway):
@@ -151,17 +150,23 @@ def find3Waves(validHeartbeats, leeway):
             return start
         i += 1
 
+
 def makeRWaveAnnotation(validHeartbeats, start, offset, ax, numHighlights):
     for i in range(0, numHighlights):
-        ax.axvspan(validHeartbeats[start+i].RWave.start - offset, validHeartbeats[start+i].RWave.end - offset, zorder = 2, facecolor = 'blue', alpha = 0.3, label = 'R-Wave' if i == 0 else "")
+        ax.axvspan(validHeartbeats[start + i].RWave.start - offset, validHeartbeats[start + i].RWave.end - offset,
+                   zorder=2, facecolor='blue', alpha=0.3, label='R-Wave' if i == 0 else "")
+
 
 def makeTWaveAnnotation(validHeartbeats, start, offset, ax, numHighlights):
     for i in range(0, numHighlights):
-        ax.axvspan(validHeartbeats[start + i].TWave.start - offset, validHeartbeats[start + i].TWave.end - offset,zorder=2, facecolor='red', alpha=0.5, label='T-Wave' if i == 0 else "")
+        ax.axvspan(validHeartbeats[start + i].TWave.start - offset, validHeartbeats[start + i].TWave.end - offset,
+                   zorder=2, facecolor='red', alpha=0.5, label='T-Wave' if i == 0 else "")
+
 
 def makePWaveAnnotation(validHeartbeats, start, offset, ax, numHighlights):
     for i in range(0, numHighlights):
-        ax.axvspan(validHeartbeats[start + i].PWave.start - offset,validHeartbeats[start + i].RWave.start - offset, zorder=2, facecolor='green', alpha=0.5,label='P-Wave' if i == 0 else "")
+        ax.axvspan(validHeartbeats[start + i].PWave.start - offset, validHeartbeats[start + i].RWave.start - offset,
+                   zorder=2, facecolor='green', alpha=0.5, label='P-Wave' if i == 0 else "")
 
 
 def scanData(np_array):
@@ -199,6 +204,7 @@ def scanData(np_array):
     endPoint = startPoint + 1300
 
     return startPoint, validHeartbeats, start, endPoint
+
 
 def return_svg_bytes():
     fig = plt.gcf()
