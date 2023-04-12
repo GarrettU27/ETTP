@@ -71,61 +71,28 @@ class wave:
         self.end = end
 
 
-def createHeartbeats(t_waves, p_waves, r_waves):
-    # Finding the smallest array
-    j = min(len(t_waves), len(p_waves), len(r_waves)) - 1
+# Checks t wave against all possible other p_waves and r_waves
+# If one of them works, returns the first triplet that works
+# Otherwise, return false
+def check_t_wave(t_wave, p_waves, r_waves):
+    for p_wave in p_waves:
+        for r_wave in r_waves:
+            if t_wave.start > r_wave.start > p_wave.start:
+                return t_wave, p_wave, r_wave
 
-    pwave_index = 0
-    rwave_index = 0
-    twave_index = 0
+    return False
+
+
+def create_heartbeats(t_waves, p_waves, r_waves):
     heartbeat_list = []
 
-    # This goes through all our waves and tries to find valid triplets, where there's first a t wave, then an r wave
-    # and finally a p wave. Once it finds a valid triplet, its added to the list of heartbeats
-    while pwave_index < j or rwave_index < j or twave_index < j:
-        r_wave_start_index = r_waves[rwave_index].start
-        p_wave_start_index = p_waves[pwave_index].start
-        t_wave_start_index = t_waves[twave_index].start
+    # Checks each t wave against all the other p and r waves. If a triplet is found, add it and move
+    # onto the next t wave
+    for t_wave in t_waves:
+        valid_triplet = check_t_wave(t_wave, p_waves, r_waves)
 
-        # if missing P-wave
-        # validating that P-wave is higher than the other two waves and that the other two waves are correct
-        if r_wave_start_index < p_wave_start_index and p_wave_start_index > t_wave_start_index > r_wave_start_index:
-            # if the p-wave is higher than the other two, the other two waves become invalid and we iterate
-            rwave_index += 1
-            twave_index += 1
-
-        # if missing R-wave
-        # Validating start of RWave is greater than TWave and the other two waves are vaild
-        elif r_wave_start_index > t_wave_start_index > p_wave_start_index:
-            pwave_index += 1
-            twave_index += 1
-
-        # If P-Wave and R-Wave are missing
-        elif p_wave_start_index > t_wave_start_index and r_wave_start_index > t_wave_start_index:
-            twave_index += 1
-
-        # if missing T-Wave
-        # if T-Wave is in the next heartbeat
-        elif t_wave_start_index > p_waves[pwave_index + 1].start:
-            # if P-Wave is in the next heartbeat
-            if p_wave_start_index > r_wave_start_index:
-                rwave_index += 1
-
-            # If R-Wave is in the next heartbeat
-            elif r_wave_start_index > p_waves[pwave_index + 1].start:
-                pwave_index += 1
-
-            # Just the T-Wave is in the next heartbeat
-            else:
-                pwave_index += 1
-                rwave_index += 1
-
-        # if wave is valid
-        elif t_wave_start_index > r_wave_start_index > p_wave_start_index:
-            heartbeat_list.append(Heartbeat(t_waves[twave_index], p_waves[pwave_index], r_waves[rwave_index]))
-            pwave_index += 1
-            rwave_index += 1
-            twave_index += 1
+        if valid_triplet:
+            heartbeat_list.append(Heartbeat(*valid_triplet))
 
     return heartbeat_list
 
@@ -190,7 +157,7 @@ def scanData(np_array):
     RWaves = cleanArrays(startR, endR, 150)
 
     # finds and stores all valid heartbeats into the heartbeat class
-    validHeartbeats = createHeartbeats(TWaves, PWaves, RWaves)
+    validHeartbeats = create_heartbeats(TWaves, PWaves, RWaves)
 
     # Finds 3 heartbeats in a row that we can output
     start = find3Waves(validHeartbeats, 700)
