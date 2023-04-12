@@ -71,48 +71,48 @@ class wave:
         self.end = end
 
 
-def createHeartbeats(TWave, PWave, RWave):
+def createHeartbeats(t_waves, p_waves, r_waves):
     # Finding the smallest array
-    j = min(len(TWave), len(PWave), len(RWave)) - 1
+    j = min(len(t_waves), len(p_waves), len(r_waves)) - 1
 
     pwave_index = 0
     rwave_index = 0
     twave_index = 0
     heartbeat_list = []
 
-    # This goes through the waves and checks to ensure that the TWave is the tallest, the RWave is the second tallest
-    # and the PWave is the shortest. Once all criteria are met, they are put together to form a heartbeat
+    # This goes through all our waves and tries to find valid triplets, where there's first a t wave, then an r wave
+    # and finally a p wave. Once it finds a valid triplet, its added to the list of heartbeats
     while pwave_index < j or rwave_index < j or twave_index < j:
-        pwave_magnitude = PWave[pwave_index].start
-        rwave_magnitude = RWave[rwave_index].start
-        twave_magnitude = TWave[twave_index].start
+        r_wave_start_index = r_waves[rwave_index].start
+        p_wave_start_index = p_waves[pwave_index].start
+        t_wave_start_index = t_waves[twave_index].start
 
         # if missing P-wave
-        # validating that P-wave is higher than the other two waves and that the other two waves are correct    
-        if rwave_magnitude < pwave_magnitude and pwave_magnitude > twave_magnitude and rwave_magnitude < twave_magnitude:
+        # validating that P-wave is higher than the other two waves and that the other two waves are correct
+        if r_wave_start_index < p_wave_start_index and p_wave_start_index > t_wave_start_index > r_wave_start_index:
             # if the p-wave is higher than the other two, the other two waves become invalid and we iterate
             rwave_index += 1
             twave_index += 1
 
         # if missing R-wave
         # Validating start of RWave is greater than TWave and the other two waves are vaild
-        elif rwave_magnitude > twave_magnitude and pwave_magnitude < twave_magnitude:
+        elif r_wave_start_index > t_wave_start_index > p_wave_start_index:
             pwave_index += 1
             twave_index += 1
 
         # If P-Wave and R-Wave are missing
-        elif pwave_magnitude > twave_magnitude and rwave_magnitude > twave_magnitude:
+        elif p_wave_start_index > t_wave_start_index and r_wave_start_index > t_wave_start_index:
             twave_index += 1
 
         # if missing T-Wave
         # if T-Wave is in the next heartbeat
-        elif twave_magnitude > PWave[pwave_index + 1].start:
+        elif t_wave_start_index > p_waves[pwave_index + 1].start:
             # if P-Wave is in the next heartbeat
-            if pwave_magnitude > rwave_magnitude:
+            if p_wave_start_index > r_wave_start_index:
                 rwave_index += 1
 
             # If R-Wave is in the next heartbeat
-            elif rwave_magnitude > PWave[pwave_index + 1].start:
+            elif r_wave_start_index > p_waves[pwave_index + 1].start:
                 pwave_index += 1
 
             # Just the T-Wave is in the next heartbeat
@@ -121,8 +121,8 @@ def createHeartbeats(TWave, PWave, RWave):
                 rwave_index += 1
 
         # if wave is valid
-        elif rwave_magnitude < twave_magnitude and rwave_magnitude > pwave_magnitude:
-            heartbeat_list.append(Heartbeat(TWave[twave_index], PWave[pwave_index], RWave[rwave_index]))
+        elif t_wave_start_index > r_wave_start_index > p_wave_start_index:
+            heartbeat_list.append(Heartbeat(t_waves[twave_index], p_waves[pwave_index], r_waves[rwave_index]))
             pwave_index += 1
             rwave_index += 1
             twave_index += 1
@@ -721,4 +721,4 @@ def plot12ECGs(data, nameOfArrhythmia):
 if __name__ == '__main__':
     mat = loadmat("annotation_test_data/working/JS00008.mat")
     print(mat)
-    plot12ECGs(mat, 'basic')
+    plot12ECGs(mat, 'Atrial Fibrillation')
