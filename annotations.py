@@ -197,7 +197,7 @@ def scanDataRedone(np_array):
     heartbeats_dict = nk.ecg_segment(cleaned_ecg, rpeaks, sampling_rate=500)
 
     for key, value in heartbeats_dict.items():
-        print(value)
+        print(value[['Index', 'Signal']].reset_index(drop=True))
 
 
 def scanData(np_array):
