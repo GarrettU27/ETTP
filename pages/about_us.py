@@ -20,14 +20,16 @@ class AboutUs(QWidget):
         self.layout.addWidget(self.heading)
 
         people = [
-            ("images:marie.jpg", "Marie Hessefort"),
-            ("images:henry.jpg", "Henry Hein"),
-            ("images:michael.jpg", "Michael Johnson"),
-            ("images:jacob.jpg", "Jacob Medchill"),
-            ("images:garrett.png", "Garrett Udstrand")
+            ("", "We created this application to allow users of all levels to improve their knowledge of ECGs and their ability to read an ECG strip and Identify different arrhythmias."),
+            ("images:marie.jpg", "Marie Hessefort: I am an Electrical Engineering major at the University of Minnesota with a focus in Biomedical Engineering, Circuit Design, and Digital Signal Processing. "),
+            ("images:henry.jpg", "Henry Hein: tbd"),
+            ("images:michael.jpg", "Michael Johnson: tbd"),
+            ("images:jacob.jpg", "Jacob Medchill: tbd"),
+            ("images:garrett.png", "Garrett Udstrand: I am a Computer Engineering major at the University of Minnesota with a focus in Application Development and AI."),
+            ("images:Sobelman.jpg", "Gerald Sobelman: Project Sponsor and Professor, Department of Electrical and Computer Engineering.  Learn more about my research at: https://cse.umn.edu/ece/gerald-sobelman") 
         ]
 
-        for image, name in people:
+        for image, name, in people:
             horizontal_layout = QHBoxLayout()
             horizontal_layout.setSpacing(30)
             horizontal_layout.addWidget(AboutUsPicture(image))
