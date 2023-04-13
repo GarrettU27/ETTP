@@ -640,7 +640,7 @@ def find_correct_rpeaks(data: NDArray[float], rpeaks1: dict, rpeaks2: dict, rpea
     return rpeaks1, rpeaks2, rpeaks3
 
 
-def plot_12_ecgs(data: dict, name_of_arrhythmia: str) -> NoReturn:
+def plot_12_ecgs(data: NDArray[float], name_of_arrhythmia: str) -> NoReturn:
     annotations = []
     fig, axs = plt.subplots(nrows=3, ncols=4, figsize=(40, 19.68), sharey='all')
 
@@ -654,7 +654,7 @@ def plot_12_ecgs(data: dict, name_of_arrhythmia: str) -> NoReturn:
         # We need to get the startpoint and endpoints for the graphs first
         # In the basic example, we are annotating lead 2, so we will get those start/endpoints for the whole graph
         # based on lead 2
-        start_point, valid_heartbeats, start, end_point = scan_data(data['val'][1])
+        start_point, valid_heartbeats, start, end_point = scan_data(data[1])
 
     elif name_of_arrhythmia == '1st Degree AV Block':
         annotations = ['1st Degree AV Block', 'none', 'none', 'none', '1st Degree AV Block', 'none',
@@ -663,7 +663,7 @@ def plot_12_ecgs(data: dict, name_of_arrhythmia: str) -> NoReturn:
         # We need to get the startpoint and endpoints for the graphs first
         # In the basic example, we are annotating lead 2, so we will get those start/endpoints for the whole graph
         # based on lead 2
-        start_point, valid_heartbeats, start, end_point = scan_data(data['val'][1])
+        start_point, valid_heartbeats, start, end_point = scan_data(data[1])
 
     elif name_of_arrhythmia == 'Atrial Fibrillation':
         annotations = ['Atrial Fibrillation', 'none', 'none', 'none', 'Atrial Fibrillation', 'none', 'none', 'none',
@@ -679,16 +679,16 @@ def plot_12_ecgs(data: dict, name_of_arrhythmia: str) -> NoReturn:
     elif name_of_arrhythmia == 'Normal Sinus Rhythm':
         annotations = ['none', 'none', 'none', 'none', 'Normal Sinus Rhythm', 'none', 'none', 'none',
                        'Normal Sinus Rhythm', 'none', 'none', 'none']
-        start_point, valid_heartbeats, start, end_point = scan_data(data['val'][1])
+        start_point, valid_heartbeats, start, end_point = scan_data(data[1])
 
     elif name_of_arrhythmia == 'Sinus Tachycardia':
         annotations = ['Sinus Tachycardia', 'none', 'none', 'none', 'Sinus Tachycardia', 'none', 'none', 'none',
                        'Sinus Tachycardia', 'none', 'none', 'none']
-        start_point, valid_heartbeats, start, end_point = scan_data(data['val'][1])
+        start_point, valid_heartbeats, start, end_point = scan_data(data[1])
 
     # Finds the amount of heartbeats displayed and puts them into length. This is needed because we need the
     # big boxes to have a time of 0.2 seconds per box
-    _, rpeaks2 = nk.ecg_peaks(data['val'][1], sampling_rate=500)
+    _, rpeaks2 = nk.ecg_peaks(data[1], sampling_rate=500)
 
     length = 0
     for i in range(0, len(rpeaks2['ECG_R_Peaks'])):
@@ -697,30 +697,30 @@ def plot_12_ecgs(data: dict, name_of_arrhythmia: str) -> NoReturn:
 
     # we need to compare rpeaks found because neurokit won't always find the same rpeaks values between leads
     if name_of_arrhythmia == 'Atrial Fibrillation':
-        _, rpeaks1 = nk.ecg_peaks(data['val'][0], sampling_rate=500)
-        _, rpeaks3 = nk.ecg_peaks(data['val'][2], sampling_rate=500)
+        _, rpeaks1 = nk.ecg_peaks(data[0], sampling_rate=500)
+        _, rpeaks3 = nk.ecg_peaks(data[2], sampling_rate=500)
         rpeaks1, rpeaks2, rpeaks3 = find_correct_rpeaks(data, rpeaks1, rpeaks2, rpeaks3, end_point, start_point)
     # Otherwise we just want to base our annotations off of lead 2
     else:
-        rpeaks1 = nk.ecg_peaks(data['val'][1], sampling_rate=500)
-        rpeaks3 = nk.ecg_peaks(data['val'][1], sampling_rate=500)
+        rpeaks1 = nk.ecg_peaks(data[1], sampling_rate=500)
+        rpeaks3 = nk.ecg_peaks(data[1], sampling_rate=500)
 
     # Plotting leads in order
     # We will have to custom code the annotations array for every annotation we do
     # This means that setting the annotations must be done for every case
     # And every case we do must be added to the plotting functions above
-    plot_lead_1(ax1, data['val'][0], annotations[0], start_point, end_point, valid_heartbeats, start, length, rpeaks1)
-    plot_lead_avr(ax2, data['val'][3], annotations[1], start_point, end_point, valid_heartbeats, start, length)
-    plot_lead_v1(ax3, data['val'][6], annotations[2], start_point, end_point, valid_heartbeats, start, length)
-    plot_lead_v4(ax4, data['val'][9], annotations[3], start_point, end_point, valid_heartbeats, start, length)
-    plot_lead_2(ax5, data['val'][1], annotations[4], start_point, end_point, valid_heartbeats, start, length, rpeaks2)
-    plot_lead_avl(ax6, data['val'][4], annotations[5], start_point, end_point, valid_heartbeats, start, length)
-    plot_lead_v2(ax7, data['val'][7], annotations[6], start_point, end_point, valid_heartbeats, start, length)
-    plot_lead_v5(ax8, data['val'][10], annotations[7], start_point, end_point, valid_heartbeats, start, length)
-    plot_lead_3(ax9, data['val'][2], annotations[8], start_point, end_point, valid_heartbeats, start, length, rpeaks3)
-    plot_lead_avf(ax10, data['val'][5], annotations[9], start_point, end_point, valid_heartbeats, start, length)
-    plot_lead_v3(ax11, data['val'][8], annotations[10], start_point, end_point, valid_heartbeats, start, length)
-    plot_lead_v6(ax12, data['val'][11], annotations[11], start_point, end_point, valid_heartbeats, start, length)
+    plot_lead_1(ax1, data[0], annotations[0], start_point, end_point, valid_heartbeats, start, length, rpeaks1)
+    plot_lead_avr(ax2, data[3], annotations[1], start_point, end_point, valid_heartbeats, start, length)
+    plot_lead_v1(ax3, data[6], annotations[2], start_point, end_point, valid_heartbeats, start, length)
+    plot_lead_v4(ax4, data[9], annotations[3], start_point, end_point, valid_heartbeats, start, length)
+    plot_lead_2(ax5, data[1], annotations[4], start_point, end_point, valid_heartbeats, start, length, rpeaks2)
+    plot_lead_avl(ax6, data[4], annotations[5], start_point, end_point, valid_heartbeats, start, length)
+    plot_lead_v2(ax7, data[7], annotations[6], start_point, end_point, valid_heartbeats, start, length)
+    plot_lead_v5(ax8, data[10], annotations[7], start_point, end_point, valid_heartbeats, start, length)
+    plot_lead_3(ax9, data[2], annotations[8], start_point, end_point, valid_heartbeats, start, length, rpeaks3)
+    plot_lead_avf(ax10, data[5], annotations[9], start_point, end_point, valid_heartbeats, start, length)
+    plot_lead_v3(ax11, data[8], annotations[10], start_point, end_point, valid_heartbeats, start, length)
+    plot_lead_v6(ax12, data[11], annotations[11], start_point, end_point, valid_heartbeats, start, length)
 
     fig.subplots_adjust(
         hspace=0,
@@ -747,4 +747,4 @@ def plot_12_ecgs(data: dict, name_of_arrhythmia: str) -> NoReturn:
 if __name__ == '__main__':
     mat = loadmat("../annotation_test_data/working/JS00008.mat")
     # print(mat)
-    plot_12_ecgs(mat, 'Atrial Fibrillation')
+    plot_12_ecgs(mat['val'], 'Atrial Fibrillation')
