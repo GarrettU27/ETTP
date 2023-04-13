@@ -34,8 +34,8 @@ class TestingQuestions(QWidget):
         self.set_state = set_state
 
         self.ecg_plot = ImageWidget()
-        self.ecg_plot.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
-                                    PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
+        self.ecg_plot.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
+                                    PyQt6.QtWidgets.QSizePolicy.Policy.Expanding)
 
         self.title = HeadingLabel("Test")
 
