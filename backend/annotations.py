@@ -47,7 +47,7 @@ def point_finder(start_r, end_r, start_t, end_t, start_p, end_p, signal_cwt):
 
 def clean_arrays(start, end, leeway):
     list_waves = []
-    # finds the shorter of the two so we don't run into overflows
+    # finds the shorter of the two, so we don't run into overflows
     if len(start) < len(end):
         j = len(start)
     else:
@@ -96,13 +96,13 @@ def create_heartbeats(t_wave, p_wave, r_wave):
         # validating that P-wave is higher than the other two waves and that the other two waves are correct
         if r_wave[y].start < p_wave[x].start and p_wave[x].start > t_wave[z].start and r_wave[y].start < t_wave[
             z].start:
-            # if the p-wave is higher than the other two, the other two waves become invalid and we iterate
+            # if the p-wave is higher than the other two, the other two waves become invalid, and we iterate
             y += 1
             z += 1
 
         # if missing R-wave
-        # Validating start of RWave is greater than TWave and the other two waves are vaild
-        elif r_wave[y].start > t_wave[z].start and p_wave[x].start < t_wave[z].start:
+        # Validating start of RWave is greater than TWave and the other two waves are valid
+        elif r_wave[y].start > t_wave[z].start > p_wave[x].start:
             x += 1
             z += 1
 
@@ -127,7 +127,7 @@ def create_heartbeats(t_wave, p_wave, r_wave):
                 y += 1
 
         # if wave is valid
-        elif r_wave[y].start < t_wave[z].start and r_wave[y].start > p_wave[x].start:
+        elif t_wave[z].start > r_wave[y].start > p_wave[x].start:
             heartbeat_list.append(Heartbeat(t_wave[z], p_wave[x], r_wave[y]))
             x += 1
             y += 1
@@ -142,16 +142,17 @@ def find_3_waves(valid_heartbeats: List[Heartbeat], leeway):
     i = 0
 
     while i in range(0, len(valid_heartbeats) - 1):
-        # finds if two pwaves are together by checking it against a leeway
+        # finds if two p waves are together by checking it against a leeway
         if valid_heartbeats[i + 1].p_wave.start - valid_heartbeats[i].p_wave.start < leeway:
             end += 1
 
-        # If the pwaves are not together, we reset the starting point and do it again
+        # If the p waves are not together, we reset the starting point and do it again
         else:
             start = i + 1
             end = 0
 
-        # since the statements above checks the if the current and next heartbeat are together, we only need end to be a value of 2 here
+        # since the statements above checks the if the current and next heartbeat are together,
+        # we only need end to be a value of 2 here
         if end == 2:
             return start
         i += 1
@@ -280,8 +281,7 @@ def plot_red_lines(ax, start_point, end_point, y_min, y_max):
 
     # Vertical Line plotting
     ax.axvline(x=x_min, linestyle='-', linewidth=2, color='red', zorder=3)
-    # This double for loop will plot all vertical red lines. We start off by plotting the major lines
-    # major lines = bold lines
+    # This double for loop will plot all vertical red lines. We start off by plotting the major lines (bold lines)
     for i in range(0, 13):
 
         ax.axvline(x=(i / 13) * x_max, linestyle='-', linewidth=2, color='red', zorder=3)
@@ -347,7 +347,7 @@ def plot_lead_1(ax, data, annotate, start_point, end_point, valid_heartbeats: Li
         found = 0
         setter = 1
         for i in range(0, len(rpeaks['ECG_R_Peaks'])):
-            if rpeaks['ECG_R_Peaks'][i] <= end_point and rpeaks['ECG_R_Peaks'][i] >= start_point:
+            if end_point >= rpeaks['ECG_R_Peaks'][i] >= start_point:
                 length += 1
                 if length == 1 and setter == 1:
                     found = i
@@ -526,7 +526,7 @@ def find_correct_rpeaks(data, rpeaks1, rpeaks2, rpeaks3, end_point, start_point)
     found = 0
     setter = 1
     for i in range(0, len(rpeaks2['ECG_R_Peaks'])):
-        if rpeaks2['ECG_R_Peaks'][i] <= end_point and rpeaks2['ECG_R_Peaks'][i] >= start_point:
+        if end_point >= rpeaks2['ECG_R_Peaks'][i] >= start_point:
             length += 1
             if length == 1 and setter == 1:
                 found = i
@@ -545,8 +545,8 @@ def find_correct_rpeaks(data, rpeaks1, rpeaks2, rpeaks3, end_point, start_point)
     # Goes through the ranges we want for each rpeaks array
     for i in range(found, found + length):
         # if all rpeaks found the same peak
-        if (math.isclose(rpeaks1['ECG_R_Peaks'][x], rpeaks2['ECG_R_Peaks'][y], rel_tol=tolerance) == True) and (
-                math.isclose(rpeaks2['ECG_R_Peaks'][y], rpeaks3['ECG_R_Peaks'][z], rel_tol=tolerance) == True):
+        if (math.isclose(rpeaks1['ECG_R_Peaks'][x], rpeaks2['ECG_R_Peaks'][y], rel_tol=tolerance) is True) and (
+                math.isclose(rpeaks2['ECG_R_Peaks'][y], rpeaks3['ECG_R_Peaks'][z], rel_tol=tolerance) is True):
             correct1 += 1
             correct2 += 1
             correct3 += 1
@@ -554,19 +554,19 @@ def find_correct_rpeaks(data, rpeaks1, rpeaks2, rpeaks3, end_point, start_point)
             y += 1
             z += 1
         # if only 1 and 2 found it
-        elif (math.isclose(rpeaks1['ECG_R_Peaks'][x], rpeaks2['ECG_R_Peaks'][y], rel_tol=tolerance) == True):
+        elif math.isclose(rpeaks1['ECG_R_Peaks'][x], rpeaks2['ECG_R_Peaks'][y], rel_tol=tolerance) is True:
             correct1 += 1
             correct2 += 1
             x += 1
             y += 1
         # if only 2 and 3 found it
-        elif (math.isclose(rpeaks3['ECG_R_Peaks'][z], rpeaks2['ECG_R_Peaks'][y], rel_tol=tolerance) == True):
+        elif math.isclose(rpeaks3['ECG_R_Peaks'][z], rpeaks2['ECG_R_Peaks'][y], rel_tol=tolerance) is True:
             correct2 += 1
             correct3 += 1
             y += 1
             z += 1
         # if only 1 and 3 found it
-        elif (math.isclose(rpeaks1['ECG_R_Peaks'][x], rpeaks3['ECG_R_Peaks'][z], rel_tol=tolerance) == True):
+        elif math.isclose(rpeaks1['ECG_R_Peaks'][x], rpeaks3['ECG_R_Peaks'][z], rel_tol=tolerance) is True:
             correct1 += 1
             correct3 += 1
             x += 1
@@ -594,7 +594,7 @@ def find_correct_rpeaks(data, rpeaks1, rpeaks2, rpeaks3, end_point, start_point)
     # if 3 didn't find all rpeaks
     elif correct1 == correct2 == length:
         rpeaks3['ECG_R_Peaks'] = rpeaks1['ECG_R_Peaks']
-    # if 1 didnt find all rpeaks
+    # if 1 didn't find all rpeaks
     elif correct2 == correct3 == length:
         rpeaks1['ECG_R_Peaks'] = rpeaks2['ECG_R_Peaks']
 
@@ -624,7 +624,7 @@ def find_correct_rpeaks(data, rpeaks1, rpeaks2, rpeaks3, end_point, start_point)
 
 def plot_12_ecgs(data, name_of_arrhythmia):
     annotations = []
-    fig, axs = plt.subplots(nrows=3, ncols=4, figsize=(40, 19.68), sharey=True)
+    fig, axs = plt.subplots(nrows=3, ncols=4, figsize=(40, 19.68), sharey='all')
 
     # Sets up our 12 axis
     ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8, ax9, ax10, ax11, ax12 = axs.flatten()
@@ -634,7 +634,8 @@ def plot_12_ecgs(data, name_of_arrhythmia):
         annotations = ['none', 'none', 'none', 'none', 'basic', 'none', 'none', 'none', 'none', 'none', 'none', 'none']
 
         # We need to get the startpoint and endpoints for the graphs first
-        # In the basic example, we are annotating lead 2 so we will get those start/endpoints for the whole graph based on lead 2
+        # In the basic example, we are annotating lead 2, so we will get those start/endpoints for the whole graph
+        # based on lead 2
         start_point, valid_heartbeats, start, end_point = scan_data(data['val'][1])
 
     elif name_of_arrhythmia == '1st Degree AV Block':
@@ -642,7 +643,8 @@ def plot_12_ecgs(data, name_of_arrhythmia):
                        '1st Degree AV Block', 'none', 'none', 'none', 'none', 'none']
 
         # We need to get the startpoint and endpoints for the graphs first
-        # In the basic example, we are annotating lead 2 so we will get those start/endpoints for the whole graph based on lead 2
+        # In the basic example, we are annotating lead 2, so we will get those start/endpoints for the whole graph
+        # based on lead 2
         start_point, valid_heartbeats, start, end_point = scan_data(data['val'][1])
 
     elif name_of_arrhythmia == 'Atrial Fibrillation':
@@ -672,7 +674,7 @@ def plot_12_ecgs(data, name_of_arrhythmia):
 
     length = 0
     for i in range(0, len(rpeaks2['ECG_R_Peaks'])):
-        if rpeaks2['ECG_R_Peaks'][i] <= end_point and rpeaks2['ECG_R_Peaks'][i] >= start_point:
+        if end_point >= rpeaks2['ECG_R_Peaks'][i] >= start_point:
             length += 1
 
     # we need to compare rpeaks found because neurokit won't always find the same rpeaks values between leads
