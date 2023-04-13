@@ -1,11 +1,26 @@
 import io
 import math
 import sys
+from dataclasses import dataclass
+from typing import List
 
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import neurokit2 as nk
 from scipy.io import loadmat
+
+
+@dataclass
+class Wave:
+    start: int
+    end: int
+
+
+@dataclass
+class Heartbeat:
+    t_wave: Wave
+    p_wave: Wave
+    r_wave: Wave
 
 
 def point_finder(start_r, end_r, start_t, end_t, start_p, end_p, signal_cwt):
@@ -37,17 +52,18 @@ def clean_arrays(start, end, leeway):
         j = len(start)
     else:
         j = len(end)
-    # seperate pointer variables
+    # separate pointer variables
     x = 0
     y = 0
 
     while x < j or y < j:
         # if we have a valid wave
         if 0 < end[y] - start[x] < leeway:
-            list_waves.append(Wave(start[x], end[y]))
+            list_waves.append(Wave(start=start[x], end=end[y]))
             x += 1
             y += 1
-        # if the algorithm missed the start of the wave. Ex. algorithm found end[0] but start[0] corresponds to heartbeat 2
+        # if the algorithm missed the start of the wave. Ex. algorithm found end[0] but start[0] corresponds
+        # to heartbeat 2
         elif end[y] - start[x] < 0:
             y += 1
         # if the algorithm missed the end of the wave
@@ -55,20 +71,6 @@ def clean_arrays(start, end, leeway):
             x += 1
 
     return list_waves
-
-
-class Heartbeat:
-
-    def __init__(self, TWave, PWave, RWave):
-        self.TWave = TWave
-        self.PWave = PWave
-        self.RWave = RWave
-
-
-class Wave:
-    def __init__(self, start, end):
-        self.start = start
-        self.end = end
 
 
 def create_heartbeats(t_wave, p_wave, r_wave):
@@ -134,14 +136,14 @@ def create_heartbeats(t_wave, p_wave, r_wave):
     return heartbeat_list
 
 
-def find_3_waves(valid_heartbeats, leeway):
+def find_3_waves(valid_heartbeats: List[Heartbeat], leeway):
     start = 0
     end = 0
     i = 0
 
     while i in range(0, len(valid_heartbeats) - 1):
         # finds if two pwaves are together by checking it against a leeway
-        if valid_heartbeats[i + 1].PWave.start - valid_heartbeats[i].PWave.start < leeway:
+        if valid_heartbeats[i + 1].p_wave.start - valid_heartbeats[i].p_wave.start < leeway:
             end += 1
 
         # If the pwaves are not together, we reset the starting point and do it again
@@ -155,21 +157,21 @@ def find_3_waves(valid_heartbeats, leeway):
         i += 1
 
 
-def make_r_wave_annotation(valid_heartbeats, start, offset, ax, number_highlights):
+def make_r_wave_annotation(valid_heartbeats: List[Heartbeat], start, offset, ax, number_highlights):
     for i in range(0, number_highlights):
-        ax.axvspan(valid_heartbeats[start + i].RWave.start - offset, valid_heartbeats[start + i].RWave.end - offset,
+        ax.axvspan(valid_heartbeats[start + i].r_wave.start - offset, valid_heartbeats[start + i].r_wave.end - offset,
                    zorder=2, facecolor='blue', alpha=0.3, label='R-Wave' if i == 0 else "")
 
 
-def make_t_wave_annotation(valid_heartbeats, start, offset, ax, number_highlights):
+def make_t_wave_annotation(valid_heartbeats: List[Heartbeat], start, offset, ax, number_highlights):
     for i in range(0, number_highlights):
-        ax.axvspan(valid_heartbeats[start + i].TWave.start - offset, valid_heartbeats[start + i].TWave.end - offset,
+        ax.axvspan(valid_heartbeats[start + i].t_wave.start - offset, valid_heartbeats[start + i].t_wave.end - offset,
                    zorder=2, facecolor='red', alpha=0.5, label='T-Wave' if i == 0 else "")
 
 
-def make_p_wave_annotation(valid_heartbeats, start, offset, ax, number_highlights):
+def make_p_wave_annotation(valid_heartbeats: List[Heartbeat], start, offset, ax, number_highlights):
     for i in range(0, number_highlights):
-        ax.axvspan(valid_heartbeats[start + i].PWave.start - offset, valid_heartbeats[start + i].RWave.start - offset,
+        ax.axvspan(valid_heartbeats[start + i].p_wave.start - offset, valid_heartbeats[start + i].r_wave.start - offset,
                    zorder=2, facecolor='green', alpha=0.5, label='P-Wave' if i == 0 else "")
 
 
@@ -204,7 +206,7 @@ def scan_data(np_array):
         sys.exit("There are not 3 valid heartbeats in a row")
 
     # declares where the start_point is
-    start_point = valid_heartbeats[start].PWave.start - 100
+    start_point = valid_heartbeats[start].p_wave.start - 100
     end_point = start_point + 1300
 
     return start_point, valid_heartbeats, start, end_point
@@ -311,7 +313,7 @@ def plot_red_lines(ax, start_point, end_point, y_min, y_max):
             ax.axhline(y=y2, linestyle='-', linewidth=1, color=(1, 0.7, 0.7), zorder=1)
 
 
-def plot_lead_1(ax, data, annotate, start_point, end_point, valid_heartbeats, start, length, rpeaks):
+def plot_lead_1(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length, rpeaks):
     plot_setup(ax, start_point, end_point, 'I')
 
     # These if statements are where the custom arrhythmia code will go
@@ -323,8 +325,8 @@ def plot_lead_1(ax, data, annotate, start_point, end_point, valid_heartbeats, st
     elif annotate == '1st Degree AV Block':
         make_r_wave_annotation(valid_heartbeats, start, start_point, ax, length)
         ax.plot(data[start_point:end_point], color='black', zorder=4)
-        ax.annotate('QRS < 0.12', xy=(valid_heartbeats[start + 1].RWave.end - start_point, 300),
-                    xytext=(valid_heartbeats[start + 1].RWave.end - start_point + 50, 800),
+        ax.annotate('QRS < 0.12', xy=(valid_heartbeats[start + 1].r_wave.end - start_point, 300),
+                    xytext=(valid_heartbeats[start + 1].r_wave.end - start_point + 50, 800),
                     arrowprops=dict(facecolor='blue', shrink=0.05, linewidth=5),
                     zorder=5, fontsize=25)
 
@@ -357,7 +359,7 @@ def plot_lead_1(ax, data, annotate, start_point, end_point, valid_heartbeats, st
         ax.text(150, 850, 'Regular HR > 100', fontsize=30, color='blue')
 
 
-def plot_lead_2(ax, data, annotate, start_point, end_point, valid_heartbeats, start, length, rpeaks):
+def plot_lead_2(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length, rpeaks):
     plot_setup(ax, start_point, end_point, 'II')
 
     if annotate == 'none':
@@ -373,8 +375,8 @@ def plot_lead_2(ax, data, annotate, start_point, end_point, valid_heartbeats, st
     elif annotate == '1st Degree AV Block':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
         make_p_wave_annotation(valid_heartbeats, start, start_point, ax, length)
-        ax.annotate('PR Interval > 0.2', xy=(valid_heartbeats[start + 1].PWave.start - start_point, 200),
-                    xytext=(valid_heartbeats[start + 1].PWave.start - start_point - 120, 800),
+        ax.annotate('PR Interval > 0.2', xy=(valid_heartbeats[start + 1].p_wave.start - start_point, 200),
+                    xytext=(valid_heartbeats[start + 1].p_wave.start - start_point - 120, 800),
                     arrowprops=dict(facecolor='green', shrink=0.05, linewidth=5),
                     zorder=5, fontsize=25, ha='center')
 
@@ -405,8 +407,8 @@ def plot_lead_2(ax, data, annotate, start_point, end_point, valid_heartbeats, st
         make_r_wave_annotation(valid_heartbeats, start, start_point, ax, length)
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
-        ax.annotate('QRS < 0.12', xy=(valid_heartbeats[start + 1].RWave.end - start_point, 300),
-                    xytext=(valid_heartbeats[start + 1].RWave.end - start_point + 50, 800),
+        ax.annotate('QRS < 0.12', xy=(valid_heartbeats[start + 1].r_wave.end - start_point, 300),
+                    xytext=(valid_heartbeats[start + 1].r_wave.end - start_point + 50, 800),
                     arrowprops=dict(facecolor='blue', shrink=0.05, linewidth=5),
                     zorder=5, fontsize=25)
 
@@ -414,13 +416,13 @@ def plot_lead_2(ax, data, annotate, start_point, end_point, valid_heartbeats, st
         make_r_wave_annotation(valid_heartbeats, start, start_point, ax, length)
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
-        ax.annotate('QRS < 0.12', xy=(valid_heartbeats[start + 1].RWave.end - start_point, 300),
-                    xytext=(valid_heartbeats[start + 1].RWave.end - start_point + 50, 800),
+        ax.annotate('QRS < 0.12', xy=(valid_heartbeats[start + 1].r_wave.end - start_point, 300),
+                    xytext=(valid_heartbeats[start + 1].r_wave.end - start_point + 50, 800),
                     arrowprops=dict(facecolor='blue', shrink=0.05, linewidth=5),
                     zorder=5, fontsize=25)
 
 
-def plot_lead_3(ax, data, annotate, start_point, end_point, valid_heartbeats, start, length, rpeaks):
+def plot_lead_3(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length, rpeaks):
     plot_setup(ax, start_point, end_point, 'III')
 
     if annotate == 'none':
@@ -438,50 +440,50 @@ def plot_lead_3(ax, data, annotate, start_point, end_point, valid_heartbeats, st
         make_p_wave_annotation(valid_heartbeats, start, start_point, ax, length)
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
-        ax.annotate('PR Interval: 0.12 - 0.2', xy=(valid_heartbeats[start + 1].PWave.start - start_point, 200),
+        ax.annotate('PR Interval: 0.12 - 0.2', xy=(valid_heartbeats[start + 1].p_wave.start - start_point, 200),
                     arrowprops=dict(facecolor='green', shrink=0.05, linewidth=5),
-                    xytext=(valid_heartbeats[start + 1].PWave.start - start_point - 120, 800),
+                    xytext=(valid_heartbeats[start + 1].p_wave.start - start_point - 120, 800),
                     zorder=5, fontsize=25, ha='center')
 
     elif annotate == 'Sinus Tachycardia':
         make_p_wave_annotation(valid_heartbeats, start, start_point, ax, length)
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
-        ax.annotate('PR Interval: 0.12 - 0.2', xy=(valid_heartbeats[start + 1].PWave.end - start_point, 200),
+        ax.annotate('PR Interval: 0.12 - 0.2', xy=(valid_heartbeats[start + 1].p_wave.end - start_point, 200),
                     arrowprops=dict(facecolor='green', shrink=0.05, linewidth=5),
-                    xytext=(valid_heartbeats[start + 1].PWave.start - start_point - 120, 800),
+                    xytext=(valid_heartbeats[start + 1].p_wave.start - start_point - 120, 800),
                     zorder=5, fontsize=25, ha='center')
 
 
-def plot_lead_avr(ax, data, annotate, start_point, end_point, valid_heartbeats, start, length):
+def plot_lead_avr(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
     plot_setup(ax, start_point, end_point, 'aVR')
 
     if annotate == 'none':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
 
-def plot_lead_avl(ax, data, annotate, start_point, end_point, valid_heartbeats, start, length):
+def plot_lead_avl(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
     plot_setup(ax, start_point, end_point, 'aVL')
 
     if annotate == 'none':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
 
-def plot_lead_avf(ax, data, annotate, start_point, end_point, valid_heartbeats, start, length):
+def plot_lead_avf(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
     plot_setup(ax, start_point, end_point, 'aVF')
 
     if annotate == 'none':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
 
-def plot_lead_v1(ax, data, annotate, start_point, end_point, valid_heartbeats, start, length):
+def plot_lead_v1(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
     plot_setup(ax, start_point, end_point, 'V1')
 
     if annotate == 'none':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
 
-def plot_lead_v2(ax, data, annotate, start_point, end_point, valid_heartbeats, start, length):
+def plot_lead_v2(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
     plot_setup(ax, start_point, end_point, 'V2')
 
     if annotate == 'none':
@@ -491,40 +493,40 @@ def plot_lead_v2(ax, data, annotate, start_point, end_point, valid_heartbeats, s
         make_p_wave_annotation(valid_heartbeats, start, start_point, ax, length)
 
 
-def plot_lead_v3(ax, data, annotate, start_point, end_point, valid_heartbeats, start, length):
+def plot_lead_v3(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
     plot_setup(ax, start_point, end_point, 'V3')
 
     if annotate == 'none':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
 
-def plot_lead_v4(ax, data, annotate, start_point, end_point, valid_heartbeats, start, length):
+def plot_lead_v4(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
     plot_setup(ax, start_point, end_point, 'V4')
 
     if annotate == 'none':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
 
-def plot_lead_v5(ax, data, annotate, start_point, end_point, valid_heartbeats, start, length):
+def plot_lead_v5(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
     plot_setup(ax, start_point, end_point, 'V5')
 
     if annotate == 'none':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
 
-def plot_lead_v6(ax, data, annotate, start_point, end_point, valid_heartbeats, start, length):
+def plot_lead_v6(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
     plot_setup(ax, start_point, end_point, 'V6')
 
     if annotate == 'none':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
 
-def find_correct_rpeaks(data, rpeaks1, rpeaks2, rpeaks3, endPoint, start_point):
+def find_correct_rpeaks(data, rpeaks1, rpeaks2, rpeaks3, end_point, start_point):
     length = 0
     found = 0
     setter = 1
     for i in range(0, len(rpeaks2['ECG_R_Peaks'])):
-        if rpeaks2['ECG_R_Peaks'][i] <= endPoint and rpeaks2['ECG_R_Peaks'][i] >= start_point:
+        if rpeaks2['ECG_R_Peaks'][i] <= end_point and rpeaks2['ECG_R_Peaks'][i] >= start_point:
             length += 1
             if length == 1 and setter == 1:
                 found = i
