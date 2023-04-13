@@ -2,11 +2,12 @@ import io
 import math
 import sys
 from dataclasses import dataclass
-from typing import List
+from typing import List, NoReturn
 
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import neurokit2 as nk
+from numpy._typing import NDArray
 from scipy.io import loadmat
 
 
@@ -23,7 +24,8 @@ class Heartbeat:
     r_wave: Wave
 
 
-def point_finder(start_r, end_r, start_t, end_t, start_p, end_p, signal_cwt):
+def point_finder(start_r: List[int], end_r: List[int], start_t: List[int], end_t: List[int], start_p: List[int],
+                 end_p: List[int], signal_cwt: dict) -> NoReturn:
     # all this does is finds the starts and endpoints for every heartbeat found in the signal
     for i in range(5000):
         if signal_cwt['ECG_R_Onsets'][i] != 0:
@@ -45,7 +47,7 @@ def point_finder(start_r, end_r, start_t, end_t, start_p, end_p, signal_cwt):
             end_p.append(i)
 
 
-def clean_arrays(start, end, leeway):
+def clean_arrays(start: List[int], end: List[int], leeway: int) -> List[Wave]:
     list_waves = []
     # finds the shorter of the two, so we don't run into overflows
     if len(start) < len(end):
@@ -73,7 +75,7 @@ def clean_arrays(start, end, leeway):
     return list_waves
 
 
-def create_heartbeats(t_wave, p_wave, r_wave):
+def create_heartbeats(t_wave: List[Wave], p_wave: List[Wave], r_wave: List[Wave]) -> List[Heartbeat]:
     # Finding the smallest array
     if len(t_wave) - 1 < len(p_wave) - 1:
         if len(t_wave) - 1 < len(r_wave) - 1:
@@ -136,7 +138,7 @@ def create_heartbeats(t_wave, p_wave, r_wave):
     return heartbeat_list
 
 
-def find_3_waves(valid_heartbeats: List[Heartbeat], leeway):
+def find_3_waves(valid_heartbeats: List[Heartbeat], leeway: int) -> int:
     start = 0
     end = 0
     i = 0
@@ -158,25 +160,28 @@ def find_3_waves(valid_heartbeats: List[Heartbeat], leeway):
         i += 1
 
 
-def make_r_wave_annotation(valid_heartbeats: List[Heartbeat], start, offset, ax, number_highlights):
+def make_r_wave_annotation(valid_heartbeats: List[Heartbeat], start: int, offset: int, ax: plt.Axes,
+                           number_highlights: int) -> NoReturn:
     for i in range(0, number_highlights):
         ax.axvspan(valid_heartbeats[start + i].r_wave.start - offset, valid_heartbeats[start + i].r_wave.end - offset,
                    zorder=2, facecolor='blue', alpha=0.3, label='R-Wave' if i == 0 else "")
 
 
-def make_t_wave_annotation(valid_heartbeats: List[Heartbeat], start, offset, ax, number_highlights):
+def make_t_wave_annotation(valid_heartbeats: List[Heartbeat], start: int, offset: int, ax: plt.Axes,
+                           number_highlights: int) -> NoReturn:
     for i in range(0, number_highlights):
         ax.axvspan(valid_heartbeats[start + i].t_wave.start - offset, valid_heartbeats[start + i].t_wave.end - offset,
                    zorder=2, facecolor='red', alpha=0.5, label='T-Wave' if i == 0 else "")
 
 
-def make_p_wave_annotation(valid_heartbeats: List[Heartbeat], start, offset, ax, number_highlights):
+def make_p_wave_annotation(valid_heartbeats: List[Heartbeat], start: int, offset: int, ax: plt.Axes,
+                           number_highlights: int) -> NoReturn:
     for i in range(0, number_highlights):
         ax.axvspan(valid_heartbeats[start + i].p_wave.start - offset, valid_heartbeats[start + i].r_wave.start - offset,
                    zorder=2, facecolor='green', alpha=0.5, label='P-Wave' if i == 0 else "")
 
 
-def scan_data(np_array):
+def scan_data(np_array: NDArray[float]) -> (int, List[Heartbeat], int, int):
     _, rpeaks = nk.ecg_peaks(np_array, sampling_rate=500)
 
     signal_cwt, waves_cwt = nk.ecg_delineate(np_array, rpeaks, sampling_rate=500, method="cwt")
@@ -213,7 +218,7 @@ def scan_data(np_array):
     return start_point, valid_heartbeats, start, end_point
 
 
-def return_svg_bytes():
+def return_svg_bytes() -> bytes:
     fig = plt.gcf()
     plt.ioff()
 
@@ -224,7 +229,7 @@ def return_svg_bytes():
     return buf.read()
 
 
-def plot_setup(ax, start_point, end_point, lead_name):
+def plot_setup(ax: plt.Axes, start_point: int, end_point: int, lead_name: str) -> NoReturn:
     # This is something we may want to pass in. It could be an extra feature for extra flexibility
     y_min = -1200
     y_max = 1200
@@ -272,7 +277,7 @@ def plot_setup(ax, start_point, end_point, lead_name):
         ax.axvline(x=end_point - start_point, linestyle='-', linewidth=4, color='black', zorder=4)
 
 
-def plot_red_lines(ax, start_point, end_point, y_min, y_max):
+def plot_red_lines(ax: plt.Axes, start_point: int, end_point: int, y_min: int, y_max: int) -> NoReturn:
     x_min = 0
     x_max = end_point - start_point
 
@@ -313,7 +318,8 @@ def plot_red_lines(ax, start_point, end_point, y_min, y_max):
             ax.axhline(y=y2, linestyle='-', linewidth=1, color=(1, 0.7, 0.7), zorder=1)
 
 
-def plot_lead_1(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length, rpeaks):
+def plot_lead_1(ax: plt.axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
+                valid_heartbeats: List[Heartbeat], start: int, length: int, rpeaks: dict) -> NoReturn:
     plot_setup(ax, start_point, end_point, 'I')
 
     # These if statements are where the custom arrhythmia code will go
@@ -359,7 +365,8 @@ def plot_lead_1(ax, data, annotate, start_point, end_point, valid_heartbeats: Li
         ax.text(150, 850, 'Regular HR > 100', fontsize=30, color='blue')
 
 
-def plot_lead_2(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length, rpeaks):
+def plot_lead_2(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
+                valid_heartbeats: List[Heartbeat], start: int, length: int, rpeaks: dict) -> NoReturn:
     plot_setup(ax, start_point, end_point, 'II')
 
     if annotate == 'none':
@@ -422,7 +429,8 @@ def plot_lead_2(ax, data, annotate, start_point, end_point, valid_heartbeats: Li
                     zorder=5, fontsize=25)
 
 
-def plot_lead_3(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length, rpeaks):
+def plot_lead_3(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
+                valid_heartbeats: List[Heartbeat], start: int, length: int, rpeaks: dict) -> NoReturn:
     plot_setup(ax, start_point, end_point, 'III')
 
     if annotate == 'none':
@@ -455,35 +463,40 @@ def plot_lead_3(ax, data, annotate, start_point, end_point, valid_heartbeats: Li
                     zorder=5, fontsize=25, ha='center')
 
 
-def plot_lead_avr(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
+def plot_lead_avr(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
+                  valid_heartbeats: List[Heartbeat], start: int, length: int) -> NoReturn:
     plot_setup(ax, start_point, end_point, 'aVR')
 
     if annotate == 'none':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
 
-def plot_lead_avl(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
+def plot_lead_avl(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
+                  valid_heartbeats: List[Heartbeat], start: int, length: int) -> NoReturn:
     plot_setup(ax, start_point, end_point, 'aVL')
 
     if annotate == 'none':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
 
-def plot_lead_avf(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
+def plot_lead_avf(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
+                  valid_heartbeats: List[Heartbeat], start: int, length: int) -> NoReturn:
     plot_setup(ax, start_point, end_point, 'aVF')
 
     if annotate == 'none':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
 
-def plot_lead_v1(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
+def plot_lead_v1(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
+                 valid_heartbeats: List[Heartbeat], start: int, length: int) -> NoReturn:
     plot_setup(ax, start_point, end_point, 'V1')
 
     if annotate == 'none':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
 
-def plot_lead_v2(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
+def plot_lead_v2(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
+                 valid_heartbeats: List[Heartbeat], start: int, length: int) -> NoReturn:
     plot_setup(ax, start_point, end_point, 'V2')
 
     if annotate == 'none':
@@ -493,35 +506,40 @@ def plot_lead_v2(ax, data, annotate, start_point, end_point, valid_heartbeats: L
         make_p_wave_annotation(valid_heartbeats, start, start_point, ax, length)
 
 
-def plot_lead_v3(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
+def plot_lead_v3(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
+                 valid_heartbeats: List[Heartbeat], start: int, length: int) -> NoReturn:
     plot_setup(ax, start_point, end_point, 'V3')
 
     if annotate == 'none':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
 
-def plot_lead_v4(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
+def plot_lead_v4(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
+                 valid_heartbeats: List[Heartbeat], start: int, length: int) -> NoReturn:
     plot_setup(ax, start_point, end_point, 'V4')
 
     if annotate == 'none':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
 
-def plot_lead_v5(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
+def plot_lead_v5(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
+                 valid_heartbeats: List[Heartbeat], start: int, length: int) -> NoReturn:
     plot_setup(ax, start_point, end_point, 'V5')
 
     if annotate == 'none':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
 
-def plot_lead_v6(ax, data, annotate, start_point, end_point, valid_heartbeats: List[Heartbeat], start, length):
+def plot_lead_v6(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
+                 valid_heartbeats: List[Heartbeat], start: int, length: int) -> NoReturn:
     plot_setup(ax, start_point, end_point, 'V6')
 
     if annotate == 'none':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
 
 
-def find_correct_rpeaks(data, rpeaks1, rpeaks2, rpeaks3, end_point, start_point):
+def find_correct_rpeaks(data: NDArray[float], rpeaks1: dict, rpeaks2: dict, rpeaks3: dict, end_point: int,
+                        start_point: int) -> (dict, dict, dict):
     length = 0
     found = 0
     setter = 1
@@ -622,7 +640,7 @@ def find_correct_rpeaks(data, rpeaks1, rpeaks2, rpeaks3, end_point, start_point)
     return rpeaks1, rpeaks2, rpeaks3
 
 
-def plot_12_ecgs(data, name_of_arrhythmia):
+def plot_12_ecgs(data: dict, name_of_arrhythmia: str) -> NoReturn:
     annotations = []
     fig, axs = plt.subplots(nrows=3, ncols=4, figsize=(40, 19.68), sharey='all')
 
