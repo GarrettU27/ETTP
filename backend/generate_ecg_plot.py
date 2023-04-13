@@ -3,7 +3,7 @@ import io
 import numpy as np
 from scipy.io import loadmat
 
-from backend.annotations import plot12ECGs
+from backend.annotations import plot_12_ecgs
 from backend.ecg_plot import plot, return_png_bytes
 
 
@@ -27,7 +27,7 @@ def get_ecg_svg():
 
 
 def create_train_ecg(data) -> io.BytesIO:
-    return plot12ECGs(data)
+    return plot_12_ecgs(data)
 
 
 def create_test_ecg(data) -> io.BytesIO:
