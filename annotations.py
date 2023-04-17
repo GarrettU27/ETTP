@@ -88,9 +88,12 @@ def createHeartbeats(TWave, PWave, RWave):
     z = 0
     heartbeatList = []
     while x < j or y < j or z < j:
+        throwError = True
+
         # if missing P-wave
         # validating that P-wave is higher than the other two waves and that the other two waves are correct
         if RWave[y].start < PWave[x].start and PWave[x].start > TWave[z].start and RWave[y].start < TWave[z].start:
+            throwError = False
             # if the p-wave is higher than the other two, the other two waves become invalid and we iterate
             y += 1
             z += 1
@@ -98,16 +101,19 @@ def createHeartbeats(TWave, PWave, RWave):
         # if missing R-wave
         # Validating start of RWave is greater than TWave and the other two waves are vaild
         elif RWave[y].start > TWave[z].start and PWave[x].start < TWave[z].start:
+            throwError = False
             x += 1
             z += 1
 
         # If P-Wave and R-Wave are missing
         elif PWave[x].start > TWave[z].start and RWave[y].start > TWave[z].start:
+            throwError = False
             z += 1
 
         # if missing T-Wave
         # if T-Wave is in the next heartbeat
         elif TWave[z].start > PWave[x + 1].start:
+            throwError = False
             # if P-Wave is in the next heartbeat
             if PWave[x].start > RWave[y].start:
                 y += 1
@@ -123,10 +129,14 @@ def createHeartbeats(TWave, PWave, RWave):
 
         # if wave is valid
         elif RWave[y].start < TWave[z].start and RWave[y].start > PWave[x].start:
+            throwError = False
             heartbeatList.append(Heartbeat(TWave[z], PWave[x], RWave[y]))
             x += 1
             y += 1
             z += 1
+
+        if throwError:
+            raise RuntimeError("Possible infinite loop")
 
     return heartbeatList
 
@@ -192,7 +202,7 @@ def scanData(np_array):
 
     # checks and gives an error statement if the matlab file cannot be used
     if start == None:
-        sys.exit("There are not 3 valid heartbeats in a row")
+        raise RuntimeError("There are not 3 valid heartbeats in a row")
 
     # declares where the startPoint is
     startPoint = validHeartbeats[start].PWave.start - 100
@@ -845,7 +855,8 @@ def plot12ECGs(data, nameOfArrhythmia):
     #     #prints them below the graph
     #     plt.text(0.0, -.025, ('Time between big boxes: '+ str(float(f'{time:.6f}')) + ' seconds'), fontsize=40, transform=plt.gcf().transFigure)
 
-    plt.show()
+    # plt.show()
+    plt.close('all')
 
     # getting the svgbites of our figure and returning it
     svgBites = return_svg_bytes()
