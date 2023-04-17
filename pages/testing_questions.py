@@ -107,7 +107,8 @@ class TestingQuestions(QWidget):
         self.answers.append(previous_questions_answer)
         self.current_question += 1
         if self.current_question >= self.total_questions:
-            self.test_results.update_page(self.answers, self.questions)
+            #self.test_results.update_page(self.answers, self.questions)
+            self.test_results.updatePage(self.answers,self.questions)
             self.set_state()
         else:
             self.load_question()

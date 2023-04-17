@@ -22,6 +22,11 @@ def main():
     QFontDatabase.addApplicationFont("./fonts/EncodeSans.ttf")
     QFontDatabase.addApplicationFont("./fonts/EncodeSansSC.ttf")
     PyQt6.QtCore.QDir.addSearchPath('images', os.path.abspath("./images"))
+    app.setStyleSheet("""
+    * {
+    color: black;
+    }
+    """)
 
     window = MainWindow()
     window.show()
