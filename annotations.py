@@ -32,9 +32,9 @@ def cleanArrays(start, end, leeway):
     listWaves = []
     # finds the shorter of the two so we don't run into overflows
     if len(start) < len(end):
-        j = len(start)
+        j = len(start) - 1
     else:
-        j = len(end)
+        j = len(end) - 1
     # seperate pointer variables
     x = 0
     y = 0
@@ -318,7 +318,23 @@ def plotLead1(ax, data, annotate, startPoint, endPoint, validHeartbeats, start, 
                     arrowprops=dict(facecolor='blue', shrink=0.05, linewidth=5),
                     zorder=5, fontsize=25)
 
+    elif annotate == 'Sinus Bradycardia':
+        makeRWaveAnnotation(validHeartbeats, start, startPoint, ax, length)
+        ax.plot(data[startPoint:endPoint], color='black', zorder=4)
+        ax.annotate('QRS < 0.12', xy=(validHeartbeats[start + 1].RWave.end - startPoint, 300),
+                    xytext=(validHeartbeats[start + 1].RWave.end - startPoint + 50, 800),
+                    arrowprops=dict(facecolor='blue', shrink=0.05, linewidth=5),
+                    zorder=5, fontsize=25)
+
     elif annotate == 'Atrial Fibrillation':
+        ax.plot(data[startPoint:endPoint], color='black', zorder=4)
+
+        # This for loop plots the highlights
+        for i in range(0, length):
+            ax.axvspan(rpeaks['ECG_R_Peaks'][i] - 20, rpeaks['ECG_R_Peaks'][i] + 20, zorder=2, facecolor='blue',
+                       alpha=0.3)
+
+    elif annotate == 'Atrial Flutter':
         ax.plot(data[startPoint:endPoint], color='black', zorder=4)
 
         # This for loop plots the highlights
@@ -345,6 +361,30 @@ def plotLead1(ax, data, annotate, startPoint, endPoint, validHeartbeats, start, 
             ax.axvline(rpeaks['ECG_R_Peaks'][i] - startPoint, zorder=2, lw=5)
 
         ax.text(150, 850, 'Regular HR > 100', fontsize=30, color='blue')
+    elif annotate == 'WPW Syndrome':
+        ax.plot(data[startPoint:endPoint], color='black', zorder=4)
+        _, rpeaks = nk.ecg_peaks(data, sampling_rate=500)
+        ax.annotate('Delta Wave on\n upstroke of QRS', xy=(rpeaks['ECG_R_Peaks'][1], 300),
+                    xytext=(rpeaks['ECG_R_Peaks'][1] - 500, -600),
+                    arrowprops=dict(facecolor='blue', shrink=0.05, linewidth=5),
+                    zorder=5, fontsize=25)
+    elif annotate == '2nd Degree AV Block':
+        ax.plot(data[startPoint:endPoint], color='black', zorder=4)
+        _, rpeaks = nk.ecg_peaks(data, sampling_rate=500)
+
+        length = 0
+        found = 0
+        setter = 1
+        for i in range(0, len(rpeaks['ECG_R_Peaks'])):
+            if rpeaks['ECG_R_Peaks'][i] <= endPoint and rpeaks['ECG_R_Peaks'][i] >= startPoint:
+                length += 1
+                if length == 1 and setter == 1:
+                    found = i
+                    setter = 0
+        # This for loop plots the vertical blue lines
+        for i in range(found, found + length):
+            ax.axvspan(rpeaks['ECG_R_Peaks'][i] - 20, rpeaks['ECG_R_Peaks'][i] + 20, zorder=2, facecolor='blue',
+                       alpha=0.3)
 
 
 def plotLead2(ax, data, annotate, startPoint, endPoint, validHeartbeats, start, length, rpeaks):
@@ -368,6 +408,14 @@ def plotLead2(ax, data, annotate, startPoint, endPoint, validHeartbeats, start, 
                     arrowprops=dict(facecolor='green', shrink=0.05, linewidth=5),
                     zorder=5, fontsize=25, ha='center')
 
+    elif annotate == 'Sinus Bradycardia':
+        ax.plot(data[startPoint:endPoint], color='black', zorder=4)
+        makePWaveAnnotation(validHeartbeats, start, startPoint, ax, length)
+        ax.annotate('PR Interval > 0.2', xy=(validHeartbeats[start + 1].PWave.start - startPoint, 200),
+                    xytext=(validHeartbeats[start + 1].PWave.start - startPoint - 120, 800),
+                    arrowprops=dict(facecolor='green', shrink=0.05, linewidth=5),
+                    zorder=5, fontsize=25, ha='center')
+
     elif annotate == 'Atrial Fibrillation':
         ax.plot(data[startPoint:endPoint], color='black', zorder=4)
 
@@ -375,8 +423,8 @@ def plotLead2(ax, data, annotate, startPoint, endPoint, validHeartbeats, start, 
         for i in range(0, length - 1):
             # Create a Rectangle patch
             rect = patches.Rectangle((rpeaks['ECG_R_Peaks'][i] + 30, 300),
-                                     (rpeaks['ECG_R_Peaks'][i + 1]) - (rpeaks['ECG_R_Peaks'][i] + 30) - 50, -500,
-                                     linewidth=5, edgecolor='r', facecolor='none')
+                                     (rpeaks['ECG_R_Peaks'][i + 1]) - (rpeaks['ECG_R_Peaks'][i] + 30) - 30, -500,
+                                     linewidth=5, edgecolor='blue', facecolor='none')
 
             # Add the patch to the Axes
             ax.add_patch(rect)
@@ -390,6 +438,25 @@ def plotLead2(ax, data, annotate, startPoint, endPoint, validHeartbeats, start, 
                     arrowprops=dict(facecolor='blue', shrink=0.05, linewidth=5),
                     xytext=(endPoint / 2 - endPoint / 4, -700),
                     zorder=5, fontsize=30)
+
+    elif annotate == 'Atrial Flutter':
+        ax.plot(data[startPoint:endPoint], color='black', zorder=4)
+
+        # this for loop plots the rectangles
+        for i in range(0, length - 1):
+            # Create a Rectangle patch
+            rect = patches.Rectangle((rpeaks['ECG_R_Peaks'][i] + 30, 300),
+                                     (rpeaks['ECG_R_Peaks'][i + 1]) - (rpeaks['ECG_R_Peaks'][i] + 30) - 30, -500,
+                                     linewidth=5, edgecolor='blue', facecolor='none')
+
+            # Add the patch to the Axes
+            ax.add_patch(rect)
+
+        ax.annotate('Sawtooth Appearance', xy=(endPoint / 2 - endPoint / 4, -200),
+                    arrowprops=dict(facecolor='blue', shrink=0.05, linewidth=5),
+                    xytext=(endPoint / 2 - endPoint / 4, -700),
+                    zorder=5, fontsize=30)
+
 
     elif annotate == 'Normal Sinus Rhythm':
         makeRWaveAnnotation(validHeartbeats, start, startPoint, ax, length)
@@ -406,6 +473,50 @@ def plotLead2(ax, data, annotate, startPoint, endPoint, validHeartbeats, start, 
 
         ax.annotate('QRS < 0.12', xy=(validHeartbeats[start + 1].RWave.end - startPoint, 300),
                     xytext=(validHeartbeats[start + 1].RWave.end - startPoint + 50, 800),
+                    arrowprops=dict(facecolor='blue', shrink=0.05, linewidth=5),
+                    zorder=5, fontsize=25)
+    elif annotate == 'WPW Syndrome':
+        ax.plot(data[startPoint:endPoint], color='black', zorder=4)
+        _, rpeaks = nk.ecg_peaks(data, sampling_rate=500)
+
+        length = 0
+        found = 0
+        setter = 1
+        for i in range(0, len(rpeaks['ECG_R_Peaks'])):
+            if rpeaks['ECG_R_Peaks'][i] <= endPoint and rpeaks['ECG_R_Peaks'][i] >= startPoint:
+                length += 1
+                if length == 1 and setter == 1:
+                    found = i
+                    setter = 0
+        # This for loop plots the highlights
+        for i in range(found, found + length):
+            ax.axvspan(rpeaks['ECG_R_Peaks'][i] - 200, rpeaks['ECG_R_Peaks'][i] - 50, zorder=2, facecolor='green',
+                       alpha=0.3)
+
+        ax.annotate('Short PR Wave', xy=(rpeaks['ECG_R_Peaks'][1] - 100, 150),
+                    xytext=(rpeaks['ECG_R_Peaks'][1] - 300, 800),
+                    arrowprops=dict(facecolor='blue', shrink=0.05, linewidth=5),
+                    zorder=5, fontsize=25)
+    elif annotate == '2nd Degree AV Block':
+        ax.plot(data[startPoint:endPoint], color='black', zorder=4)
+        _, rpeaks = nk.ecg_peaks(data, sampling_rate=500)
+
+        length = 0
+        found = 0
+        setter = 1
+        for i in range(0, len(rpeaks['ECG_R_Peaks'])):
+            if rpeaks['ECG_R_Peaks'][i] <= endPoint and rpeaks['ECG_R_Peaks'][i] >= startPoint:
+                length += 1
+                if length == 1 and setter == 1:
+                    found = i
+                    setter = 0
+        # This for loop plots the highlights
+        for i in range(found, found + length):
+            ax.axvspan(rpeaks['ECG_R_Peaks'][i] - 200, rpeaks['ECG_R_Peaks'][i] - 50, zorder=2, facecolor='green',
+                       alpha=0.3)
+
+        ax.annotate('Longest PR Wave\n Dropped QRS', xy=(rpeaks['ECG_R_Peaks'][1] - 100, 150),
+                    xytext=(rpeaks['ECG_R_Peaks'][1] - 300, 800),
                     arrowprops=dict(facecolor='blue', shrink=0.05, linewidth=5),
                     zorder=5, fontsize=25)
 
@@ -618,16 +729,17 @@ def plot12ECGs(data, nameOfArrhythmia):
     ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8, ax9, ax10, ax11, ax12 = axs.flatten()
 
     # This is where we will change what each arrhythmia does
-    if nameOfArrhythmia == 'basic':
-        annotations = ['none', 'none', 'none', 'none', 'basic', 'none', 'none', 'none', 'none', 'none', 'none', 'none']
+    if nameOfArrhythmia == '1st Degree AV Block':
+        annotations = ['1st Degree AV Block', 'none', 'none', 'none', '1st Degree AV Block', 'none',
+                       '1st Degree AV Block', 'none', 'none', 'none', 'none', 'none']
 
         # We need to get the startpoint and endpoints for the graphs first
         # In the basic example, we are annotating lead 2 so we will get those start/endpoints for the whole graph based on lead 2
         startPoint, validHeartbeats, start, endPoint = scanData(data['val'][1])
 
-    elif nameOfArrhythmia == '1st Degree AV Block':
-        annotations = ['1st Degree AV Block', 'none', 'none', 'none', '1st Degree AV Block', 'none',
-                       '1st Degree AV Block', 'none', 'none', 'none', 'none', 'none']
+    elif nameOfArrhythmia == 'Sinus Bradycardia':
+        annotations = ['Sinus Bradycardia', 'none', 'none', 'none', 'Sinus Bradycardia', 'none', 'none', 'none', 'none',
+                       'none', 'none', 'none']
 
         # We need to get the startpoint and endpoints for the graphs first
         # In the basic example, we are annotating lead 2 so we will get those start/endpoints for the whole graph based on lead 2
@@ -644,6 +756,18 @@ def plot12ECGs(data, nameOfArrhythmia):
         validHeartbeats = 'none'
         start = 'none'
 
+    elif nameOfArrhythmia == 'Atrial Flutter':
+        annotations = ['Atrial Flutter', 'none', 'none', 'none', 'Atrial Flutter', 'none', 'none', 'none', 'none',
+                       'none', 'none', 'none']
+
+        # We need to manually set this because neurokit doesn't work with this arrhythmia
+        # It only finds the R wave peaks which is all we need
+        startPoint = 0
+        endPoint = startPoint + 1300
+        validHeartbeats = 'none'
+        start = 'none'
+
+
     elif nameOfArrhythmia == 'Normal Sinus Rhythm':
         annotations = ['none', 'none', 'none', 'none', 'Normal Sinus Rhythm', 'none', 'none', 'none',
                        'Normal Sinus Rhythm', 'none', 'none', 'none']
@@ -653,6 +777,22 @@ def plot12ECGs(data, nameOfArrhythmia):
         annotations = ['Sinus Tachycardia', 'none', 'none', 'none', 'Sinus Tachycardia', 'none', 'none', 'none',
                        'Sinus Tachycardia', 'none', 'none', 'none']
         startPoint, validHeartbeats, start, endPoint = scanData(data['val'][1])
+
+    elif nameOfArrhythmia == 'WPW Syndrome':
+        annotations = ['WPW Syndrome', 'none', 'none', 'none', 'WPW Syndrome', 'none', 'none', 'none', 'none', 'none',
+                       'none', 'none']
+        startPoint = 0
+        endPoint = startPoint + 1300
+        validHeartbeats = 'none'
+        start = 'none'
+
+    elif nameOfArrhythmia == '2nd Degree AV Block':
+        annotations = ['2nd Degree AV Block', 'none', 'none', 'none', '2nd Degree AV Block', 'none', 'none', 'none',
+                       'none', 'none', 'none', 'none']
+        startPoint = 0
+        endPoint = startPoint + 1300
+        validHeartbeats = 'none'
+        start = 'none'
 
     # Finds the amount of heartbeats displayed and puts them into length. This is needed because we need the
     # big boxes to have a time of 0.2 seconds per box
@@ -664,7 +804,7 @@ def plot12ECGs(data, nameOfArrhythmia):
             length += 1
 
     # we need to compare rpeaks found because neurokit won't always find the same rpeaks values between leads
-    if nameOfArrhythmia == 'Atrial Fibrillation':
+    if nameOfArrhythmia == 'Atrial Fibrillation' or 'Atrial Flutter':
         _, rpeaks1 = nk.ecg_peaks(data['val'][0], sampling_rate=500)
         _, rpeaks3 = nk.ecg_peaks(data['val'][2], sampling_rate=500)
         rpeaks1, rpeaks2, rpeaks3 = findCorrectRpeaks(data, rpeaks1, rpeaks2, rpeaks3, endPoint, startPoint)
