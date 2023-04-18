@@ -15,6 +15,16 @@ class ArrhythmiaAnnotation:
 
 hr_data = [
     ArrhythmiaAnnotation(
+        id=1,
+        rhythm_name="1st Degree AV Block",
+        bpm="60 - 100",
+        rhythm="Regular, evenly spaced",
+        p_wave="Before each QRS, identical waves",
+        pr_interval="> 0.20",
+        qrs_complex="< 0.12",
+        note="In this rhythm, the Atrioventricular, AV, conduction is lengthened. The P-wave always proceeds the QRS complex, but the PR interval is prolonged over 2 seconds"
+    ),
+    ArrhythmiaAnnotation(
         id=54,
         rhythm_name="Normal Sinus Rhythm",
         bpm="60 - 100",
