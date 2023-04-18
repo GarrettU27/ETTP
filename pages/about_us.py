@@ -22,9 +22,9 @@ class AboutUs(QWidget):
         people = [
             ("", "We created this application to allow users of all levels to improve their knowledge of ECGs and their ability to read an ECG strip and Identify different arrhythmias."),
             ("images:marie.jpg", "Marie Hessefort: I am an Electrical Engineering major at the University of Minnesota with a focus in Biomedical Engineering, Circuit Design, and Digital Signal Processing. "),
-            ("images:henry.jpg", "Henry Hein: tbd"),
-            ("images:michael.jpg", "Michael Johnson: tbd"),
-            ("images:jacob.jpg", "Jacob Medchill: tbd"),
+            ("images:henry.jpg", "Henry Hein: I am a Computer Engineering major at the University of Minnesota with a focus in Firmware and Digital Logic Design"),
+            ("images:michael.jpg", "Michael Johnson: I am a Computer Engineering major at the University of Minnesota."),
+            ("images:jacob.jpg", "Jacob Medchill: I am a Computer Engineering major at the University of Minnesota with a focus on embedded systems."),
             ("images:garrett.png", "Garrett Udstrand: I am a Computer Engineering major at the University of Minnesota with a focus in Application Development and AI."),
             ("images:Sobelman.jpg", "Gerald Sobelman: Project Sponsor and Professor, Department of Electrical and Computer Engineering.  Learn more about my research at: https://cse.umn.edu/ece/gerald-sobelman") 
         ]
