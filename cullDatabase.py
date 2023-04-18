@@ -88,6 +88,16 @@ def cullDatabase(arrhythmiaIDs):
     )
     """)
 
+    # Delete non-matching entries from patient
+    cur.execute("""
+    DELETE FROM patient
+    WHERE NOT EXISTS (
+        SELECT *
+        FROM goodecgs
+        WHERE patient.id = goodecgs.patient_id
+    )
+    """)
+
     cur.execute("DROP TABLE IF EXISTS goodecgs")
     con.commit()
     con.close()
