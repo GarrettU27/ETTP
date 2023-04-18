@@ -1,15 +1,11 @@
-from annotations import plot12ECGs
-from sqlite_setup import get_sqlite_connection
+from backend.annotations import plot_12_ecgs
+from backend.arrhythmia_annotation import get_arrhythmia_annotation, get_supported_arrhythmias
+from backend.sqlite_setup import get_sqlite_connection
 
-def convertName(arrhythmiaId):
-    if(arrhythmiaId == 1):
-        return('1st Degree AV Block')
-    if(arrhythmiaId == 55):
-        return('Atrial Fibrillation')
-    if(arrhythmiaId == 54):
-        return('Normal Sinus Rhythm')
-    if(arrhythmiaId == 56):
-        return('Sinus Tachycardia')
+
+def convert_name(arrhythmia_id: int) -> str:
+    return get_arrhythmia_annotation(arrhythmia_id).rhythm_name
+
 
 """
 cullDatabase
@@ -20,11 +16,12 @@ Result
     Delete all other database entries not pertaining to the ECGs which function and of particular diagnosis
     Any ECG diagnosis besides the one that the ECG is selected for will be deleted
 """
-def cullDatabase(arrhythmiaIDs):
+
+
+def cull_database():
     con = get_sqlite_connection()
     cur = con.cursor()
-    # This will store a tuple of (patient_id, arrhythmia_id)
-    ecgsToSave = []
+    arrhythmias = get_supported_arrhythmias()
 
     # This table will be used within the DELETE FROM statement and then it will be dropped
     cur.execute("DROP TABLE IF EXISTS goodecgs")
@@ -38,41 +35,40 @@ def cullDatabase(arrhythmiaIDs):
     )""")
 
     # Loop through all input arrhythmia IDs
-    for tempId in arrhythmiaIDs:
+    for arrhythmia in arrhythmias:
         # Number of diagnosed arrhythmias besides the one of interest
         # This will increase by one until 200 ECGs are found
-        additionalDiagnosis = -1
+        additional_diagnosis = -1
         # The number of ECGs that have been found which function with plot12ECGs
-        numSelected = 0
+        num_selected = 0
 
-        while numSelected < 200:
-            additionalDiagnosis = additionalDiagnosis + 1
-            queryRes = cur.execute("""
+        while num_selected < 200:
+            additional_diagnosis = additional_diagnosis + 1
+            query_res = cur.execute("""
             SELECT p1.id, p1.ecg
             FROM patient p1, diagnosis d1
             WHERE p1.id = d1.patient_id AND
-                d1.arrhythmia_id = """ + str(tempId) + """ AND
+                d1.arrhythmia_id = """ + str(arrhythmia.id) + """ AND
                 (
                     SELECT COUNT(*)
                     FROM patient p2, diagnosis d2
                     WHERE p2.id = d2.patient_id AND
                     p2.id = p1.id AND
-                    d2.arrhythmia_id <> """ + str(tempId) + """
-                ) = """ + str(additionalDiagnosis)
-            ).fetchall()
+                    d2.arrhythmia_id <> """ + str(arrhythmia.id) + """
+                ) = """ + str(additional_diagnosis)
+                                    ).fetchall()
 
-            for ecgData in queryRes:
-                myDict = {'val':ecgData[1]}
+            for ecg_data in query_res:
                 try:
-                    _ = plot12ECGs(myDict, convertName(tempId))
+                    _ = plot_12_ecgs(ecg_data[1], arrhythmia.rhythm_name)
                     # Insert into non-delete table
-                    cur.execute("INSERT INTO goodecgs VALUES(NULL, ?, ?)", (ecgData[0], tempId))
+                    cur.execute("INSERT INTO goodecgs VALUES(NULL, ?, ?)", (ecg_data[0], arrhythmia.id))
                     con.commit()
-                    numSelected = numSelected + 1
-                    print("tempId = " + str(tempId))
-                    print("numSelected = " + str(numSelected))
+                    num_selected = num_selected + 1
+                    print("temp_id = " + str(arrhythmia.id))
+                    print("num_selected = " + str(num_selected))
                     print("--------------")
-                    if numSelected >= 200:
+                    if num_selected >= 200:
                         break
                 except Exception as error:
                     pass
@@ -101,3 +97,7 @@ def cullDatabase(arrhythmiaIDs):
     cur.execute("DROP TABLE IF EXISTS goodecgs")
     con.commit()
     con.close()
+
+
+if __name__ == '__main__':
+    cull_database()
