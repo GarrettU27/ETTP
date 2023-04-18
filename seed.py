@@ -10,11 +10,9 @@ con = get_sqlite_connection()
 cur = con.cursor()
 
 # drop the table if it exists
-cur.execute("PRAGMA foreign_keys = OFF;")
 cur.execute("DROP TABLE IF EXISTS patient")
 cur.execute("DROP TABLE IF EXISTS diagnosis")
 cur.execute("DROP TABLE IF EXISTS arrhythmia")
-cur.execute("PRAGMA foreign_keys = ON;")
 
 
 cur.execute("""
