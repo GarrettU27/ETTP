@@ -4,12 +4,20 @@ from sqlite_setup import get_sqlite_connection
 def convertName(arrhythmiaId):
     if(arrhythmiaId == 1):
         return('1st Degree AV Block')
-    if(arrhythmiaId == 55):
-        return('Atrial Fibrillation')
+    if(arrhythmiaId == 2):
+        return('2nd Degree AV Block')
+    if(arrhythmiaId == 52):
+        return('WPW Syndrome')
+    if(arrhythmiaId == 53):
+        return('Sinus Bradycardia')
     if(arrhythmiaId == 54):
         return('Normal Sinus Rhythm')
+    if(arrhythmiaId == 55):
+        return('Atrial Fibrillation')
     if(arrhythmiaId == 56):
         return('Sinus Tachycardia')
+    if(arrhythmiaId == 57):
+        return('Atrial Flutter')
 
 """
 cullDatabase
@@ -37,6 +45,12 @@ def cullDatabase(arrhythmiaIDs):
         FOREIGN KEY(arrhythmia_id) REFERENCES arrhythmia(id) ON DELETE CASCADE ON UPDATE CASCADE
     )""")
 
+    # Get number of arrhythmias in database. This will be used to test if we've run out of ECGs
+    numArrhythmias = cur.execute("""
+    SELECT COUNT(*)
+    FROM arrhythmia
+    """).fetchone()
+
     # Loop through all input arrhythmia IDs
     for tempId in arrhythmiaIDs:
         # Number of diagnosed arrhythmias besides the one of interest
@@ -47,6 +61,9 @@ def cullDatabase(arrhythmiaIDs):
 
         while numSelected < 200:
             additionalDiagnosis = additionalDiagnosis + 1
+            if(additionalDiagnosis > numArrhythmias[0] - 1):
+                print("Ran out of ECGs")
+                break
             queryRes = cur.execute("""
             SELECT p1.id, p1.ecg
             FROM patient p1, diagnosis d1
