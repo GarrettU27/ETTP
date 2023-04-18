@@ -1,15 +1,17 @@
-from annotations import plot12ECGs
-from sqlite_setup import get_sqlite_connection
+from backend.annotations import plot_12_ecgs
+from backend.sqlite_setup import get_sqlite_connection
+
 
 def convertName(arrhythmiaId):
-    if(arrhythmiaId == 1):
-        return('1st Degree AV Block')
-    if(arrhythmiaId == 55):
-        return('Atrial Fibrillation')
-    if(arrhythmiaId == 54):
-        return('Normal Sinus Rhythm')
-    if(arrhythmiaId == 56):
-        return('Sinus Tachycardia')
+    if (arrhythmiaId == 1):
+        return ('1st Degree AV Block')
+    if (arrhythmiaId == 55):
+        return ('Atrial Fibrillation')
+    if (arrhythmiaId == 54):
+        return ('Normal Sinus Rhythm')
+    if (arrhythmiaId == 56):
+        return ('Sinus Tachycardia')
+
 
 con = get_sqlite_connection()
 cur = con.cursor()
@@ -61,9 +63,9 @@ for tempId in arrhyIds:
     for ecgData in queryRes:
         print("--- patientId = " + str(ecgData[0]) + " ---")
         print("arrhythmia id = " + str(tempId))
-        myDict = {'val':ecgData[1]}
+        myDict = {'val': ecgData[1]}
         try:
-            _ = plot12ECGs(myDict, convertName(tempId))
+            _ = plot_12_ecgs(myDict, convertName(tempId))
             cur.execute("INSERT INTO goodecgs VALUES(?, ?, ?)", (goodecgsId, ecgData[0], tempId))
             con.commit()
             numInserted = numInserted + 1

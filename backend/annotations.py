@@ -1,6 +1,5 @@
 import io
 import math
-import sys
 from dataclasses import dataclass
 from typing import List, NoReturn
 
@@ -77,27 +76,20 @@ def clean_arrays(start: List[int], end: List[int], leeway: int) -> List[Wave]:
 
 def create_heartbeats(t_wave: List[Wave], p_wave: List[Wave], r_wave: List[Wave]) -> List[Heartbeat]:
     # Finding the smallest array
-    if len(t_wave) - 1 < len(p_wave) - 1:
-        if len(t_wave) - 1 < len(r_wave) - 1:
-            j = len(t_wave) - 1
-        else:
-            j = len(r_wave) - 1
-    # If PWave is smaller than TWave
-    else:
-        if len(p_wave) - 1 < len(r_wave) - 1:
-            j = len(p_wave) - 1
-        else:
-            j = len(r_wave) - 1
+    j = min(len(t_wave), len(p_wave), len(r_wave)) - 1
 
     x = 0
     y = 0
     z = 0
     heartbeat_list = []
     while x < j or y < j or z < j:
+        throw_error = True
+
         # if missing P-wave
         # validating that P-wave is higher than the other two waves and that the other two waves are correct
         if r_wave[y].start < p_wave[x].start and p_wave[x].start > t_wave[z].start and r_wave[y].start < t_wave[
             z].start:
+            throw_error = False
             # if the p-wave is higher than the other two, the other two waves become invalid, and we iterate
             y += 1
             z += 1
@@ -105,16 +97,19 @@ def create_heartbeats(t_wave: List[Wave], p_wave: List[Wave], r_wave: List[Wave]
         # if missing R-wave
         # Validating start of RWave is greater than TWave and the other two waves are valid
         elif r_wave[y].start > t_wave[z].start > p_wave[x].start:
+            throw_error = False
             x += 1
             z += 1
 
         # If P-Wave and R-Wave are missing
         elif p_wave[x].start > t_wave[z].start and r_wave[y].start > t_wave[z].start:
+            throw_error = False
             z += 1
 
         # if missing T-Wave
         # if T-Wave is in the next heartbeat
         elif t_wave[z].start > p_wave[x + 1].start:
+            throw_error = False
             # if P-Wave is in the next heartbeat
             if p_wave[x].start > r_wave[y].start:
                 y += 1
@@ -130,10 +125,14 @@ def create_heartbeats(t_wave: List[Wave], p_wave: List[Wave], r_wave: List[Wave]
 
         # if wave is valid
         elif t_wave[z].start > r_wave[y].start > p_wave[x].start:
+            throw_error = False
             heartbeat_list.append(Heartbeat(t_wave[z], p_wave[x], r_wave[y]))
             x += 1
             y += 1
             z += 1
+
+        if throw_error:
+            raise RuntimeError("Possible infinite loop")
 
     return heartbeat_list
 
@@ -209,7 +208,7 @@ def scan_data(np_array: NDArray[float]) -> (int, List[Heartbeat], int, int):
 
     # checks and gives an error statement if the matlab file cannot be used
     if start is None:
-        sys.exit("There are not 3 valid heartbeats in a row")
+        raise RuntimeError("There are not 3 valid heartbeats in a row")
 
     # declares where the start_point is
     start_point = valid_heartbeats[start].p_wave.start - 100
@@ -737,7 +736,8 @@ def plot_12_ecgs(data: NDArray[float], name_of_arrhythmia: str) -> NoReturn:
     #     #prints them below the graph
     #     plt.text(0.0, -.025, ('Time between big boxes: '+ str(float(f'{time:.6f}')) + ' seconds'), fontsize=40, transform=plt.gcf().transFigure)
 
-    plt.show()
+    # plt.show()
+    plt.close('all')
 
     # getting the svgbites of our figure and returning it
     svgBites = return_svg_bytes()

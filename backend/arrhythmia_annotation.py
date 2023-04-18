@@ -57,7 +57,7 @@ hr_data = [
 ]
 
 
-def get_arrhythmia_annotation(arrhythmia_id: str):
+def get_arrhythmia_annotation(arrhythmia_id: str | int):
     for annotation in hr_data:
         if int(arrhythmia_id) == annotation.id:
             return annotation
