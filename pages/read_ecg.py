@@ -1,10 +1,12 @@
 import PyQt6
 from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget
+from PyQt6.QtWidgets import QWidget, QSpacerItem, QVBoxLayout, QHBoxLayout
 
+from components.arrythmia_picture import ArrythmiaPicture
 from components.heading_label import HeadingLabel
 from components.image_widget import ImageWidget
+from components.paragraph_label import ParagraphLabel
 from components.resizing_text_edit import ResizingTextEdit
 
 
@@ -16,6 +18,7 @@ class ReadECG(QWidget):
         self.layout.addWidget(HeadingLabel("How do I read a 12-lead ECG?"))
 
         layout2 = QHBoxLayout()
+        layout3 = QVBoxLayout()
         self.read_ecg_explanation = ResizingTextEdit()
         self.read_ecg_explanation.setReadOnly(True)
 
@@ -45,9 +48,20 @@ class ReadECG(QWidget):
         <p><strong>Small Squares:</strong> These are usually 1mm square. Horizontally they represent 0.04 
             seconds, and vertically they represent 0.1 mV.</p>
         <p><strong>Large Squares:</strong> These are made up of 25 little squares, 5mm square. Horizontally it represents 0.2 seconds, and vertically 
-            it represents 0.5 mV.</p>
+            it represents 0.5 mV. Five large squares represent 1 second, and there are 300 large quares per minute.</p>
+        <br>
+        <p><strong>Calculating Heart Rate:</strong> There are a few different ways to calculate the heart rate on an ECG strip, with the assumption that the paper is running at the regular standard speed of 25mm/second. 
+            <li>1) Count the number of large squares between each R wave, and divde 300 by that number. </li>
+            <li>2) Count the number of small squares between each R wave, and divde 1,500 by that number. </li>
+        <br>
+        <p> Sources:</p>
+            <li>1) Chatterjee, S. and Miller, A. "Biomedical Instrumentation Systems." Delmar, Cengage Learning. 2010.</li>
+            <li>2) Malminvuo, J. and Plonsey, R. "Bioelectromagnetism - Principles and Applications of Bioelectric and Biomagnetic Fields." Oxford University Press. 1995.</li>
+            <li>3) Meek, S. and Morris, F. "ABC of clinical electrocaridography: Introduction. I-Leads, rate, rhythm, and cardiac axis." BMJ Clinical Review. Vol 324: 415-8. 16FEB2002.<li>
+            <li>4) Webster, John. 	"Medical Instrumentation, Application and Design," Fourth Edition. Wiley 2010.</li>
         """)
 
+        # Start Layout
         self.image = ImageWidget(True)
         self.pixmap = QPixmap("images:read_ecg.png")
         self.image.setPixmap(self.pixmap)
@@ -57,10 +71,54 @@ class ReadECG(QWidget):
         layout2.setAlignment(self.image, PyQt6.QtCore.Qt.AlignmentFlag.AlignTop)
         layout2.addWidget(self.read_ecg_explanation)
 
-        layout2.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignTop)
+        self.image2 = ImageWidget(True)
+        self.pixmap = QPixmap("images:HeartRates.png")
+        self.image2.setPixmap(self.pixmap)
+        self.image2.setMaximumHeight(1000)
+
+        layout2.addWidget(self.image2)
+        layout2.setAlignment(self.image2, PyQt6.QtCore.Qt.AlignmentFlag.AlignLeft)
         layout2.setSpacing(50)
 
         layout2.setStretch(0, 1)
         layout2.setStretch(1, 1)
 
         self.layout.addLayout(layout2)
+
+        rhythms = [
+            ("images:NormalSinusRhythm.png",
+             "Normal Sinus Rhythm: heart rate of 60-100 bpm, PR interval is 0.12-0.20 seconds, and QRS complex < 0.12 seconds"),
+            ("images:NormalSinusRhythm2.png", "A second example of normal sinus rhythm."),
+            ("images:SinusTachycardia.png", "Sinus Tachycardia: elevated heart rate greater than 100 bpm."),
+            ("images:SinusTachycardia2.png", "A second example of sinus tachcardia."),
+            ("images:SinusBradycardia.png", "Sinus Bradycardia: slow heart rate less than 60 bpm."),
+            ("images:SinusBradycardia2.png", "A second example of sinus bradycardia."),
+            ("images:AtrialFibrillation.jpg",
+             "Atrial Fibrillation: rapid atrial rate, slow ventricular rate, with rapid and irregular p-wave and rhythm."),
+            ("images:AtrialFlutter.png", "Atrial Flutter: heart rate of 220-300 bpm with a sawtoothed p wave."),
+            ("images:FirstDegreeAVBlock.png", "1st Degree AV Block: lengthened PR interval greater than 0.2 seconds."),
+            ("images:SecondDegreeAVBlock.png",
+             "2nd Degree AV Block: longest PR interval just before QRS wave is dropped."),
+            ("images:ThirdDegreeAVBlock.png", "3rd Degree AV Block: p wave is regular but out of sync with QRS."),
+        ]
+
+        layout3.setSpacing(30)
+        layout3.setContentsMargins(0, 60, 0, 0)
+
+        layout3.addWidget(ParagraphLabel(
+            "<strong>Next we will look at a sampling of ideal arrythmia waveforms. Training mode will provide you with more details about each arrythmia, but this will give you a good place to start</strong>"))
+
+        # example Arrythmia layout
+        for image, name, in rhythms:
+            horizontal_layout = QHBoxLayout()
+            horizontal_layout.setSpacing(30)
+            horizontal_layout.addWidget(ArrythmiaPicture(image))
+            horizontal_layout.addWidget(ParagraphLabel(name))
+            layout3.addLayout(horizontal_layout)
+
+        layout3.addWidget(ParagraphLabel(
+            "ECG Examples Source: Chatterjee, S. and Miller, A. Biomedical Instrumentation Systems. Delmar, Cengage Learning. 2010."))
+
+        self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
+                                              PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
+        self.layout.addLayout(layout3)
