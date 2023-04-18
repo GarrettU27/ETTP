@@ -26,8 +26,8 @@ def get_ecg_svg():
     return return_png_bytes()
 
 
-def create_train_ecg(data) -> io.BytesIO:
-    return plot_12_ecgs(data)
+def create_train_ecg(data, arrhythmia) -> io.BytesIO:
+    return plot_12_ecgs(data, arrhythmia)
 
 
 def create_test_ecg(data) -> io.BytesIO:

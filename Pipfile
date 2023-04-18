@@ -11,6 +11,7 @@ neurokit2 = "*"
 pyqt6 = "*"
 qtawesome = "*"
 pyinstaller = "*"
+pywavelets = "*"
 
 [dev-packages]
 

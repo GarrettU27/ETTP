@@ -23,6 +23,9 @@ class Heartbeat:
     r_wave: Wave
 
 
+line_width = 3
+
+
 def point_finder(start_r: List[int], end_r: List[int], start_t: List[int], end_t: List[int], start_p: List[int],
                  end_p: List[int], signal_cwt: dict) -> NoReturn:
     # all this does is finds the starts and endpoints for every heartbeat found in the signal
@@ -217,13 +220,15 @@ def scan_data(np_array: NDArray[float]) -> (int, List[Heartbeat], int, int):
     return start_point, valid_heartbeats, start, end_point
 
 
-def return_svg_bytes() -> bytes:
+def return_png_bytes() -> bytes:
     fig = plt.gcf()
     plt.ioff()
 
     buf = io.BytesIO()
-    fig.savefig(buf, format="svg")
+    fig.savefig(buf, format="png", dpi=150)
     buf.seek(0)
+
+    plt.close()
 
     return buf.read()
 
@@ -326,17 +331,17 @@ def plot_lead_1(ax: plt.axes, data: NDArray[float], annotate: str, start_point: 
     # For specific arrhythmia's we will pass in the name of the arryhthmia and then create
     # extra elif line's for each arrhythmia
     if annotate == 'none':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
     elif annotate == '1st Degree AV Block':
         make_r_wave_annotation(valid_heartbeats, start, start_point, ax, length)
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
         ax.annotate('QRS < 0.12', xy=(valid_heartbeats[start + 1].r_wave.end - start_point, 300),
                     xytext=(valid_heartbeats[start + 1].r_wave.end - start_point + 50, 800),
                     arrowprops=dict(facecolor='blue', shrink=0.05, linewidth=5),
                     zorder=5, fontsize=25)
 
     elif annotate == 'Atrial Fibrillation':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
         # This for loop plots the highlights
         for i in range(0, length):
@@ -344,7 +349,7 @@ def plot_lead_1(ax: plt.axes, data: NDArray[float], annotate: str, start_point: 
                        alpha=0.3)
 
     elif annotate == 'Sinus Tachycardia':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
         _, rpeaks = nk.ecg_peaks(data, sampling_rate=500)
 
@@ -369,17 +374,17 @@ def plot_lead_2(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: 
     plot_setup(ax, start_point, end_point, 'II')
 
     if annotate == 'none':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
     elif annotate == 'basic':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
         make_r_wave_annotation(valid_heartbeats, start, start_point, ax, length)
         make_t_wave_annotation(valid_heartbeats, start, start_point, ax, length)
         make_p_wave_annotation(valid_heartbeats, start, start_point, ax, length)
 
     elif annotate == '1st Degree AV Block':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
         make_p_wave_annotation(valid_heartbeats, start, start_point, ax, length)
         ax.annotate('PR Interval > 0.2', xy=(valid_heartbeats[start + 1].p_wave.start - start_point, 200),
                     xytext=(valid_heartbeats[start + 1].p_wave.start - start_point - 120, 800),
@@ -387,7 +392,7 @@ def plot_lead_2(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: 
                     zorder=5, fontsize=25, ha='center')
 
     elif annotate == 'Atrial Fibrillation':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
         # this for loop plots the rectangles
         for i in range(0, length - 1):
@@ -411,7 +416,7 @@ def plot_lead_2(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: 
 
     elif annotate == 'Normal Sinus Rhythm':
         make_r_wave_annotation(valid_heartbeats, start, start_point, ax, length)
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
         ax.annotate('QRS < 0.12', xy=(valid_heartbeats[start + 1].r_wave.end - start_point, 300),
                     xytext=(valid_heartbeats[start + 1].r_wave.end - start_point + 50, 800),
@@ -420,7 +425,7 @@ def plot_lead_2(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: 
 
     elif annotate == 'Sinus Tachycardia':
         make_r_wave_annotation(valid_heartbeats, start, start_point, ax, length)
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
         ax.annotate('QRS < 0.12', xy=(valid_heartbeats[start + 1].r_wave.end - start_point, 300),
                     xytext=(valid_heartbeats[start + 1].r_wave.end - start_point + 50, 800),
@@ -433,10 +438,10 @@ def plot_lead_3(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: 
     plot_setup(ax, start_point, end_point, 'III')
 
     if annotate == 'none':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
     elif annotate == 'Atrial Fibrillation':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
         # This for loop plots the highlights
         for i in range(0, length):
@@ -445,7 +450,7 @@ def plot_lead_3(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: 
 
     elif annotate == 'Normal Sinus Rhythm':
         make_p_wave_annotation(valid_heartbeats, start, start_point, ax, length)
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
         ax.annotate('PR Interval: 0.12 - 0.2', xy=(valid_heartbeats[start + 1].p_wave.start - start_point, 200),
                     arrowprops=dict(facecolor='green', shrink=0.05, linewidth=5),
@@ -454,7 +459,7 @@ def plot_lead_3(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: 
 
     elif annotate == 'Sinus Tachycardia':
         make_p_wave_annotation(valid_heartbeats, start, start_point, ax, length)
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
         ax.annotate('PR Interval: 0.12 - 0.2', xy=(valid_heartbeats[start + 1].p_wave.end - start_point, 200),
                     arrowprops=dict(facecolor='green', shrink=0.05, linewidth=5),
@@ -467,7 +472,7 @@ def plot_lead_avr(ax: plt.Axes, data: NDArray[float], annotate: str, start_point
     plot_setup(ax, start_point, end_point, 'aVR')
 
     if annotate == 'none':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
 
 def plot_lead_avl(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
@@ -475,7 +480,7 @@ def plot_lead_avl(ax: plt.Axes, data: NDArray[float], annotate: str, start_point
     plot_setup(ax, start_point, end_point, 'aVL')
 
     if annotate == 'none':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
 
 def plot_lead_avf(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
@@ -483,7 +488,7 @@ def plot_lead_avf(ax: plt.Axes, data: NDArray[float], annotate: str, start_point
     plot_setup(ax, start_point, end_point, 'aVF')
 
     if annotate == 'none':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
 
 def plot_lead_v1(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
@@ -491,7 +496,7 @@ def plot_lead_v1(ax: plt.Axes, data: NDArray[float], annotate: str, start_point:
     plot_setup(ax, start_point, end_point, 'V1')
 
     if annotate == 'none':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
 
 def plot_lead_v2(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
@@ -499,9 +504,9 @@ def plot_lead_v2(ax: plt.Axes, data: NDArray[float], annotate: str, start_point:
     plot_setup(ax, start_point, end_point, 'V2')
 
     if annotate == 'none':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
     elif annotate == '1st Degree AV Block':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
         make_p_wave_annotation(valid_heartbeats, start, start_point, ax, length)
 
 
@@ -510,7 +515,7 @@ def plot_lead_v3(ax: plt.Axes, data: NDArray[float], annotate: str, start_point:
     plot_setup(ax, start_point, end_point, 'V3')
 
     if annotate == 'none':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
 
 def plot_lead_v4(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
@@ -518,7 +523,7 @@ def plot_lead_v4(ax: plt.Axes, data: NDArray[float], annotate: str, start_point:
     plot_setup(ax, start_point, end_point, 'V4')
 
     if annotate == 'none':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
 
 def plot_lead_v5(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
@@ -526,7 +531,7 @@ def plot_lead_v5(ax: plt.Axes, data: NDArray[float], annotate: str, start_point:
     plot_setup(ax, start_point, end_point, 'V5')
 
     if annotate == 'none':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
 
 def plot_lead_v6(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: int, end_point: int,
@@ -534,7 +539,7 @@ def plot_lead_v6(ax: plt.Axes, data: NDArray[float], annotate: str, start_point:
     plot_setup(ax, start_point, end_point, 'V6')
 
     if annotate == 'none':
-        ax.plot(data[start_point:end_point], color='black', zorder=4)
+        ax.plot(data[start_point:end_point], color='black', zorder=4, linewidth=line_width)
 
 
 def find_correct_rpeaks(data: NDArray[float], rpeaks1: dict, rpeaks2: dict, rpeaks3: dict, end_point: int,
@@ -641,7 +646,14 @@ def find_correct_rpeaks(data: NDArray[float], rpeaks1: dict, rpeaks2: dict, rpea
 
 def plot_12_ecgs(data: NDArray[float], name_of_arrhythmia: str) -> NoReturn:
     annotations = []
-    fig, axs = plt.subplots(nrows=3, ncols=4, figsize=(40, 19.68), sharey='all')
+    row_height = 6
+    rows = 3
+    columns = 4
+    sections = 1300 / 500
+
+    fig, axs = plt.subplots(nrows=rows, ncols=columns,
+                            figsize=(sections * columns * 3, rows * row_height * 3 / 5),
+                            sharey='all')
 
     # Sets up our 12 axis
     ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8, ax9, ax10, ax11, ax12 = axs.flatten()
@@ -737,11 +749,10 @@ def plot_12_ecgs(data: NDArray[float], name_of_arrhythmia: str) -> NoReturn:
     #     plt.text(0.0, -.025, ('Time between big boxes: '+ str(float(f'{time:.6f}')) + ' seconds'), fontsize=40, transform=plt.gcf().transFigure)
 
     # plt.show()
-    plt.close('all')
 
     # getting the svgbites of our figure and returning it
-    svgBites = return_svg_bytes()
-    return svgBites
+    png_bytes = return_png_bytes()
+    return png_bytes
 
 
 if __name__ == '__main__':
