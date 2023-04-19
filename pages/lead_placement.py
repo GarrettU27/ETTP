@@ -15,7 +15,7 @@ class LeadPlacement(QWidget):
         self.layout = QVBoxLayout(self)
         self.layout.addWidget(HeadingLabel("Where are the 12 Leads Placed on the Body?"))
 
-        layout2 = QHBoxLayout()
+        content = QHBoxLayout()
         self.lead_placement_explanation = ResizingTextEdit()
         self.lead_placement_explanation.setReadOnly(True)
 
@@ -113,30 +113,28 @@ class LeadPlacement(QWidget):
         </ul>
         """)
 
-        self.layout.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignTop)
+        images = QVBoxLayout()
+        images.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignTop)
+
         image = ImageWidget(True)
         pixmap = QPixmap('images:lead_placement.png')
         image.setPixmap(pixmap)
         image.setMaximumHeight(500)
 
-        self.layout.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignRight)
         image2 = ImageWidget(True)
         pixmap2 = QPixmap('images:Annoatated_ECGcolor.png')
         image2.setPixmap(pixmap2)
         image2.setMaximumHeight(500)
 
-        layout2.addWidget(image2)
-        layout2.setAlignment(image2, PyQt6.QtCore.Qt.AlignmentFlag.AlignRight)
-        layout2.setSpacing(50)
-        layout2.setStretch(0, 1)
-        layout2.setStretch(1, 1)
+        images.addWidget(image)
+        images.addWidget(image2)
 
-        layout2.addWidget(self.lead_placement_explanation)
-        layout2.addWidget(image)
-        layout2.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignLeft)
-        layout2.setSpacing(50)
+        content.addWidget(self.lead_placement_explanation)
+        content.addLayout(images)
+        content.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignLeft)
+        content.setSpacing(50)
 
-        layout2.setStretch(0, 1)
-        layout2.setStretch(1, 1)
+        content.setStretch(0, 1)
+        content.setStretch(1, 1)
 
-        self.layout.addLayout(layout2)
+        self.layout.addLayout(content)

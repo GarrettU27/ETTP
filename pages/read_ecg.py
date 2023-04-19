@@ -17,8 +17,9 @@ class ReadECG(QWidget):
         self.layout = QVBoxLayout(self)
         self.layout.addWidget(HeadingLabel("How do I read a 12-lead ECG?"))
 
-        layout2 = QHBoxLayout()
-        layout3 = QVBoxLayout()
+        general_ecg_explanation = QHBoxLayout()
+        ecg_breakdown = QVBoxLayout()
+        images = QVBoxLayout()
         self.read_ecg_explanation = ResizingTextEdit()
         self.read_ecg_explanation.setReadOnly(True)
 
@@ -67,23 +68,23 @@ class ReadECG(QWidget):
         self.image.setPixmap(self.pixmap)
         self.image.setMaximumHeight(800)
 
-        layout2.addWidget(self.image)
-        layout2.setAlignment(self.image, PyQt6.QtCore.Qt.AlignmentFlag.AlignTop)
-        layout2.addWidget(self.read_ecg_explanation)
-
         self.image2 = ImageWidget(True)
         self.pixmap = QPixmap("images:HeartRates.png")
         self.image2.setPixmap(self.pixmap)
         self.image2.setMaximumHeight(1000)
 
-        layout2.addWidget(self.image2)
-        layout2.setAlignment(self.image2, PyQt6.QtCore.Qt.AlignmentFlag.AlignLeft)
-        layout2.setSpacing(50)
+        images.addWidget(self.image)
+        images.addWidget(self.image2)
 
-        layout2.setStretch(0, 1)
-        layout2.setStretch(1, 1)
+        general_ecg_explanation.addWidget(self.read_ecg_explanation)
+        general_ecg_explanation.addLayout(images)
+        general_ecg_explanation.setAlignment(self.image2, PyQt6.QtCore.Qt.AlignmentFlag.AlignLeft)
+        general_ecg_explanation.setSpacing(50)
 
-        self.layout.addLayout(layout2)
+        general_ecg_explanation.setStretch(0, 1)
+        general_ecg_explanation.setStretch(1, 1)
+
+        self.layout.addLayout(general_ecg_explanation)
 
         rhythms = [
             ("images:NormalSinusRhythm.png",
@@ -102,10 +103,10 @@ class ReadECG(QWidget):
             ("images:ThirdDegreeAVBlock.png", "3rd Degree AV Block: p wave is regular but out of sync with QRS."),
         ]
 
-        layout3.setSpacing(30)
-        layout3.setContentsMargins(0, 60, 0, 0)
+        ecg_breakdown.setSpacing(30)
+        ecg_breakdown.setContentsMargins(0, 60, 0, 0)
 
-        layout3.addWidget(ParagraphLabel(
+        ecg_breakdown.addWidget(ParagraphLabel(
             "<strong>Next we will look at a sampling of ideal arrythmia waveforms. Training mode will provide you with more details about each arrythmia, but this will give you a good place to start</strong>"))
 
         # example Arrythmia layout
@@ -114,11 +115,11 @@ class ReadECG(QWidget):
             horizontal_layout.setSpacing(30)
             horizontal_layout.addWidget(ArrythmiaPicture(image))
             horizontal_layout.addWidget(ParagraphLabel(name))
-            layout3.addLayout(horizontal_layout)
+            ecg_breakdown.addLayout(horizontal_layout)
 
-        layout3.addWidget(ParagraphLabel(
+        ecg_breakdown.addWidget(ParagraphLabel(
             "ECG Examples Source: Chatterjee, S. and Miller, A. Biomedical Instrumentation Systems. Delmar, Cengage Learning. 2010."))
 
         self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
                                               PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
-        self.layout.addLayout(layout3)
+        self.layout.addLayout(ecg_breakdown)
