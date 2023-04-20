@@ -1,5 +1,5 @@
 import PyQt6
-from PyQt6 import QtCore, QtGui
+from PyQt6 import QtCore
 from PyQt6.QtGui import QCursor
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QComboBox, QVBoxLayout, QSpacerItem
 
@@ -82,6 +82,8 @@ class StartNew(QWidget):
         self.begin_button.clicked.connect(self.begin)
         submission_layout.setSpacing(30)
 
+        submission_layout.setAlignment(self.begin_button, PyQt6.QtCore.Qt.AlignmentFlag.AlignBottom)
+
         self.layout.addWidget(submission_row)
         self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
                                               PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
@@ -118,19 +120,3 @@ class StartNew(QWidget):
 
     def number_text(self) -> str:
         return "Number"
-
-    def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
-        self.update_buttons_font_size()
-
-    def update_buttons_font_size(self):
-        button_font_size = 40
-
-        # this 'magic' 795 number came from using a pixel ruler on my
-        # computer to determine when the button becomes too wide
-        # I just end up using this as the break point for all
-        # size updates
-        if self.width() <= 695:
-            button_font_size = 20
-
-        for checkbox, _ in self.checkboxes:
-            checkbox.set_font_size(button_font_size)

@@ -23,7 +23,7 @@ class Heartbeat:
     r_wave: Wave
 
 
-line_width = 3
+line_width = 2
 
 
 def point_finder(start_r: List[int], end_r: List[int], start_t: List[int], end_t: List[int], start_p: List[int],
