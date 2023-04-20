@@ -4,7 +4,7 @@ from sqlite_setup import get_sqlite_connection
 def convertName(arrhythmiaId):
     if(arrhythmiaId == 1):
         return('1st Degree AV Block')
-    if(arrhythmiaId == 2):
+    if(arrhythmiaId == 3):
         return('2nd Degree AV Block')
     if(arrhythmiaId == 52):
         return('WPW Syndrome')

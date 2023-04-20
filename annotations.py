@@ -855,8 +855,8 @@ def plot12ECGs(data, nameOfArrhythmia):
     #     #prints them below the graph
     #     plt.text(0.0, -.025, ('Time between big boxes: '+ str(float(f'{time:.6f}')) + ' seconds'), fontsize=40, transform=plt.gcf().transFigure)
 
-    # plt.show()
-    plt.close('all')
+    plt.show()
+    # plt.close('all')
 
     # getting the svgbites of our figure and returning it
     svgBites = return_svg_bytes()
