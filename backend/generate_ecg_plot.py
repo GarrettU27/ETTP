@@ -27,7 +27,14 @@ def get_ecg_svg():
 
 
 def create_train_ecg(data, arrhythmia) -> io.BytesIO:
-    return plot_12_ecgs(data, arrhythmia)
+    ecg = []
+
+    for ecg_lead in data:
+        ecg.append([convert_to_millivolts(bits) for bits in ecg_lead])
+
+    ecg = np.array(ecg)
+
+    return plot_12_ecgs(ecg, arrhythmia)
 
 
 def create_test_ecg(data) -> io.BytesIO:

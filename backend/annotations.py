@@ -868,8 +868,9 @@ def plot_12_ecgs(data: NDArray[float], name_of_arrhythmia: str) -> NoReturn:
     #     plt.text(0.0, -.025, ('Time between big boxes: '+ str(float(f'{time:.6f}')) + ' seconds'), fontsize=40, transform=plt.gcf().transFigure)
 
     # plt.show()
-
+    
     png_bytes = return_png_bytes()
+    plt.close(fig)
     return png_bytes
 
 
