@@ -1,8 +1,9 @@
-import sqlite3
-import os
-from scipy.io import loadmat
-from backend.sqlite_setup import get_sqlite_connection
 import csv
+import os
+
+from scipy.io import loadmat
+
+from backend.sqlite_setup import get_sqlite_connection
 
 path = "a-large-scale-12-lead-electrocardiogram-database-for-arrhythmia-study-1.0.0/WFDBRecords"
 conditions_path = "a-large-scale-12-lead-electrocardiogram-database-for-arrhythmia-study-1.0.0/ConditionNames_SNOMED-CT.csv"
@@ -10,11 +11,12 @@ con = get_sqlite_connection()
 cur = con.cursor()
 
 # drop the table if it exists
+print("drop tables")
 cur.execute("DROP TABLE IF EXISTS patient")
 cur.execute("DROP TABLE IF EXISTS diagnosis")
 cur.execute("DROP TABLE IF EXISTS arrhythmia")
 
-
+print("create tables")
 cur.execute("""
 CREATE TABLE patient (
     id INTEGER PRIMARY KEY, 
@@ -39,7 +41,6 @@ CREATE TABLE arrhythmia(
     name,
     code
 )""")
-
 
 processed_files = set()
 
@@ -72,14 +73,13 @@ def add_to_db(hea_data, mat_data):
             cur.execute("INSERT INTO diagnosis VALUES(NULL, ?, ?)", (patient_row_id, arrhythmia_row_id))
 
 
-
-
 with open(conditions_path, newline='') as csvfile:
     csvreader = csv.reader(csvfile)
     next(csvreader)
 
     for row in csvreader:
-        cur.execute("INSERT INTO arrhythmia VALUES(NULL, ?, ?, ?)", (row[0], row[1].upper().replace(u'\xc2\xa0', ' '), row[2]))
+        cur.execute("INSERT INTO arrhythmia VALUES(NULL, ?, ?, ?)",
+                    (row[0], row[1].upper().replace(u'\xc2\xa0', ' '), row[2]))
 
 # This for loop recursively checks all files in the path given and will output the array hea_files which has the path
 # to all hea files found
@@ -94,6 +94,7 @@ for dirpath, dirs, files in os.walk(path):
             add_to_db(hea_data, mat_data)
 
             processed_files.add(fname)
+            print("processed:", fname)
 
 con.commit()
 con.close()

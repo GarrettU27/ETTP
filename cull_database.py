@@ -1,3 +1,8 @@
+import os
+from multiprocessing import Pool
+
+import numpy.typing
+
 from backend.annotations import plot_12_ecgs
 from backend.arrhythmia_annotation import get_arrhythmia_annotation, get_supported_arrhythmias
 from backend.sqlite_setup import get_sqlite_connection
@@ -19,12 +24,15 @@ Result
 
 
 def cull_database():
+    print("Start cull")
+
     con = get_sqlite_connection()
     cur = con.cursor()
     arrhythmias = get_supported_arrhythmias()
 
     # This table will be used within the DELETE FROM statement and then it will be dropped
     cur.execute("DROP TABLE IF EXISTS goodecgs")
+    print("Finish dropping goodecgs")
     cur.execute("""
     CREATE TABLE goodecgs (
         id INTEGER PRIMARY KEY,
@@ -33,6 +41,7 @@ def cull_database():
         FOREIGN KEY(patient_id) REFERENCES patient(id) ON DELETE CASCADE ON UPDATE CASCADE,
         FOREIGN KEY(arrhythmia_id) REFERENCES arrhythmia(id) ON DELETE CASCADE ON UPDATE CASCADE
     )""")
+    print("Finish creating goodecgs")
 
     # Loop through all input arrhythmia IDs
     for arrhythmia in arrhythmias:
@@ -44,6 +53,12 @@ def cull_database():
 
         while num_selected < 200:
             additional_diagnosis = additional_diagnosis + 1
+
+            if additional_diagnosis > 10:
+                print("Ran out of ECGs")
+                break
+
+            print("Start data query")
             query_res = cur.execute("""
             SELECT p1.id, p1.ecg
             FROM patient p1, diagnosis d1
@@ -56,22 +71,23 @@ def cull_database():
                     p2.id = p1.id AND
                     d2.arrhythmia_id <> """ + str(arrhythmia.id) + """
                 ) = """ + str(additional_diagnosis)
-                                    ).fetchall()
+                                    )
+            print("Finish data query")
 
-            for ecg_data in query_res:
-                try:
-                    _ = plot_12_ecgs(ecg_data[1], arrhythmia.rhythm_name)
-                    # Insert into non-delete table
-                    cur.execute("INSERT INTO goodecgs VALUES(NULL, ?, ?)", (ecg_data[0], arrhythmia.id))
-                    con.commit()
-                    num_selected = num_selected + 1
-                    print("temp_id = " + str(arrhythmia.id))
-                    print("num_selected = " + str(num_selected))
-                    print("--------------")
-                    if num_selected >= 200:
-                        break
-                except Exception as error:
-                    pass
+            with Pool() as pool:
+                results = pool.imap(check_ecg, [ecg_data + (arrhythmia.rhythm_name,) for ecg_data in query_res])
+
+                for ecg_id in results:
+                    if ecg_id != -1:
+                        num_selected += 1
+                        print("num_selected = ", str(num_selected), "added id = ", ecg_id, "arrhythmia name = ",
+                              arrhythmia.rhythm_name)
+
+                        cur.execute("INSERT INTO goodecgs VALUES(NULL, ?, ?)", (ecg_id, arrhythmia.id))
+                        if num_selected >= 200:
+                            break
+
+    con.commit()
 
     # Delete non-matching entries from diagnosis
     cur.execute("""
@@ -94,9 +110,23 @@ def cull_database():
     )
     """)
 
+    cur.execute("VACUUM")
+
     cur.execute("DROP TABLE IF EXISTS goodecgs")
     con.commit()
     con.close()
+
+
+def check_ecg(process_input: tuple[int, numpy.typing.NDArray[float], str]) -> int:
+    ecg_id, ecg_data, rhythm_name = process_input
+
+    try:
+        print(os.getpid(), ": Start ECG Data check")
+        _ = plot_12_ecgs(ecg_data, rhythm_name)
+        print(os.getpid(), ": Complete ECG plotting")
+        return ecg_id
+    except Exception as error:
+        return -1
 
 
 if __name__ == '__main__':

@@ -123,10 +123,9 @@ def get_random_patient_id(cur: Cursor, arrhythmia_id: str) -> str:
     """
 
     return str(cur.execute("""
-                SELECT patient_id, arrhythmia_id, COUNT(patient_id) c
+                SELECT patient_id, arrhythmia_id
                 FROM diagnosis
                 WHERE arrhythmia_id = ?
-                GROUP BY patient_id HAVING c = 1
                 ORDER BY RANDOM()
             """, (arrhythmia_id,)).fetchone()[0])
 

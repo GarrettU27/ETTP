@@ -374,7 +374,7 @@ def plot_lead_1(ax: plt.axes, data: NDArray[float], annotate: str, start_point: 
 
         ax.text(150, 850, 'Regular HR > 100', fontsize=30, color='blue')
 
-    elif annotate == 'WPW Syndrome':
+    elif annotate == 'Wolff-Parkinson-White Syndrome':
         ax.plot(data[start_point:end_point], color='black', zorder=4)
         _, rpeaks = nk.ecg_peaks(data, sampling_rate=500)
         ax.annotate('Delta Wave on\n upstroke of QRS', xy=(rpeaks['ECG_R_Peaks'][1], 300),
@@ -468,7 +468,7 @@ def plot_lead_2(ax: plt.Axes, data: NDArray[float], annotate: str, start_point: 
     elif annotate == 'Sinus Tachycardia':
         annotate_qrs_interval(ax, data, end_point, length, start, start_point, valid_heartbeats)
 
-    elif annotate == 'WPW Syndrome':
+    elif annotate == 'Wolff-Parkinson-White Syndrome':
         rpeaks = highlight_r_peaks(ax, data, end_point, start_point)
 
         ax.annotate('Short PR Wave', xy=(rpeaks['ECG_R_Peaks'][1] - 100, 150),
@@ -797,8 +797,9 @@ def plot_12_ecgs(data: NDArray[float], name_of_arrhythmia: str) -> NoReturn:
                        'Sinus Tachycardia', 'none', 'none', 'none']
         start_point, valid_heartbeats, start, end_point = scan_data(data[1])
 
-    elif name_of_arrhythmia == 'WPW Syndrome':
-        annotations = ['WPW Syndrome', 'none', 'none', 'none', 'WPW Syndrome', 'none', 'none', 'none', 'none', 'none',
+    elif name_of_arrhythmia == 'Wolff-Parkinson-White Syndrome':
+        annotations = ['Wolff-Parkinson-White Syndrome', 'none', 'none', 'none', 'Wolff-Parkinson-White Syndrome',
+                       'none', 'none', 'none', 'none', 'none',
                        'none', 'none']
         start_point = 0
         end_point = start_point + 1300
@@ -868,7 +869,7 @@ def plot_12_ecgs(data: NDArray[float], name_of_arrhythmia: str) -> NoReturn:
     #     plt.text(0.0, -.025, ('Time between big boxes: '+ str(float(f'{time:.6f}')) + ' seconds'), fontsize=40, transform=plt.gcf().transFigure)
 
     # plt.show()
-    
+
     png_bytes = return_png_bytes()
     plt.close(fig)
     return png_bytes
