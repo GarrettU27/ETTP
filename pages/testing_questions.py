@@ -22,16 +22,20 @@ class TestingQuestions(QWidget):
     test_results: TestingResults
     current_question = 0
     total_questions: int
+    end_test: bool
 
     questions: List[Question]
     answer_buttons: List[ChoiceButton] = []
     answers: List[str] = []
     choices: List[str] = []
+    questionChoices: List[List[str]]
 
     def __init__(self, set_state: Callable, test_results: TestingResults):
         super().__init__()
         self.test_results = test_results
         self.set_state = set_state
+        self.end_test = False
+        self.questionChoices = []
 
         self.ecg_plot = ImageWidget()
         self.ecg_plot.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
@@ -63,6 +67,7 @@ class TestingQuestions(QWidget):
     def start_new_test(self, questions: List[Question], choices: List[str]):
         self.questions = questions
         self.choices = choices
+        self.end_test = False
         self.reset_test()
 
     def reset_test(self):
@@ -75,10 +80,14 @@ class TestingQuestions(QWidget):
 
         self.answer_buttons = []
 
+        i = 0
+        self.questionChoices.append([])
         for choice in self.choices:
             answer_button = ChoiceButton(choice)
+            self.questionChoices[0].append(choice)
             answer_button.clicked.connect(partial(self.show_next_question, choice))
             self.answer_buttons.append(answer_button)
+            i+=1
 
         self.update_buttons_font_size()
 
@@ -107,16 +116,42 @@ class TestingQuestions(QWidget):
         self.answers.append(previous_questions_answer)
         self.current_question += 1
         if self.current_question >= self.total_questions:
+            self.end_test = True
             #self.test_results.update_page(self.answers, self.questions)
             self.test_results.updatePage(self.answers,self.questions)
             self.set_state()
         else:
+            #Implement some code here to save the previous question's choices
             self.load_question()
 
     def load_question(self):
         self.spinner.start()
         load_test_ecg = LoadTestECG(self)
         QThreadPool.globalInstance().start(load_test_ecg)
+
+    def show_previous_question(self, question_num):
+        if self.end_test:
+            self.current_question = question_num
+            self.load_question()
+
+            for answer_button in self.answer_buttons:
+                self.grid.removeWidget(answer_button)
+
+            self.answer_buttons = []
+
+            for choice in self.questionChoices: # We can uncomment this once there's more implemented[self.current_question]:
+                answer_button = ChoiceButton(choice)
+                if choice == self.answers[self.current_question]:
+                    answer_button.setStyleSheet("background-color : red")
+                if choice == self.questions[self.current_question].correct_answer:
+                    answer_button.setStyleSheet("background-color : green")
+                self.answer_buttons.append(answer_button)
+            self.update_buttons_font_size()
+            for (i, answer_button) in enumerate(self.answer_buttons):
+                self.grid.addWidget(answer_button, math.floor(i / 2), i % 2)
+            self.set_state()
+
+
 
     @pyqtSlot(io.BytesIO)
     def show_question(self, data):
@@ -128,7 +163,6 @@ class TestingQuestions(QWidget):
         pixmap = QPixmap()
         pixmap.loadFromData(data)
         self.ecg_plot.setPixmap(pixmap)
-
 
 # https://gist.github.com/eyllanesc/1a09157d17ba13d223c312b28a81c320
 class LoadTestECG(QRunnable):

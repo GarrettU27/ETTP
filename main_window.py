@@ -71,7 +71,7 @@ class MainWindow(QMainWindow):
         self.page_list = None
         self.create_page_list()
 
-        burger_icon = qtawesome.icon("fa5s.bars")
+        burger_icon = qtawesome.icon("fa5s.bars",color = "black")
         self.burger_button = QPushButton(burger_icon, "")
         self.burger_button.setIconSize(QSize(30, 30))
         self.burger_button.setCursor(QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
@@ -184,22 +184,22 @@ class MainWindow(QMainWindow):
     def create_page_list(self):
         self.page_list = BurgerMenu()
         home = BurgerItem(["Home"], self.home)
-        home.setIcon(0, qtawesome.icon("fa5s.home"))
+        home.setIcon(0, qtawesome.icon("fa5s.home",color = "black"))
 
         about_us = BurgerItem(["About Us"], self.about_us)
-        about_us.setIcon(0, qtawesome.icon("fa5s.address-card"))
+        about_us.setIcon(0, qtawesome.icon("fa5s.address-card",color = "black"))
 
         train = BurgerItem(["Train"], self.start_new_training)
-        train.setIcon(0, qtawesome.icon("fa5s.globe"))
+        train.setIcon(0, qtawesome.icon("fa5s.globe",color = "black"))
 
         ecg_reading = BurgerItem(["ECG Reading"], self.read_ecg)
-        ecg_reading.setIcon(0, qtawesome.icon("fa5s.book"))
+        ecg_reading.setIcon(0, qtawesome.icon("fa5s.book",color = "black"))
 
         ecg_reading.addChild(BurgerItem(["Reading an ECG Strip"], self.read_ecg))
         ecg_reading.addChild(BurgerItem(["Lead Placements"], self.lead_placement))
 
         test = BurgerItem(["Test"], self.start_new_testing)
-        test.setIcon(0, qtawesome.icon("fa5s.pen-nib"))
+        test.setIcon(0, qtawesome.icon("fa5s.pen-nib",color = "black"))
 
         self.page_list.addTopLevelItem(home)
         self.page_list.addTopLevelItem(train)

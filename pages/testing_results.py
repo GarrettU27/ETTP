@@ -11,6 +11,7 @@ from backend.get_ecg_from_db import Question
 from components.heading_label import HeadingLabel
 from components.main_button import MainButton
 from components.paragraph_label import ParagraphLabel
+from pages import buffer
 
 
 class CollapsibleBox(QWidget):
@@ -39,7 +40,7 @@ class CollapsibleBox(QWidget):
         )
         self.content_area.setFrameShape(QFrame.NoFrame)
 
-        lay = QVBoxLayout(self)
+        lay = QGridLayout(self)
         lay.setSpacing(0)
         lay.setContentsMargins(0, 0, 0, 0)
         lay.addWidget(self.toggle_button)
@@ -71,6 +72,9 @@ class CollapsibleBox(QWidget):
     def setContentLayout(self, layout):
         lay = self.content_area.layout()
         del lay
+
+        layout.setSpacing(30)
+        layout.setHorizontalSpacing(60)
         self.content_area.setLayout(layout)
         collapsed_height = (
             self.sizeHint().height() - self.content_area.maximumHeight()
@@ -131,6 +135,15 @@ class TestingResults(QWidget):
             answer_label = ParagraphLabel(f"{i + 1}. {answer}", 40)
             answer_label.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
                                        PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
+            self.setStyleSheet("""
+            QLabel {
+                font-family: "Encode Sans";
+                font-weight: 400;
+                line-height: 150%;
+                height: auto;
+                padding: {0.4 * self.font_size}px;
+            }
+                            """)            
             self.answer_labels.append(answer_label)
 
             if answer == question.correct_answer:
@@ -189,8 +202,20 @@ class TestingResults(QWidget):
 
             #Prepares an answer label that will be displayed on the left side of the screen showing what the user entered
             answer_label = ParagraphLabel(f"{i + 1}. {answer}", 40)
+            answer_label.setMaximumHeight(30)
             answer_label.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
                                        PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
+            answer_label.setStyleSheet("""
+            QLabel {
+                font-family: "Encode Sans";
+                font-weight: 400;
+                line-height: 150%;
+                height: auto;
+                margin-right: 15px;
+                margin-top: 30px;
+                margin-bottom: 30px;
+            }
+                            """)
             #If it's the first run, then skip the if statement otherwise it will error
             if len(arrhythmia_tested) == 0:
                 #adds arrhythmia to list so it will not have another collapsible box created corresponding to that arrhythmia
@@ -198,8 +223,9 @@ class TestingResults(QWidget):
                 #create the collapsible box layout and format it correctly
                 box = CollapsibleBox(str(question.correct_answer))
                 lay = QGridLayout()
-                lay.setSpacing(30)
-                lay.setHorizontalSpacing(60)
+                #lay.setContentsMargins(0,0,0,0)
+                #lay.setSpacing(30)
+                #lay.setHorizontalSpacing(60)
                 lay.update()
 
                 #add the corresponding objects and values to their corresponding lists, 
@@ -234,6 +260,7 @@ class TestingResults(QWidget):
                 for i in range(len(arrhythmia_tested)):
                     if(arrhythmia_tested[i] == question.correct_answer):
                         #add the answer_label to a global list and add the widget to the collapsible box layout
+
                         self.answer_labels.append(answer_label)
                         internals[i].addWidget(answer_label,entries[i],0)
                         #Create and add a check widget to the collapsible box layout
@@ -244,6 +271,12 @@ class TestingResults(QWidget):
                         check_widget.update()
                         internals[i].addWidget(check_widget,entries[i],1)
                         self.icons.append(check_widget)
+                        note_label = ParagraphLabel(" ",20)
+                        note_label.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
+                                PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
+                        note_label.setMaximumHeight(30)
+                        self.note_labels.append(note_label)
+                        internals[i].addWidget(note_label, entries[i], 2)
                         #Increment the corresponding values for each arrythmia
                         entries[i]+=1
                         arrhythmia_correct[i]+=1
@@ -268,9 +301,10 @@ class TestingResults(QWidget):
                         internals[i].addWidget(x_widget, entries[i], 1)
                         self.icons.append(x_widget)
                         #Create a label that is at the right side of the screen with the corect arrhythmia for that question
-                        note_label = ParagraphLabel(f"Correct answer: {question.correct_answer}", 40)
+                        note_label = ParagraphLabel(f"Correct answer: {question.correct_answer}", 20)
                         note_label.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
                                          PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
+                        note_label.setMaximumHeight(30)
                         self.note_labels.append(note_label)
                         internals[i].addWidget(note_label, entries[i], 2)
                         #Update corresponding values for each arrhythmia
@@ -279,12 +313,7 @@ class TestingResults(QWidget):
 
         for i in range(len(arrhythmia_tested)):
             box = CollapsibleBox(str(arrhythmia_tested[i] + ": "+str(arrhythmia_correct[i])+"/"+str(arrhythmia_freq[i])))
-            if self.width() <= 1380:
-                internals[i].setSpacing(15)
-                internals[i].setHorizontalSpacing(30)
-            else:   
-                internals[i].setSpacing(30)
-                internals[i].setHorizontalSpacing(60)
+            #internals[i].
             box.setContentLayout(internals[i])
             self.grid.addWidget(box,i,0) 
         self.update_buttons_font_size()
@@ -314,7 +343,7 @@ class TestingResults(QWidget):
         self.update_buttons_font_size()
 
     def update_buttons_font_size(self):
-        button_font_size = 40
+        button_font_size = 20
 
         # Magic size I measured again
         if self.width() <= 1380:
