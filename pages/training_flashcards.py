@@ -7,7 +7,7 @@ from PyQt6.QtCore import Qt, pyqtSlot, QThreadPool, QRunnable, QMetaObject, Q_AR
 from PyQt6.QtGui import QColor, QPixmap
 from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QHBoxLayout
 
-from backend.generate_ecg_plot import create_test_ecg
+from backend.generate_ecg_plot import create_train_ecg
 from backend.get_ecg_from_db import Flashcard
 from components.heading_label import HeadingLabel
 from components.image_widget import ImageWidget
@@ -149,6 +149,7 @@ class LoadTrainingECG(QRunnable):
         self.training_flashcards = training_flashcards
 
     def run(self):
-        ecg = create_test_ecg(self.training_flashcards.flashcards[self.training_flashcards.current_flashcard].ecg)
+        current_flashcard = self.training_flashcards.flashcards[self.training_flashcards.current_flashcard]
+        ecg = create_train_ecg(current_flashcard.ecg, current_flashcard.arrhythmia_annotation.rhythm_name)
         QMetaObject.invokeMethod(self.training_flashcards, "show_flashcard", Qt.ConnectionType.QueuedConnection,
                                  Q_ARG(bytes, ecg))

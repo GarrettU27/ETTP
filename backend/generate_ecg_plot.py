@@ -3,7 +3,7 @@ import io
 import numpy as np
 from scipy.io import loadmat
 
-from backend.annotations import plot12ECGs
+from backend.annotations import plot_12_ecgs
 from backend.ecg_plot import plot, return_png_bytes
 
 
@@ -26,8 +26,15 @@ def get_ecg_svg():
     return return_png_bytes()
 
 
-def create_train_ecg(data) -> io.BytesIO:
-    return plot12ECGs(data)
+def create_train_ecg(data, arrhythmia) -> io.BytesIO:
+    # ecg = []
+    #
+    # for ecg_lead in data:
+    #     ecg.append([convert_to_millivolts(bits) for bits in ecg_lead])
+    #
+    # ecg = np.array(ecg)
+
+    return plot_12_ecgs(data, arrhythmia)
 
 
 def create_test_ecg(data) -> io.BytesIO:

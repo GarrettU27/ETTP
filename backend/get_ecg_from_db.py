@@ -1,4 +1,3 @@
-import io
 import math
 import random
 from dataclasses import dataclass
@@ -21,13 +20,13 @@ class Arrhythmia:
 
 @dataclass
 class Question:
-    ecg: numpy.typing.NDArray
+    ecg: numpy.typing.NDArray[float]
     correct_answer: str
 
 
 @dataclass
 class Flashcard:
-    ecg: numpy.typing.NDArray
+    ecg: numpy.typing.NDArray[float]
     arrhythmia_annotation: ArrhythmiaAnnotation
 
 
@@ -102,7 +101,7 @@ def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: i
     cur = con.cursor()
 
     questions = []
-    choices = [get_arrhythmia_name(cur, arrhythmia.id) for arrhythmia in tested_arrhythmias]
+    choices = [get_arrhythmia_annotation(arrhythmia.id).rhythm_name for arrhythmia in tested_arrhythmias]
 
     for arrhythmia in tested_arrhythmias:
         for i in range(arrhythmia.amount):
@@ -110,7 +109,7 @@ def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: i
             ecg = get_patients_ecg(cur, patient_id)
             questions.append(Question(
                 ecg=ecg,
-                correct_answer=get_arrhythmia_name(cur, arrhythmia.id),
+                correct_answer=get_arrhythmia_annotation(arrhythmia.id).rhythm_name,
             ))
 
     random.shuffle(questions)
@@ -124,25 +123,16 @@ def get_random_patient_id(cur: Cursor, arrhythmia_id: str) -> str:
     """
 
     return str(cur.execute("""
-                SELECT patient_id, arrhythmia_id, COUNT(patient_id) c
+                SELECT patient_id, arrhythmia_id
                 FROM diagnosis
                 WHERE arrhythmia_id = ?
-                GROUP BY patient_id HAVING c = 1
                 ORDER BY RANDOM()
             """, (arrhythmia_id,)).fetchone()[0])
 
 
-def get_patients_ecg(cur: Cursor, patient_id: str) -> io.BytesIO:
+def get_patients_ecg(cur: Cursor, patient_id: str) -> numpy.typing.NDArray[float]:
     return cur.execute("""
                 SELECT patient.ecg 
                 FROM patient 
                 WHERE patient.id = ? 
                 """, (patient_id,)).fetchone()[0]
-
-
-def get_arrhythmia_name(cur: Cursor, arrhythmia_id: str) -> str:
-    return cur.execute("""
-                    SELECT arrhythmia.name
-                    FROM arrhythmia
-                    WHERE arrhythmia.id = ? 
-                    """, (arrhythmia_id,)).fetchone()[0].title()

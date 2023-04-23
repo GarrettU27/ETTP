@@ -38,8 +38,8 @@ class TestingQuestions(QWidget):
         self.questionChoices = []
 
         self.ecg_plot = ImageWidget()
-        self.ecg_plot.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
-                                    PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
+        self.ecg_plot.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
+                                    PyQt6.QtWidgets.QSizePolicy.Policy.Expanding)
 
         self.title = HeadingLabel("Test")
 
@@ -102,11 +102,13 @@ class TestingQuestions(QWidget):
     def update_buttons_font_size(self):
         button_font_size = 40
 
-        # this 'magic' 795 number came from using a pixel ruler on my
+        # this 'magic' numbers came from using a pixel ruler on my
         # computer to determine when the button becomes too wide
         # I just end up using this as the break point for all
         # size updates
-        if self.width() <= 795:
+        if self.width() <= 1380:
+            button_font_size = 30
+        if self.width() <= 1200:
             button_font_size = 20
 
         for answer_button in self.answer_buttons:

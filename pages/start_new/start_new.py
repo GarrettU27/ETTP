@@ -3,7 +3,7 @@ from PyQt6 import QtCore
 from PyQt6.QtGui import QCursor
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QComboBox, QVBoxLayout, QSpacerItem
 
-from arrhythmia import supported_arrhythmias
+from backend.arrhythmia_annotation import get_supported_arrhythmias
 from components.heading_label import HeadingLabel
 from components.main_button import MainButton
 from components.main_checkbox import MainCheckbox
@@ -30,8 +30,8 @@ class StartNew(QWidget):
 
         self.checkboxes = []
 
-        for index, arrhythmia in enumerate(supported_arrhythmias):
-            checkbox = MainCheckbox(arrhythmia.name)
+        for index, arrhythmia in enumerate(self.get_supported_arrhythmias()):
+            checkbox = MainCheckbox(arrhythmia.rhythm_name)
             checkbox.clicked.connect(self.update_begin_button)
             self.checkboxes.append((checkbox, arrhythmia.id))
             self.layout.addWidget(checkbox)
@@ -82,6 +82,8 @@ class StartNew(QWidget):
         self.begin_button.clicked.connect(self.begin)
         submission_layout.setSpacing(30)
 
+        submission_layout.setAlignment(self.begin_button, PyQt6.QtCore.Qt.AlignmentFlag.AlignBottom)
+
         self.layout.addWidget(submission_row)
         self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
                                               PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
@@ -103,6 +105,9 @@ class StartNew(QWidget):
                 arrhythmias.append(arrhythmia_id)
 
         return arrhythmias
+
+    def get_supported_arrhythmias(self):
+        return get_supported_arrhythmias()
 
     def heading_text(self) -> str:
         return "Heading"
