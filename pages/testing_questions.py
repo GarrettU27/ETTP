@@ -4,9 +4,9 @@ from functools import partial
 from typing import List, Callable
 
 import PyQt6
-from PyQt6 import QtGui
+from PyQt6 import QtGui, QtCore
 from PyQt6.QtCore import Qt, pyqtSlot, QThreadPool, QRunnable, QMetaObject, Q_ARG
-from PyQt6.QtGui import QColor, QPixmap
+from PyQt6.QtGui import QColor, QPixmap, QCursor
 from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout
 
 from backend.generate_ecg_plot import create_test_ecg
@@ -31,7 +31,8 @@ class TestingQuestions(QWidget):
     answers: List[str] = []
     choices: List[str] = []
 
-    def __init__(self, set_state: Callable, test_results: TestingResults, back_to_results: Callable, restart_test : Callable):
+    def __init__(self, set_state: Callable, test_results: TestingResults, back_to_results: Callable,
+                 restart_test: Callable):
         super().__init__()
         self.test_results = test_results
         self.set_state = set_state
@@ -94,10 +95,10 @@ class TestingQuestions(QWidget):
 
         exitButton = ChoiceButton("Exit test completely")
         exitButton.clicked.connect(partial(self.restart_test))
-        #Not sure what color should go here, but 
+        # Not sure what color should go here, but
         exitButton.setStyleSheet("QPushButton{{background: #ff6803;}}")
         exitButton.update()
-        self.grid.addWidget(exitButton,math.floor(len(self.choices)/2 + 1),0,1,2)
+        self.grid.addWidget(exitButton, math.floor(len(self.choices) / 2 + 1), 0, 1, 2)
         self.answer_buttons.append(exitButton)
         self.load_question()
 
@@ -118,18 +119,17 @@ class TestingQuestions(QWidget):
 
         for answer_button in self.answer_buttons:
             answer_button.set_font_size(button_font_size)
-        
 
     def show_next_question(self, previous_questions_answer: str):
         self.answers.append(previous_questions_answer)
         self.current_question += 1
         if self.current_question >= self.total_questions:
             self.end_test = True
-            #self.test_results.update_page(self.answers, self.questions)
-            self.test_results.updatePage(self.answers,self.questions)
+            # self.test_results.update_page(self.answers, self.questions)
+            self.test_results.updatePage(self.answers, self.questions)
             self.set_state()
         else:
-            #Implement some code here to save the previous question's choices
+            # Implement some code here to save the previous question's choices
             self.load_question()
 
     def load_question(self):
@@ -140,7 +140,6 @@ class TestingQuestions(QWidget):
     def show_previous_question(self, question_num):
         if self.end_test:
             self.current_question = question_num
-            
 
             for answer_button in self.answer_buttons:
                 self.grid.removeWidget(answer_button)
@@ -151,10 +150,12 @@ class TestingQuestions(QWidget):
                 answer_button.setDisabled(True)
                 if choice == self.answers[self.current_question]:
                     answer_button.setDisabled(False)
+                    answer_button.setCursor(QCursor(QtCore.Qt.CursorShape.ArrowCursor))
                     answer_button.status = 2
                     answer_button.set_wrong_button_style()
                 if choice == self.questions[self.current_question].correct_answer:
                     answer_button.setDisabled(False)
+                    answer_button.setCursor(QCursor(QtCore.Qt.CursorShape.ArrowCursor))
                     answer_button.status = 1
                     answer_button.set_right_button_style()
                 self.answer_buttons.append(answer_button)
@@ -165,11 +166,9 @@ class TestingQuestions(QWidget):
             exitButton = ChoiceButton("Exit back to results page")
             exitButton.clicked.connect(partial(self.set_state))
             self.answer_buttons.append(exitButton)
-            self.grid.addWidget(exitButton,math.floor(len(self.choices)/2 + 1),0,1,2)
+            self.grid.addWidget(exitButton, math.floor(len(self.choices) / 2 + 1), 0, 1, 2)
             self.load_question()
             self.back_to_results()
-
-
 
     @pyqtSlot(io.BytesIO)
     def show_question(self, data):
@@ -181,6 +180,7 @@ class TestingQuestions(QWidget):
         pixmap = QPixmap()
         pixmap.loadFromData(data)
         self.ecg_plot.setPixmap(pixmap)
+
 
 # https://gist.github.com/eyllanesc/1a09157d17ba13d223c312b28a81c320
 class LoadTestECG(QRunnable):
