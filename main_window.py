@@ -45,6 +45,8 @@ class MainWindow(QMainWindow):
     testing_state: State = State.NEW
     training_state: State = State.NEW
 
+    def previous_question(self,test_num):
+        self.testing_questions.show_previous_question(test_num)
     def __init__(self):
         super().__init__()
 
@@ -126,14 +128,15 @@ class MainWindow(QMainWindow):
         self.stacked_widget.addWidget(self.lead_placement)
 
         self.testing_results_widget = TestingResults(
-            lambda: (self.set_testing_state(self.State.NEW), self.choose_testing_page())
+            lambda: (self.set_testing_state(self.State.NEW), self.choose_testing_page()),self.previous_question
         )
         self.testing_results = ScrollablePage(self.testing_results_widget)
         self.stacked_widget.addWidget(self.testing_results)
 
         self.testing_questions = TestingQuestions(
             lambda: (self.set_testing_state(self.State.DONE), self.choose_testing_page()),
-            self.testing_results_widget
+            self.testing_results_widget, lambda: (self.set_testing_state(self.State.IN_PROGRESS), self.choose_testing_page()),
+            lambda: (self.set_testing_state(self.State.NEW),self.stacked_widget.setCurrentWidget(self.home))
         )
         self.stacked_widget.addWidget(self.testing_questions)
 

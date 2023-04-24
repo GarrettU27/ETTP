@@ -23,19 +23,21 @@ class TestingQuestions(QWidget):
     current_question = 0
     total_questions: int
     end_test: bool
+    back_to_results = 0
+    restart_test = 0
 
     questions: List[Question]
     answer_buttons: List[ChoiceButton] = []
     answers: List[str] = []
     choices: List[str] = []
-    questionChoices: List[List[str]]
 
-    def __init__(self, set_state: Callable, test_results: TestingResults):
+    def __init__(self, set_state: Callable, test_results: TestingResults, back_to_results: Callable, restart_test : Callable):
         super().__init__()
         self.test_results = test_results
         self.set_state = set_state
         self.end_test = False
-        self.questionChoices = []
+        self.back_to_results = back_to_results
+        self.restart_test = restart_test
 
         self.ecg_plot = ImageWidget()
         self.ecg_plot.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
@@ -80,20 +82,23 @@ class TestingQuestions(QWidget):
 
         self.answer_buttons = []
 
-        i = 0
-        self.questionChoices.append([])
         for choice in self.choices:
             answer_button = ChoiceButton(choice)
-            self.questionChoices[0].append(choice)
             answer_button.clicked.connect(partial(self.show_next_question, choice))
             self.answer_buttons.append(answer_button)
-            i+=1
 
         self.update_buttons_font_size()
 
         for (i, answer_button) in enumerate(self.answer_buttons):
             self.grid.addWidget(answer_button, math.floor(i / 2), i % 2)
 
+        exitButton = ChoiceButton("Exit test completely")
+        exitButton.clicked.connect(partial(self.restart_test))
+        #Not sure what color should go here, but 
+        exitButton.setStyleSheet("QPushButton{{background: #ff6803;}}")
+        exitButton.update()
+        self.grid.addWidget(exitButton,math.floor(len(self.choices)/2 + 1),0,1,2)
+        self.answer_buttons.append(exitButton)
         self.load_question()
 
     def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
@@ -113,6 +118,7 @@ class TestingQuestions(QWidget):
 
         for answer_button in self.answer_buttons:
             answer_button.set_font_size(button_font_size)
+        
 
     def show_next_question(self, previous_questions_answer: str):
         self.answers.append(previous_questions_answer)
@@ -134,24 +140,34 @@ class TestingQuestions(QWidget):
     def show_previous_question(self, question_num):
         if self.end_test:
             self.current_question = question_num
-            self.load_question()
+            
 
             for answer_button in self.answer_buttons:
                 self.grid.removeWidget(answer_button)
-
             self.answer_buttons = []
 
-            for choice in self.questionChoices: # We can uncomment this once there's more implemented[self.current_question]:
+            for choice in self.choices:
                 answer_button = ChoiceButton(choice)
+                answer_button.setDisabled(True)
                 if choice == self.answers[self.current_question]:
-                    answer_button.setStyleSheet("background-color : red")
+                    answer_button.setDisabled(False)
+                    answer_button.status = 2
+                    answer_button.set_wrong_button_style()
                 if choice == self.questions[self.current_question].correct_answer:
-                    answer_button.setStyleSheet("background-color : green")
+                    answer_button.setDisabled(False)
+                    answer_button.status = 1
+                    answer_button.set_right_button_style()
                 self.answer_buttons.append(answer_button)
-            self.update_buttons_font_size()
+
             for (i, answer_button) in enumerate(self.answer_buttons):
                 self.grid.addWidget(answer_button, math.floor(i / 2), i % 2)
-            self.set_state()
+
+            exitButton = ChoiceButton("Exit back to results page")
+            exitButton.clicked.connect(partial(self.set_state))
+            self.answer_buttons.append(exitButton)
+            self.grid.addWidget(exitButton,math.floor(len(self.choices)/2 + 1),0,1,2)
+            self.load_question()
+            self.back_to_results()
 
 
 

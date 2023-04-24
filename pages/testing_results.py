@@ -1,4 +1,5 @@
 from typing import List
+from functools import partial
 
 import PyQt6
 import qtawesome
@@ -11,7 +12,7 @@ from backend.get_ecg_from_db import Question
 from components.heading_label import HeadingLabel
 from components.main_button import MainButton
 from components.paragraph_label import ParagraphLabel
-from pages import buffer
+from components.choice_button import ChoiceButton
 
 
 class CollapsibleBox(QWidget):
@@ -95,12 +96,15 @@ class CollapsibleBox(QWidget):
 class TestingResults(QWidget):
     answer_labels: List[ParagraphLabel] = []
     note_labels: List[ParagraphLabel] = []
+    back_buttons: List[ChoiceButton] = []
     icons: List[qtawesome.IconWidget] = []
+    previous_question = 0
 
-    def __init__(self, set_state):
+    def __init__(self, set_state,previous_question):
         super().__init__()
         self.layout = QVBoxLayout(self)
         self.layout.setSpacing(30)
+        self.previous_question = previous_question
 
         self.heading = HeadingLabel("Test")
         self.subheading = ParagraphLabel("See what you need to study next")
@@ -121,7 +125,9 @@ class TestingResults(QWidget):
 
         self.layout.addSpacerItem(QSpacerItem(1, 1, PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
                                               PyQt6.QtWidgets.QSizePolicy.Policy.Expanding))
-
+    def go_back_previous(self,num_quest):
+        self.previous_question(num_quest)
+        
     def update_page(self, answers, questions: List[Question]):
         self.clear_page()
 
@@ -223,9 +229,6 @@ class TestingResults(QWidget):
                 #create the collapsible box layout and format it correctly
                 box = CollapsibleBox(str(question.correct_answer))
                 lay = QGridLayout()
-                #lay.setContentsMargins(0,0,0,0)
-                #lay.setSpacing(30)
-                #lay.setHorizontalSpacing(60)
                 lay.update()
 
                 #add the corresponding objects and values to their corresponding lists, 
@@ -238,8 +241,8 @@ class TestingResults(QWidget):
             #Check to see if the arrhythmia object should be added onto an existing object or not.
             else:
                 exists = False    
-                for i in range(len(arrhythmia_tested)):
-                    if question.correct_answer == arrhythmia_tested[i]:
+                for j in range(len(arrhythmia_tested)):
+                    if question.correct_answer == arrhythmia_tested[j]:
                         exists = True
                 if exists == False:
                         arrhythmia_tested.append(question.correct_answer)
@@ -257,38 +260,47 @@ class TestingResults(QWidget):
             if answer == question.correct_answer:
                 number_correct+=1
                 #Search for the corresponding arrhythmia in the list of arrythmia tested
-                for i in range(len(arrhythmia_tested)):
-                    if(arrhythmia_tested[i] == question.correct_answer):
+                for j in range(len(arrhythmia_tested)):
+                    if(arrhythmia_tested[j] == question.correct_answer):
                         #add the answer_label to a global list and add the widget to the collapsible box layout
 
                         self.answer_labels.append(answer_label)
-                        internals[i].addWidget(answer_label,entries[i],0)
+                        internals[j].addWidget(answer_label,entries[j],0)
                         #Create and add a check widget to the collapsible box layout
                         check_widget = qtawesome.IconWidget()
                         check_icon = qtawesome.icon("fa5s.check", color='green')
                         check_widget.setIcon(check_icon)
                         check_widget.setIconSize(QSize(40, 40))
                         check_widget.update()
-                        internals[i].addWidget(check_widget,entries[i],1)
+                        internals[j].addWidget(check_widget,entries[j],1)
                         self.icons.append(check_widget)
+
+                        #This is a spacing object so that everything lines up
                         note_label = ParagraphLabel(" ",20)
                         note_label.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
                                 PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
                         note_label.setMaximumHeight(30)
                         self.note_labels.append(note_label)
-                        internals[i].addWidget(note_label, entries[i], 2)
+                        internals[j].addWidget(note_label, entries[j], 2)
+
+                        #Creates a button so the user can return back to a previous question and view the ECG there
+                        goback = ChoiceButton("Return to Question "+str(i+1))
+                        goback.clicked.connect(partial(self.go_back_previous,i))
+                        internals[j].addWidget(goback,entries[j],3)
+                        self.back_buttons.append(goback)
+
                         #Increment the corresponding values for each arrythmia
-                        entries[i]+=1
-                        arrhythmia_correct[i]+=1
-                        arrhythmia_freq[i]+=1
+                        entries[j]+=1
+                        arrhythmia_correct[j]+=1
+                        arrhythmia_freq[j]+=1
                         
 
             else:
-                for i in range(len(arrhythmia_tested)):
-                    if(arrhythmia_tested[i] == question.correct_answer):
+                for j in range(len(arrhythmia_tested)):
+                    if(arrhythmia_tested[j] == question.correct_answer):
                         #Add answer label to layout of collapsible box
                         self.answer_labels.append(answer_label)
-                        internals[i].addWidget(answer_label, entries[i], 0)
+                        internals[j].addWidget(answer_label, entries[j], 0)
 
                         #Add an X icon to the layout to signify user got a question incorrect
                         x_widget = qtawesome.IconWidget()
@@ -298,22 +310,28 @@ class TestingResults(QWidget):
                         x_widget.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Fixed,
                                        PyQt6.QtWidgets.QSizePolicy.Policy.Fixed)
                         x_widget.update()
-                        internals[i].addWidget(x_widget, entries[i], 1)
+                        internals[j].addWidget(x_widget, entries[j], 1)
                         self.icons.append(x_widget)
+
                         #Create a label that is at the right side of the screen with the corect arrhythmia for that question
                         note_label = ParagraphLabel(f"Correct answer: {question.correct_answer}", 20)
                         note_label.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Preferred,
                                          PyQt6.QtWidgets.QSizePolicy.Policy.Preferred)
                         note_label.setMaximumHeight(30)
                         self.note_labels.append(note_label)
-                        internals[i].addWidget(note_label, entries[i], 2)
+                        internals[j].addWidget(note_label, entries[j], 2)
+
+                        #Creates a button so the user can go back and view an ECG
+                        goback = ChoiceButton("Return to Question " + str(i+1))
+                        goback.clicked.connect(partial(self.go_back_previous,i))
+                        internals[j].addWidget(goback,entries[j],3)
+                        self.back_buttons.append(goback)
                         #Update corresponding values for each arrhythmia
-                        entries[i]+=1
-                        arrhythmia_freq[i]+=1
+                        entries[j]+=1
+                        arrhythmia_freq[j]+=1
 
         for i in range(len(arrhythmia_tested)):
             box = CollapsibleBox(str(arrhythmia_tested[i] + ": "+str(arrhythmia_correct[i])+"/"+str(arrhythmia_freq[i])))
-            #internals[i].
             box.setContentLayout(internals[i])
             self.grid.addWidget(box,i,0) 
         self.update_buttons_font_size()
@@ -363,6 +381,9 @@ class TestingResults(QWidget):
         for icon in self.icons:
             icon.setIconSize(QSize(button_font_size, button_font_size))
             icon.update()
+        
+        for back in self.back_buttons:
+            back.set_font_size(button_font_size)
 
     def clear_page(self):
 
