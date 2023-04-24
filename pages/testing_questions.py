@@ -22,16 +22,22 @@ class TestingQuestions(QWidget):
     test_results: TestingResults
     current_question = 0
     total_questions: int
+    end_test: bool
+    back_to_results = 0
+    restart_test = 0
 
     questions: List[Question]
     answer_buttons: List[ChoiceButton] = []
     answers: List[str] = []
     choices: List[str] = []
 
-    def __init__(self, set_state: Callable, test_results: TestingResults):
+    def __init__(self, set_state: Callable, test_results: TestingResults, back_to_results: Callable, restart_test : Callable):
         super().__init__()
         self.test_results = test_results
         self.set_state = set_state
+        self.end_test = False
+        self.back_to_results = back_to_results
+        self.restart_test = restart_test
 
         self.ecg_plot = ImageWidget()
         self.ecg_plot.setSizePolicy(PyQt6.QtWidgets.QSizePolicy.Policy.Expanding,
@@ -63,6 +69,7 @@ class TestingQuestions(QWidget):
     def start_new_test(self, questions: List[Question], choices: List[str]):
         self.questions = questions
         self.choices = choices
+        self.end_test = False
         self.reset_test()
 
     def reset_test(self):
@@ -85,6 +92,13 @@ class TestingQuestions(QWidget):
         for (i, answer_button) in enumerate(self.answer_buttons):
             self.grid.addWidget(answer_button, math.floor(i / 2), i % 2)
 
+        exitButton = ChoiceButton("Exit test completely")
+        exitButton.clicked.connect(partial(self.restart_test))
+        #Not sure what color should go here, but 
+        exitButton.setStyleSheet("QPushButton{{background: #ff6803;}}")
+        exitButton.update()
+        self.grid.addWidget(exitButton,math.floor(len(self.choices)/2 + 1),0,1,2)
+        self.answer_buttons.append(exitButton)
         self.load_question()
 
     def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
@@ -104,20 +118,58 @@ class TestingQuestions(QWidget):
 
         for answer_button in self.answer_buttons:
             answer_button.set_font_size(button_font_size)
+        
 
     def show_next_question(self, previous_questions_answer: str):
         self.answers.append(previous_questions_answer)
         self.current_question += 1
         if self.current_question >= self.total_questions:
-            self.test_results.update_page(self.answers, self.questions)
+            self.end_test = True
+            #self.test_results.update_page(self.answers, self.questions)
+            self.test_results.updatePage(self.answers,self.questions)
             self.set_state()
         else:
+            #Implement some code here to save the previous question's choices
             self.load_question()
 
     def load_question(self):
         self.spinner.start()
         load_test_ecg = LoadTestECG(self)
         QThreadPool.globalInstance().start(load_test_ecg)
+
+    def show_previous_question(self, question_num):
+        if self.end_test:
+            self.current_question = question_num
+            
+
+            for answer_button in self.answer_buttons:
+                self.grid.removeWidget(answer_button)
+            self.answer_buttons = []
+
+            for choice in self.choices:
+                answer_button = ChoiceButton(choice)
+                answer_button.setDisabled(True)
+                if choice == self.answers[self.current_question]:
+                    answer_button.setDisabled(False)
+                    answer_button.status = 2
+                    answer_button.set_wrong_button_style()
+                if choice == self.questions[self.current_question].correct_answer:
+                    answer_button.setDisabled(False)
+                    answer_button.status = 1
+                    answer_button.set_right_button_style()
+                self.answer_buttons.append(answer_button)
+
+            for (i, answer_button) in enumerate(self.answer_buttons):
+                self.grid.addWidget(answer_button, math.floor(i / 2), i % 2)
+
+            exitButton = ChoiceButton("Exit back to results page")
+            exitButton.clicked.connect(partial(self.set_state))
+            self.answer_buttons.append(exitButton)
+            self.grid.addWidget(exitButton,math.floor(len(self.choices)/2 + 1),0,1,2)
+            self.load_question()
+            self.back_to_results()
+
+
 
     @pyqtSlot(io.BytesIO)
     def show_question(self, data):
@@ -129,7 +181,6 @@ class TestingQuestions(QWidget):
         pixmap = QPixmap()
         pixmap.loadFromData(data)
         self.ecg_plot.setPixmap(pixmap)
-
 
 # https://gist.github.com/eyllanesc/1a09157d17ba13d223c312b28a81c320
 class LoadTestECG(QRunnable):
