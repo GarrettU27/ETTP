@@ -4,8 +4,6 @@ This is the repository for the ECG Training Tool Project, or ETTP for short. It 
 
 [This tutorial](https://docs.python.org/3/library/sqlite3.html) from the Python documentation was used to setup the `sqlite3` module in Python to connect to SQLite
 
-
-
 # Setting Up the Project
 
 1. Install [Python 3.11.2](https://www.python.org/downloads/) (current latest installation of Python)
@@ -63,6 +61,8 @@ python -m pipenv install <library_name>
 # Improvements for Future Maintainers
 
 A software project is never really done, and there's always more to do. While this project is functional, and we are proud of the result, there certainly are areas that could be cleaned up/improved. If you are someone taking on the task of improving, modifying or maintaining this repository, here are some places that could use your attention.
+
+- *Add CI/CD pipeline.* I was unfamiliar with Python when starting this project and was unable to properly add CI/CD. This would be a good thing to add to the repo. It's generally useful across the board
 
 - *Cleaning up the messy code*. While we did our best to maintain coding best practices throughout this project, we still ended up having some messier parts to our code when all was said and done. In particular, `annotations.py` was written to be heavily extensible, but was not necessarily written to be readable or to follow best practices. It worked for what we needed, and it allowed us to get many annotations done for this project, but that file could use some reworking, and, in general, there are certain areas of the code that are not written particularly nicely and could do with some cleaning
 
