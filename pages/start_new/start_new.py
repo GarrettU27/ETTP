@@ -32,7 +32,7 @@ class StartNew(QWidget):
 
         for index, arrhythmia in enumerate(self.get_supported_arrhythmias()):
             checkbox = MainCheckbox(arrhythmia.rhythm_name)
-            checkbox.clicked.connect(self.update_begin_button)
+            checkbox.clicked.connect(self.update_self)
             self.checkboxes.append((checkbox, arrhythmia.id))
             self.layout.addWidget(checkbox)
 
@@ -91,8 +91,19 @@ class StartNew(QWidget):
     def begin(self):
         self.set_state()
 
-    def update_begin_button(self):
+    def update_self(self):
         self.begin_button.setEnabled(self.can_begin())
+
+        if len(self.get_arrhythmias()) > 3:
+            current_choice = self.question_number.currentIndex()
+            self.question_number.clear()
+            self.question_number.addItems(str(num * 5) for num in range(2, 6))
+            self.question_number.setCurrentIndex(max(current_choice - 1, 0))
+        else:
+            current_choice = self.question_number.currentIndex()
+            self.question_number.clear()
+            self.question_number.addItems(str(num * 5) for num in range(1, 6))
+            self.question_number.setCurrentIndex(current_choice)
 
     def can_begin(self):
         return len(self.get_arrhythmias()) > 0
