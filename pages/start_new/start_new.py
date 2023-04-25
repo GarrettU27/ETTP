@@ -95,12 +95,18 @@ class StartNew(QWidget):
         self.begin_button.setEnabled(self.can_begin())
 
         if len(self.get_arrhythmias()) > 3:
-            current_choice = self.question_number.currentIndex()
+            if self.question_number.count() == 4:
+                current_choice = self.question_number.currentIndex()
+            else:
+                current_choice = self.question_number.currentIndex() - 1
             self.question_number.clear()
             self.question_number.addItems(str(num * 5) for num in range(2, 6))
-            self.question_number.setCurrentIndex(max(current_choice - 1, 0))
+            self.question_number.setCurrentIndex(max(current_choice, 0))
         else:
-            current_choice = self.question_number.currentIndex()
+            if self.question_number.count() == 5:
+                current_choice = self.question_number.currentIndex()
+            else:
+                current_choice = self.question_number.currentIndex() + 1
             self.question_number.clear()
             self.question_number.addItems(str(num * 5) for num in range(1, 6))
             self.question_number.setCurrentIndex(current_choice)
