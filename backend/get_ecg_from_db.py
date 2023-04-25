@@ -113,9 +113,10 @@ def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: i
             current_name = get_arrhythmia_annotation(arrhythmia.id).rhythm_name
             possible_choices.remove(current_name)
             choices.append(current_name)
-            other_choices = random.sample(possible_choices, 3)
+            other_choices = random.sample(possible_choices, min(len(possible_choices), 3))
             possible_choices.append(current_name)
             choices.extend(other_choices)
+            random.shuffle(choices)
 
             questions.append(Question(
                 ecg=ecg,

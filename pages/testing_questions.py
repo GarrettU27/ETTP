@@ -81,9 +81,9 @@ class TestingQuestions(QWidget):
 
         self.answer_buttons = []
 
-        for i in range(0, 4):
-            answer_button = ChoiceButton("")
-            answer_button.clicked.connect(lambda x: x)
+        for choice in self.questions[self.current_question].choices:
+            answer_button = ChoiceButton(choice)
+            answer_button.clicked.connect(partial(self.show_next_question, choice))
             self.answer_buttons.append(answer_button)
 
         self.update_buttons_font_size()
@@ -96,7 +96,7 @@ class TestingQuestions(QWidget):
         # Not sure what color should go here, but
         exitButton.setStyleSheet("QPushButton{{background: #ff6803;}}")
         exitButton.update()
-        self.grid.addWidget(exitButton, math.floor(len(self.choices) / 2 + 1), 0, 1, 2)
+        self.grid.addWidget(exitButton, math.floor(4 / 2 + 1), 0, 1, 2)
         self.answer_buttons.append(exitButton)
         self.load_question()
 
@@ -143,9 +143,10 @@ class TestingQuestions(QWidget):
                 self.grid.removeWidget(answer_button)
             self.answer_buttons = []
 
-            for choice in self.choices:
+            for choice in self.questions[self.current_question].choices:
                 answer_button = ChoiceButton(choice)
                 answer_button.setDisabled(True)
+                answer_button.clicked.connect(lambda x: x)
                 if choice == self.answers[self.current_question]:
                     answer_button.setDisabled(False)
                     answer_button.setCursor(QCursor(QtCore.Qt.CursorShape.ArrowCursor))
@@ -164,8 +165,10 @@ class TestingQuestions(QWidget):
             exitButton = ChoiceButton("Exit back to results page")
             exitButton.clicked.connect(partial(self.set_state))
             self.answer_buttons.append(exitButton)
-            self.grid.addWidget(exitButton, math.floor(len(self.choices) / 2 + 1), 0, 1, 2)
+            self.grid.addWidget(exitButton, math.floor(len(self.questions[self.current_question].choices) / 2 + 1), 0,
+                                1, 2)
             self.load_question()
+            self.update_buttons_font_size()
             self.back_to_results()
 
     @pyqtSlot(io.BytesIO)
