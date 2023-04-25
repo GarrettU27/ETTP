@@ -12,8 +12,8 @@ class StartNewTesting(StartNew):
         self.test_window = testing_questions
 
     def begin(self):
-        questions, choices = get_testing_questions(self.get_arrhythmias(), int(self.question_number.currentText()))
-        self.test_window.start_new_test(questions, choices)
+        questions = get_testing_questions(self.get_arrhythmias(), int(self.question_number.currentText()))
+        self.test_window.start_new_test(questions)
         self.set_state()
 
     def get_supported_arrhythmias(self):

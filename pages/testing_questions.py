@@ -26,7 +26,6 @@ class TestingQuestions(QWidget):
     questions: List[Question]
     answer_buttons: List[ChoiceButton] = []
     answers: List[str] = []
-    choices: List[str] = []
 
     def __init__(self, set_state: Callable, test_results: TestingResults):
         super().__init__()
@@ -60,9 +59,8 @@ class TestingQuestions(QWidget):
         self.layout.addLayout(self.grid)
         self.spinner.raise_()
 
-    def start_new_test(self, questions: List[Question], choices: List[str]):
+    def start_new_test(self, questions: List[Question]):
         self.questions = questions
-        self.choices = choices
         self.reset_test()
 
     def reset_test(self):
@@ -75,9 +73,9 @@ class TestingQuestions(QWidget):
 
         self.answer_buttons = []
 
-        for choice in self.choices:
-            answer_button = ChoiceButton(choice)
-            answer_button.clicked.connect(partial(self.show_next_question, choice))
+        for i in range(0, 4):
+            answer_button = ChoiceButton("")
+            answer_button.clicked.connect(lambda x: x)
             self.answer_buttons.append(answer_button)
 
         self.update_buttons_font_size()
@@ -125,6 +123,11 @@ class TestingQuestions(QWidget):
         self.adjustSize()
 
         self.title.setText(f"Test - Question {str(self.current_question + 1)}/{str(self.total_questions)}")
+
+        for answer_button, choice in zip(self.answer_buttons, self.questions[self.current_question].choices):
+            answer_button.clicked.disconnect()
+            answer_button.clicked.connect(partial(self.show_next_question, choice))
+            answer_button.setText(choice)
 
         pixmap = QPixmap()
         pixmap.loadFromData(data)

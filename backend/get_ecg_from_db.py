@@ -22,6 +22,7 @@ class Arrhythmia:
 class Question:
     ecg: numpy.typing.NDArray[float]
     correct_answer: str
+    choices: List[str]
 
 
 @dataclass
@@ -75,7 +76,7 @@ def get_training_flashcards(arrhythmia_id_array: List[int], number_of_flashcards
     return flashcards
 
 
-def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: int) -> (List[Question], List[str]):
+def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: int) -> List[Question]:
     total_arrhythmias = len(arrhythmia_id_array) + 1
     if number_of_questions < total_arrhythmias:
         raise ValueError("numEcg >= len(idArray) must be true")
@@ -101,19 +102,29 @@ def get_testing_questions(arrhythmia_id_array: List[int], number_of_questions: i
     cur = con.cursor()
 
     questions = []
-    choices = [get_arrhythmia_annotation(arrhythmia.id).rhythm_name for arrhythmia in tested_arrhythmias]
+    possible_choices = [get_arrhythmia_annotation(arrhythmia.id).rhythm_name for arrhythmia in tested_arrhythmias]
 
     for arrhythmia in tested_arrhythmias:
         for i in range(arrhythmia.amount):
             patient_id = get_random_patient_id(cur, arrhythmia.id)
             ecg = get_patients_ecg(cur, patient_id)
+
+            choices = []
+            current_name = get_arrhythmia_annotation(arrhythmia.id).rhythm_name
+            possible_choices.remove(current_name)
+            choices.append(current_name)
+            other_choices = random.sample(possible_choices, 3)
+            possible_choices.append(current_name)
+            choices.extend(other_choices)
+
             questions.append(Question(
                 ecg=ecg,
                 correct_answer=get_arrhythmia_annotation(arrhythmia.id).rhythm_name,
+                choices=choices
             ))
 
     random.shuffle(questions)
-    return questions, choices
+    return questions
 
 
 def get_random_patient_id(cur: Cursor, arrhythmia_id: str) -> str:
