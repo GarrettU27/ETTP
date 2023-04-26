@@ -17,11 +17,11 @@ the `sqlite3` module in Python to connect to SQLite
 2. To help make the management of dependencies easier, we use [Pipenv](https://pipenv.pypa.io/en/latest/). This library
    handles creating the proper virtual environment, tracking dependencies, and resolving dependency issues. To use it,
    first run this command
-
+   
    ```bash
    pip install --user pipenv
    ```
-
+   
    Note: `pipenv` sets the requirement of the project to use a specific version of python. If you install the proper
    version of `pyenv` for your OS, `pipenv` will handle installing the right version of python. If you're on Mac,
    install [pyenv](https://github.com/pyenv/pyenv). On Windows,
@@ -29,14 +29,14 @@ the `sqlite3` module in Python to connect to SQLite
 
 3. After that, we want to install the current set of dependnecies required by the project. Navigate your terminal so
    that the current directory is the project root directory and run the following command
-
+   
    ```bash
    python -m pipenv sync
    ```
 
 4. To run the application, you need to run the python file in such a way that it uses the `pipenv` dependencies. One way
    is to access the `pipenv` shell and then run the app normally. The other method is to run the following command
-
+   
    ```bash
    python -m pipenv run python main.py
    ```
@@ -48,23 +48,22 @@ the `sqlite3` module in Python to connect to SQLite
    project
 
 6. To seed the database, the same principle holds. But, just run the following command
-
+   
    ```bash
    python -m pipenv run python seed.py
    ```
 
 7. Before you can use the database in the app, however, you need to remove entries that won't work with the annotations.
    You do that by running the `cull_database` script
-
+   
    ```bash
    python -m pipenv run python cull_database.py
    ```
 
-8. To compile the application into an executable, you need to run `pyinstaller` on the `main.spec`, which are the
-   compilation settings. To do that, run the following command
-
+8. To compile the application into an executable, you need to run `pyinstaller` on the proper `spec` file for your OS. On Windows, this is `windows.spec`. On Mac, this is `mac.spec`. This file is the compilation settings. To use it, run the following command (for Windows, on Mac, switch out the spec file name)
+   
    ```bash
-   python -m pipenv run pyinstaller main.spec
+   python -m pipenv run pyinstaller windows.spec
    ```
 
 9. To run the application, find the app's executable, which will `dist/main/main.exe`
